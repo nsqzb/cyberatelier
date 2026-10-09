@@ -3,7 +3,7 @@
 Tout est fourni DANS le conteneur Cyber Atelier ; rien n'est exécuté sur un runner GitLab.
 
 ## nmap (vrai outil, démonstration uniquement)
-- Installé dans l'image (paquet Debian `nmap`). Cible autorisée du lab : `127.0.0.1` ports `8000` (labo HTTP) et `8080` (Cyber Atelier lui-même est hors périmètre : ne le mentionne PAS).
+- Installé dans l'image (paquet Debian `nmap`). Cible autorisée du lab : `127.0.0.1` port `8000` uniquement (labo HTTP).
 - Commande de référence pour la démo : `nmap -sT -p 8000 -oX - 127.0.0.1` (scan TCP connect, sortie XML sur stdout). Le runner GitLab n'a pas nmap : les tests obligatoires n'appellent JAMAIS nmap, ils lisent des fixtures XML.
 - Fixtures XML fictives (fournies en lecture seule dans `/app/fixtures/nmap/`, à copier par l'apprenant) : `open_8000.xml` (1 port open http), `closed_8000.xml` (port closed), `mixed.xml` (3 ports : open, closed, filtered), `broken.xml` (XML invalide).
 

@@ -34,7 +34,7 @@ DEFAULT_STATE = {"version": 1, "selectedCourse": "socle", "completed": [],
 def _state_normalize(value):
     if not isinstance(value, dict) or value.get("version") != 1:
         raise ValueError("Progression invalide : version 1 attendue.")
-    course = value.get("selectedCourse", "portpilot")
+    course = value.get("selectedCourse", "socle")
     if course not in COURSES:
         raise ValueError("Parcours sélectionné invalide.")
     completed = value.get("completed", [])

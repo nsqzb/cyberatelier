@@ -1,6 +1,6 @@
 # Cyber Atelier
 
-Cyber Atelier est une application locale pour pratiquer Python et GitLab à son rythme. Elle contient trois parcours guidés de cinq heures. Le code que tu écris et ta progression sont enregistrés dans des volumes Docker persistants. Aucun corrigé Python ni pipeline d’exercice n’est préinstallé.
+Cyber Atelier est une application locale pour pratiquer Python et GitLab à son rythme. Elle contient six parcours guidés de cinq heures, soit trente heures de pratique (voir la section « Parcours et chemin conseillé »). Le code que tu écris et ta progression sont enregistrés dans des volumes Docker persistants. Aucun corrigé Python ni pipeline d’exercice n’est préinstallé.
 
 ## Démarrer
 
@@ -14,6 +14,25 @@ docker compose ps
 Ouvre ensuite <http://127.0.0.1:8080>. L’application utilise le port `8080` par défaut. Pour en choisir un autre, crée un fichier `.env` à côté de `compose.yaml` contenant, par exemple, `ATELIER_PORT=8081`, puis relance `docker compose up -d`. L’adresse devient alors <http://127.0.0.1:8081>.
 
 Le service écoute sur `0.0.0.0:8080` à l’intérieur du conteneur afin que Docker puisse lui transmettre les requêtes. La publication côté machine est limitée à `127.0.0.1` : l’application est accessible depuis cette machine, pas depuis le réseau local. Dans le laboratoire, `127.0.0.1` désigne le conteneur lui-même. Le labo écoute sur le port 8000 à l’intérieur du conteneur et n’est pas publié sur l’hôte.
+
+## Parcours et chemin conseillé
+
+Six parcours de cinq heures chacun, trois merge requests par parcours. Pour les objectifs, les branches et les ids de tests, voir `docs/PARCOURS.md`.
+
+- **Socle Python & Git** (`socle`), 5 h : fonctions pures, tests unittest, fichiers et JSON, Git en équipe (conflit, rebase, tag).
+- **PortPilot** (`portpilot`), 5 h : scanner TCP limité à 127.0.0.1, validation de ports, pipeline GitLab.
+- **HeaderScope** (`headerscope`), 5 h : client HTTP vers le labo local et contrôle de trois en-têtes de sécurité.
+- **FileGuard** (`fileguard`), 5 h : empreintes SHA-256, manifeste et comparaison inchangé, modifié, supprimé ou ajouté.
+- **ToolWrap** (`toolwrap`), 5 h : lancer un outil externe avec `subprocess`, CLI `argparse`, lecture des sorties nmap et adsim.
+- **ReconWrap** (`reconwrap`), 5 h : assembler un mini-framework avec des modules réseau, web et Active Directory, des rapports et une version v0.1.0.
+
+Chemin conseillé : suis l'ordre ci-dessus. Le socle prépare tout le reste. PortPilot et HeaderScope fournissent les modules réseau et web que ReconWrap réutilise ; ToolWrap apprend à piloter les outils dont ReconWrap a besoin. Commence ReconWrap seulement après ToolWrap.
+
+## Outils fournis et leurs limites
+
+- **nmap** : outil réel, installé dans le conteneur. Il sert uniquement à une démonstration sur `127.0.0.1`, port `8000`, labo démarré, par exemple `nmap -sT -p 8000 -oX - 127.0.0.1`. Limite : aucune autre cible ni plage n'est autorisée. Les tests obligatoires n'appellent jamais nmap, car le runner GitLab ne l'a pas : ils lisent des fichiers XML fictifs.
+- **adsim** (`/app/tools/adsim.py`) : simulateur **fictif** d'un annuaire Active Directory, domaine `LAB.LOCAL`. Il ne se connecte à aucun annuaire ni à aucun réseau, et ses données sont fixes. Il ne remplace pas un vrai Active Directory : le vrai AD se pratiquera dans le projet final, sur un domaine personnel.
+- **Fixtures** (`/app/fixtures/`, en lecture seule) : `integrity` pour FileGuard, `socle` (journal de connexions fictif), `nmap` (sorties XML) et `adsim` (sorties JSON et texte). Copie-les dans ton dépôt avec les commandes indiquées dans la console de chaque parcours. Ce sont des données fictives : elles ne prouvent rien sur un vrai réseau ni sur un vrai domaine.
 
 ## Travailler sur les parcours
 
@@ -97,4 +116,4 @@ Les tests de l’application (serveur, laboratoire et cohérence des contenus) s
 docker compose exec -T atelier python -m unittest discover -s tests -p 'test_*.py' -v
 ```
 
-Ils vérifient Cyber Atelier lui-même, pas tes exercices : ceux-ci sont testés par ton propre `verification.py`.
+Ces 46 tests vérifient Cyber Atelier lui-même, pas tes exercices : tes exercices sont testés par tes propres tests (`verification.py` ou `unittest`, selon le parcours).
