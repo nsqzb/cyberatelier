@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Fixture FICTIVE volontairement INVALIDE : le fichier est tronqué. -->
+<nmaprun scanner="nmap" args="nmap -sT -p 8000 -oX - 127.0.0.1" version="7.94">
+<host><status state="up" reason="echo-reply" reason_ttl="0"/>
+<address addr="127.0.0.1" addrtype="ipv4"/>
+<ports>
+<port protocol="tcp" portid="8000"><state state="open" reason="syn-ack"

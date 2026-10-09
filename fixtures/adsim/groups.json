@@ -1,0 +1,52 @@
+{
+  "domain": "LAB.LOCAL",
+  "subject": "groups",
+  "count": 5,
+  "items": [
+    {
+      "name": "Domain Users",
+      "description": "Tous les comptes du domaine",
+      "members": [
+        "alice",
+        "bob",
+        "claire",
+        "david",
+        "emma",
+        "felix",
+        "ancien.stagiaire",
+        "svc-sauvegarde"
+      ]
+    },
+    {
+      "name": "Domain Admins",
+      "description": "Administration du domaine",
+      "members": [
+        "claire"
+      ]
+    },
+    {
+      "name": "IT Support",
+      "description": "Support informatique",
+      "members": [
+        "alice",
+        "david"
+      ]
+    },
+    {
+      "name": "Comptabilite",
+      "description": "Service comptabilité",
+      "members": [
+        "bob",
+        "emma",
+        "felix"
+      ]
+    },
+    {
+      "name": "Direction",
+      "description": "Direction générale",
+      "members": [
+        "claire"
+      ]
+    }
+  ]
+}

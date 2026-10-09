@@ -20,14 +20,14 @@ from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 
 BASE_DIR = Path(__file__).resolve().parent
-COURSES = {"portpilot", "headerscope", "fileguard"}
+COURSES = {"socle", "portpilot", "headerscope", "fileguard", "toolwrap", "reconwrap"}
 EXCLUDED = {".git", ".venv", "__pycache__"}
 MAX_FILE = 1_048_576
 MAX_STATE = 1_048_576
 MAX_RUN_OUTPUT = 65_536
 MAX_ZIP = 20 * 1024 * 1024
 MAX_FILES = 2000
-DEFAULT_STATE = {"version": 1, "selectedCourse": "portpilot", "completed": [],
+DEFAULT_STATE = {"version": 1, "selectedCourse": "socle", "completed": [],
                  "notes": {c: "" for c in sorted(COURSES)}, "mrLinks": {}}
 
 

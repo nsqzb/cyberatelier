@@ -18,7 +18,7 @@ Les noms d’en-tête sont insensibles à la casse. La valeur CSP est seulement 
 
 La fonction pure classer_reponse(statut, entetes) retourne un triplet (statut, resultat, alertes). Pour 200, resultat vaut HTTP_OK et alertes contient les résultats des trois règles. Pour 404 et 500, resultat vaut HTTP_ERREUR et alertes est vide ; le statut reste dans le triplet. La fonction ne fait aucun accès réseau. Une panne de connexion ou un timeout survient avant le classement et doit être rendu comme un résultat distinct sans code HTTP.
 
-Le laboratoire local répond aux chemins /fragile, /durci, /absent et /erreur sur 127.0.0.1:8000. /fragile renvoie les trois en-têtes volontairement non conformes et doit produire trois alertes. /durci renvoie les trois en-têtes conformes et doit produire zéro alerte. /absent produit une erreur HTTP 404 et /erreur une erreur HTTP 500.
+Le laboratoire local répond aux chemins /fragile, /durci, /absent et /erreur sur 127.0.0.1:8000. /fragile répond 200 sans aucun des trois en-têtes contrôlés et doit produire trois alertes. /durci renvoie les trois en-têtes conformes et doit produire zéro alerte. /absent produit une erreur HTTP 404 et /erreur une erreur HTTP 500.
 
 ## Les trois MR
 
@@ -47,11 +47,13 @@ Après fusion de MR1, repars de la branche principale à jour. Écris le client 
 
 Teste classer_reponse sans réseau réel et sans mock : injecte directement statut et dictionnaire dans la fonction pure. H8 vérifie le cas 200 avec des en-têtes conformes ; H9 vérifie 404 et 500. Ces tests vérifient le classement et les règles, pas l’entrée/sortie réseau réelle. La démonstration manuelle du client est distincte. Ne présente jamais le service du portail comme un service préinstallé sur le runner d’école.
 
-Tu peux démontrer manuellement le client depuis Cyber Atelier : démarre le laboratoire intégré avec son bouton dans l’interface, essaie /fragile, /durci, /absent et /erreur, puis arrête le laboratoire. N’envoie pas de requête à une cible externe. Ne démarre pas un second service sur le port 8000.
+Tu peux démontrer manuellement le client depuis la console de Cyber Atelier : vérifie que le laboratoire intégré est actif (il démarre avec l’application ; son bouton permet de le relancer), puis essaie /fragile, /durci, /absent et /erreur. Arrête le laboratoire avec son bouton pour observer une panne de connexion, distincte d’une réponse HTTP. N’envoie pas de requête à une cible externe. Ne démarre pas un second service sur le port 8000.
 
 ### MR3 — feat/bilan (80 min)
 
 Après fusion de MR2, actualise la branche principale. Écris l’orchestration : configure un des quatre chemins du laboratoire, affiche le statut HTTP, les alertes et un résumé lisible. N’ajoute aucun crawl, URL arbitraire ou scan de cibles. Garde /fragile à trois alertes et /durci à zéro, et affiche séparément les résultats 404, 500, panne et timeout.
+
+La démonstration manuelle comporte trois vérifications, D1 à D3 : /fragile donne trois alertes, /durci zéro, puis /absent et /erreur sont identifiés comme 404 et 500. Ce ne sont pas des tests de verification.py : elles exigent le laboratoire, absent du runner de l’école.
 
 Améliore le README pour expliquer le périmètre local, les règles des trois en-têtes, le délai, la commande des tests et le fait que la CI vérifie les règles sans dépendre du laboratoire. La dernière MR garde un pipeline basé sur des tests locaux reproductibles. Une démonstration avec le laboratoire intégré est distincte de cette CI.
 

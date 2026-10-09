@@ -18,18 +18,18 @@
       <nav id="course-nav" class="course-nav" aria-label="Parcours"></nav>
       <div class="side-spacer"></div>
       <section class="side-progress" aria-label="Progression globale">
-        <div class="side-progress-top"><span>Ton parcours</span><strong id="side-fraction">0 / 9 MR</strong></div>
+        <div class="side-progress-top"><span>Ton parcours</span><strong id="side-fraction">0 / 18 MR</strong></div>
         <div class="progress-track"><span id="side-progress-bar"></span></div>
-        <p><strong>15 h</strong> · 3 parcours · 9 missions</p>
+        <p id="side-info"><strong>30 h</strong> · 6 parcours · 18 missions</p>
       </section>
       <button id="settings-open" class="side-link" type="button"><span aria-hidden="true">⚙</span> Progression & sauvegarde</button>
       <div class="sidebar-footer"><span class="status-dot" id="health-dot"></span><span id="health-label">Connexion…</span><span class="footer-version">LOCAL</span></div>
     </aside>
     <main id="main" class="main-area">
-      <header class="topbar"><div class="breadcrumbs" id="breadcrumbs">Accueil <span>›</span> Tableau de bord</div><div class="top-actions"><button class="icon-button" id="print-button" type="button" title="Imprimer la mission" aria-label="Imprimer la mission">⎙</button><div class="avatar" aria-hidden="true">CA</div></div></header>
+      <header class="topbar"><div class="breadcrumbs" id="breadcrumbs">Accueil <span>›</span> Tableau de bord</div><div class="top-actions"><button class="icon-button mobile-only" id="settings-open-mobile" type="button" title="Progression et sauvegarde" aria-label="Progression et sauvegarde">⚙</button><button class="icon-button" id="print-button" type="button" title="Imprimer la mission" aria-label="Imprimer la mission">⎙</button><div class="avatar" aria-hidden="true">CA</div></div></header>
       <div id="alert-region" class="alert-region" role="status" aria-live="polite"></div>
       <section id="dashboard-view" class="view" aria-labelledby="welcome-title">
-        <div class="welcome-row"><div><p class="eyebrow">TON ESPACE D’APPRENTISSAGE</p><h1 id="welcome-title">Construis tes réflexes, <span>un projet à la fois.</span></h1><p class="welcome-copy">Trois petits outils Python, neuf missions guidées. Tu écris ton code, tu l’exécutes et tu gardes la main sur tes livrables.</p></div><div class="welcome-art" aria-hidden="true"><svg viewBox="0 0 180 150"><rect x="13" y="17" width="142" height="105" rx="13" fill="#fff" stroke="#d7e2ef" stroke-width="2"/><path d="M13 43h142" stroke="#d7e2ef" stroke-width="2"/><circle cx="29" cy="30" r="4" fill="#fb8d74"/><circle cx="43" cy="30" r="4" fill="#f2c46e"/><circle cx="57" cy="30" r="4" fill="#69c3b0"/><path d="m43 68 12 10-12 10m25 0h26" fill="none" stroke="#1e6d78" stroke-linecap="round" stroke-linejoin="round" stroke-width="4"/><path d="M127 109v19m-20 0h40" stroke="#bbcadd" stroke-linecap="round" stroke-width="5"/><circle cx="144" cy="78" r="20" fill="#e4f4f1"/><path d="m135 78 6 6 12-14" fill="none" stroke="#168477" stroke-linecap="round" stroke-linejoin="round" stroke-width="3"/></svg></div></div>
+        <div class="welcome-row"><div><p class="eyebrow">TON ESPACE D’APPRENTISSAGE</p><h1 id="welcome-title">Construis tes réflexes, <span>un projet à la fois.</span></h1><p class="welcome-copy">Six parcours, dix-huit missions guidées, du premier test unitaire au mini-framework. Tu écris ton code, tu l’exécutes et tu gardes la main sur tes livrables.</p></div><div class="welcome-art" aria-hidden="true"><svg viewBox="0 0 180 150"><rect x="13" y="17" width="142" height="105" rx="13" fill="#fff" stroke="#d7e2ef" stroke-width="2"/><path d="M13 43h142" stroke="#d7e2ef" stroke-width="2"/><circle cx="29" cy="30" r="4" fill="#fb8d74"/><circle cx="43" cy="30" r="4" fill="#f2c46e"/><circle cx="57" cy="30" r="4" fill="#69c3b0"/><path d="m43 68 12 10-12 10m25 0h26" fill="none" stroke="#1e6d78" stroke-linecap="round" stroke-linejoin="round" stroke-width="4"/><path d="M127 109v19m-20 0h40" stroke="#bbcadd" stroke-linecap="round" stroke-width="5"/><circle cx="144" cy="78" r="20" fill="#e4f4f1"/><path d="m135 78 6 6 12-14" fill="none" stroke="#168477" stroke-linecap="round" stroke-linejoin="round" stroke-width="3"/></svg></div></div>
         <div class="stats-grid" id="stats-grid"></div>
         <div class="section-heading"><div><p class="eyebrow">CHOISIS TON PROCHAIN PAS</p><h2>Tes parcours</h2></div><span id="total-progress-label" class="muted-label">0 % terminé</span></div>
         <div id="course-cards" class="course-cards"></div>

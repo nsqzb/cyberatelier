@@ -75,7 +75,7 @@ class ServerApiTests(unittest.TestCase):
         self.assertEqual(self.json_request("GET", "/api/file?course=portpilot&path=src%2Fcheck.py")[1]["content"], "print('ok')\n")
         state = {"version": 1, "selectedCourse": "fileguard", "completed": ["fileguard-mr1"],
                  "notes": {"fileguard": "à reprendre"}, "mrLinks": {"fileguard-mr1": "https://gitlab.example/mr/1"}}
-        normalized = {**state, "notes": {"portpilot": "", "headerscope": "", "fileguard": "à reprendre"}}
+        normalized = {**state, "notes": {**{c: "" for c in server.COURSES}, "fileguard": "à reprendre"}}
         self.assertEqual(self.json_request("POST", "/api/state", state), (200, normalized))
         self.assertEqual(self.json_request("GET", "/api/state"), (200, normalized))
         self.assertFalse(any(p.name.startswith(".atelier-") for p in self.data.iterdir()))
