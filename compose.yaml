@@ -1,0 +1,41 @@
+services:
+  atelier:
+    build:
+      context: .
+    image: cyberatelier:local
+    ports:
+      - "127.0.0.1:${ATELIER_PORT:-8080}:8080"
+    environment:
+      ATELIER_HOST: "0.0.0.0"
+      ATELIER_PORT: "8080"
+      WORKSPACES_DIR: /workspaces
+      DATA_DIR: /data
+      LAB_PORT: "8000"
+    volumes:
+      - workspaces:/workspaces
+      - data:/data
+      - home:/home/atelier
+    init: true
+    read_only: true
+    tmpfs:
+      - /tmp:rw,noexec,nosuid,size=64m
+    cap_drop:
+      - ALL
+    security_opt:
+      - no-new-privileges:true
+    healthcheck:
+      test:
+        - CMD
+        - python
+        - -c
+        - "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8080/api/health', timeout=2).read()"
+      interval: 30s
+      timeout: 3s
+      start_period: 5s
+      retries: 3
+    restart: unless-stopped
+
+volumes:
+  workspaces:
+  data:
+  home:

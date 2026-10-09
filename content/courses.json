@@ -1,0 +1,940 @@
+{
+  "version": 1,
+  "title": "Cyber Atelier",
+  "totalMinutes": 900,
+  "description": "Trois parcours Python de cinq heures pour débuter avec des fonctions, des tests reproductibles et trois merge requests GitLab par projet. Les tests locaux n’attestent pas automatiquement qu’une fusion est autorisée.",
+  "courses": [
+    {
+      "id": "portpilot",
+      "title": "PortPilot",
+      "subtitle": "Scanner TCP local, tests et livraison GitLab",
+      "description": "Écris un outil séquentiel qui vérifie quelques ports de 127.0.0.1 et résume les résultats. Le PDF complet est fourni comme référence, et le laboratoire intégré se pilote avec son bouton.",
+      "level": "Débutant",
+      "color": "#176B70",
+      "durationMinutes": 300,
+      "goals": [
+        "Valider une courte liste de ports sans conversion implicite.",
+        "Tenter une connexion TCP locale avec un délai fixe et quatre états distincts.",
+        "Tester une écoute éphémère autonome et préserver l’ordre des ports.",
+        "Livrer le travail par trois MR avec une CI réellement bloquante si l’instance de l’école le permet."
+      ],
+      "prerequisites": [
+        "Connaître les variables, listes et fonctions Python.",
+        "Disposer de Python 3, Git et d’un dépôt GitLab autorisé.",
+        "Pour valider le gate, disposer d’un runner actif sur les branches de MR et des droits de configuration nécessaires."
+      ],
+      "scope": [
+        "Cible constante 127.0.0.1 seulement ; de 1 à 10 ports distincts compris entre 1 et 65535.",
+        "Une tentative séquentielle par port, délai 0,5 seconde, aucune donnée applicative ni bannière.",
+        "Aucun scan distant, plage, thread, classe, installation pip, exploitation ou rapport fichier.",
+        "Les tests de réussite réseau allouent un port éphémère dans le runner ; ils ne dépendent pas d’un port de service déjà présent."
+      ],
+      "concepts": [
+        "fonctions",
+        "validation",
+        "booléens et entiers",
+        "exceptions",
+        "socket TCP",
+        "délai",
+        "assertions",
+        "Git",
+        "merge request",
+        "CI et artefacts"
+      ],
+      "files": [
+        {
+          "name": "portpilot.py",
+          "purpose": "Fonctions de validation, connexion, scan, bilan et point d’entrée."
+        },
+        {
+          "name": "verification.py",
+          "purpose": "Huit tests appelés explicitement, avec échec de processus si une assertion échoue."
+        },
+        {
+          "name": ".gitlab-ci.yml",
+          "purpose": "Pipeline de MR, tests puis artefact lors de la dernière étape."
+        },
+        {
+          "name": "README.md",
+          "purpose": "Usage, limites et contenu de la livraison."
+        }
+      ],
+      "setup": [
+        {
+          "label": "Vérifier Python",
+          "command": "python --version",
+          "note": "Utilise python3 si la commande python n’existe pas."
+        },
+        {
+          "label": "Vérifier Git",
+          "command": "git --version",
+          "note": "Travaille dans le dépôt fourni ou autorisé par ton école."
+        },
+        {
+          "label": "Cloner le dépôt",
+          "command": "git clone <URL_DU_DEPOT> .",
+          "note": "Le dossier du parcours est vide : clone directement ici avant de créer les fichiers. Le point signifie « dossier courant ». Pour une session Git interactive, utilise docker compose exec atelier bash depuis le dossier Cyber Atelier ; un cd du terminal web ne persiste pas entre deux commandes."
+        },
+        {
+          "label": "Créer la première branche",
+          "command": "git status",
+          "note": "Après le clone dans le dossier de cours, vérifie la branche principale et le dépôt avant de créer feat/validation."
+        }
+      ],
+      "steps": [
+        {
+          "id": "portpilot-mr1",
+          "title": "MR1 — Valider les ports et verrouiller la fusion",
+          "branch": "feat/validation",
+          "minutes": 80,
+          "mission": "Écris valider_ports et cinq tests, puis mets en place un job CI de merge request. Provoque une régression temporaire pour observer un rouge qui bloque une fusion autorisée, corrige-la et fusionne le dernier vert.",
+          "tasks": [
+            "Accepte une liste de 1 à 10 entiers distincts de 1 à 65535, conserve son ordre et refuse booléens explicitement.",
+            "Écris T1 pour [1, 8000, 65535], T2 pour la liste vide, T3 pour onze ports distincts, T4 en testant séparément dans une liste d’un élément chacun de -1, 0, 65536, le texte « 8000 », 80,5 et True, puis T5 pour un doublon.",
+            "Fais appeler les cinq fonctions de test depuis verification.py. Une exception différente de ValueError ne doit pas compter comme succès ; une assertion ratée doit garder un code de sortie non nul.",
+            "Configure les pipelines pour merge_request_event uniquement et un job verifier qui exécute la même commande que localement. Ne rends pas le job facultatif.",
+            "Vérifie le pipeline du dernier commit de MR. Observe le blocage CI avec une vraie régression, puis corrige le code sans affaiblir les tests."
+          ],
+          "tests": [
+            {
+              "id": "T1",
+              "title": "Liste valide et ordre conservé",
+              "input": "[1, 8000, 65535]",
+              "expected": "La même liste, dans le même ordre, est acceptée."
+            },
+            {
+              "id": "T2",
+              "title": "Liste vide",
+              "input": "[]",
+              "expected": "ValueError."
+            },
+            {
+              "id": "T3",
+              "title": "Onze ports distincts",
+              "input": "Onze entiers distincts valides",
+              "expected": "ValueError."
+            },
+            {
+              "id": "T4",
+              "title": "Valeurs invalides",
+              "input": "-1, 0, 65536, texte, décimal et booléen, testés séparément",
+              "expected": "ValueError pour chacun ; aucune autre exception ne passe."
+            },
+            {
+              "id": "T5",
+              "title": "Doublon",
+              "input": "[8000, 8000]",
+              "expected": "ValueError."
+            }
+          ],
+          "acceptance": [
+            "Pour T2 à T5, ValueError doit être levée ; son absence est un échec, et toute autre exception est également un échec. Les six sous-cas T4 sont testés indépendamment.",
+            "Le pipeline de MR teste le dernier commit, un compte habilité constate le blocage lors du rouge, puis la correction donne un dernier pipeline vert.",
+            "Trois fonctions de contrôle GitLab sont vérifiées : MR ouverte, pipeline de MR, règle qui exige un pipeline réussi."
+          ],
+          "hint": "En Python, bool est une sous-classe de int. Refuse True et False avant d’accepter un entier."
+        },
+        {
+          "id": "portpilot-mr2",
+          "title": "MR2 — Connecter une socket locale",
+          "branch": "feat/connexion",
+          "minutes": 70,
+          "mission": "Implémente tester_port avec un délai de 0,5 seconde et ajoute un test de succès réseau autonome grâce à une socket d’écoute éphémère.",
+          "tasks": [
+            "Utilise uniquement la cible 127.0.0.1 et une seule tentative de connexion.",
+            "Retourne exactement OUVERT, REFUSE, TIMEOUT ou ERREUR selon les exceptions contractuelles ; traite les exceptions précises avant OSError.",
+            "Ferme toute socket créée même lorsqu’une erreur survient.",
+            "Pour T6, lie une socket d’écoute à 127.0.0.1 et au port 0, appelle listen, lis le port avec getsockname et garde l’écoute ouverte pendant tester_port.",
+            "Après fusion, actualise la branche principale avant de créer feat/scan-bilan."
+          ],
+          "tests": [
+            {
+              "id": "T6",
+              "title": "Connexion à une écoute éphémère",
+              "input": "Le port attribué par le système à une écoute TCP locale encore ouverte",
+              "expected": "tester_port retourne exactement OUVERT."
+            }
+          ],
+          "acceptance": [
+            "T1 à T6 restent appelés et passent localement et dans un runner ordinaire.",
+            "Le test n’emploie aucun port fixe, serveur externe, thread, accept ou attente artificielle.",
+            "La socket d’écoute est fermée dans tous les cas."
+          ],
+          "hint": "Le port 0 sert à demander au système un port libre pour le test ; il reste interdit dans la liste de scan."
+        },
+        {
+          "id": "portpilot-mr3",
+          "title": "MR3 — Scanner, résumer et livrer",
+          "branch": "feat/scan-bilan",
+          "minutes": 80,
+          "mission": "Écris le scan séquentiel, le bilan et main ; complète T7 et T8 puis produis l’artefact de livraison depuis le pipeline.",
+          "tasks": [
+            "Valide la liste entière avant la première connexion ; conserve exactement l’ordre reçu et une tentative par port.",
+            "Retourne pour resumer un dictionnaire à cinq compteurs : total, ouverts, refuses, timeouts et erreurs. Une liste vide vaut cinq zéros.",
+            "T7 garde deux écoutes éphémères ouvertes et vérifie les deux résultats OUVERT dans l’ordre choisi.",
+            "T8 vérifie un mélange de deux OUVERT, un REFUSE, un TIMEOUT et un ERREUR, puis une entrée vide. Ce test compte des états construits et ne provoque pas les erreurs réseau.",
+            "Finalise README.md avant le pipeline. Pour démontrer une connexion, utilise un port disponible et un serveur local ; dans Cyber Atelier, utilise le bouton du laboratoire intégré plutôt que de lancer un second serveur sur 8000."
+          ],
+          "tests": [
+            {
+              "id": "T7",
+              "title": "Scan de deux écoutes dans l’ordre",
+              "input": "Deux sockets éphémères ouvertes, fournies dans un ordre choisi",
+              "expected": "Deux paires port/OUVERT exactement dans l’ordre de l’entrée."
+            },
+            {
+              "id": "T8",
+              "title": "Bilan mixte et vide",
+              "input": "Deux OUVERT, un REFUSE, un TIMEOUT, un ERREUR ; puis liste vide",
+              "expected": "total 5, ouverts 2, refuses 1, timeouts 1, erreurs 1 ; cinq zéros pour la liste vide."
+            }
+          ],
+          "acceptance": [
+            "L’import du module n’exécute pas main ; une liste invalide affiche un message clair.",
+            "Les huit tests sont appelés ; T4 vérifie ses six sous-cas séparément. Les tests ne prétendent pas couvrir le déclenchement des trois états d’erreur réseau.",
+            "portpilot.zip contient exactement portpilot.py, verification.py et README.md, généré après succès des tests et conservé sept jours.",
+            "Trois MR sont fusionnées au pipeline vert du dernier commit ; la preuve du rouge MR1 est conservée."
+          ],
+          "hint": "Le succès du script local ne décide pas si GitLab autorise une fusion ; vérifie aussi le commit et la règle de fusion."
+        }
+      ],
+      "timeline": [
+        {
+          "label": "Préparer dépôt, runner, règles et lire le contrat",
+          "minutes": 25
+        },
+        {
+          "label": "MR1 — validation, tests, CI, cycle rouge/vert et fusion",
+          "minutes": 80
+        },
+        {
+          "label": "MR2 — connexion TCP, T6 et fusion",
+          "minutes": 70
+        },
+        {
+          "label": "MR3 — scan, bilan, T7/T8 et livraison",
+          "minutes": 80
+        },
+        {
+          "label": "Démonstration contrôlée et vérification finale",
+          "minutes": 25
+        },
+        {
+          "label": "Marge de débogage et bilan honnête",
+          "minutes": 20
+        }
+      ],
+      "references": [
+        {
+          "label": "PDF du parcours PortPilot, énoncé complet sans corrigé",
+          "url": "/downloads/PortPilot.pdf"
+        },
+        {
+          "label": "Python socket",
+          "url": "https://docs.python.org/3/library/socket.html"
+        },
+        {
+          "label": "Exceptions intégrées",
+          "url": "https://docs.python.org/3/library/exceptions.html"
+        },
+        {
+          "label": "GitLab — pipelines de merge request",
+          "url": "https://docs.gitlab.com/ci/pipelines/merge_request_pipelines/"
+        }
+      ],
+      "resources": [
+        {
+          "label": "Télécharger le guide PortPilot (Markdown)",
+          "url": "/content/portpilot.md"
+        },
+        {
+          "label": "Télécharger l’énoncé complet PortPilot (PDF)",
+          "url": "/downloads/PortPilot.pdf"
+        }
+      ],
+      "completion": [
+        "Dépôt contenant portpilot.py, verification.py, README.md, .gitignore et .gitlab-ci.yml.",
+        "Trois MR successives fusionnées après pipeline vert du dernier commit.",
+        "Lien du pipeline rouge MR1 et motif de blocage, suivis du pipeline vert corrigé.",
+        "Huit fonctions de test appelées et artefact portpilot.zip vérifié."
+      ],
+      "limits": [
+        "Le scan ne vise que 127.0.0.1, de façon séquentielle, avec 1 à 10 ports et 0,5 seconde par connexion.",
+        "Un état OUVERT ne prouve ni vulnérabilité ni nature du service ; aucune donnée applicative n’est envoyée.",
+        "T8 teste le comptage d’états fabriqués ; les états REFUSE, TIMEOUT et ERREUR ne sont pas provoqués par la suite minimale.",
+        "Une CI bloquante exige runner, droits et règles GitLab accessibles dans l’instance de l’école."
+      ]
+    },
+    {
+      "id": "headerscope",
+      "title": "HeaderScope",
+      "subtitle": "Client HTTP local et contrôle de trois en-têtes",
+      "description": "Écris des règles pures et un petit client limité au laboratoire local pour comparer les profils fragile et durci.",
+      "level": "Débutant",
+      "color": "#3557A6",
+      "durationMinutes": 300,
+      "goals": [
+        "Comparer les noms et valeurs d’en-têtes selon un contrat explicite.",
+        "Écrire au moins six cas de test autonomes sans réseau.",
+        "Traiter séparément réponses HTTP, panne de connexion et timeout.",
+        "Distinguer la CI reproductible de la démonstration avec le laboratoire local démarré explicitement."
+      ],
+      "prerequisites": [
+        "Connaître les variables, listes et fonctions Python.",
+        "Avoir Python 3 et Git ; GitLab et runner d’école sont nécessaires pour les MR avec CI."
+      ],
+      "scope": [
+        "Client limité à 127.0.0.1:8000 et aux chemins /fragile, /durci, /absent et /erreur.",
+        "Aucun exploit, crawl, URL arbitraire ou hôte distant.",
+        "La CI obligatoire porte sur les règles pures et réponses injectées ; elle ne suppose pas l’existence du laboratoire sur le runner scolaire.",
+        "Content-Security-Policy doit être non vide ; nosniff et DENY ou SAMEORIGIN sont comparés sans casse après retrait des espaces."
+      ],
+      "concepts": [
+        "dictionnaires",
+        "fonctions pures",
+        "normalisation",
+        "en-têtes HTTP",
+        "urllib.request",
+        "timeout",
+        "erreurs HTTP",
+        "assertions",
+        "GitLab CI"
+      ],
+      "files": [
+        {
+          "name": "headerscope.py",
+          "purpose": "Règles d’en-têtes, client HTTP local et orchestration."
+        },
+        {
+          "name": "verification.py",
+          "purpose": "Tests locaux reproductibles des règles et, si possible, du traitement de réponses."
+        },
+        {
+          "name": ".gitlab-ci.yml",
+          "purpose": "Lance les tests sans dépendre du laboratoire du portail."
+        },
+        {
+          "name": "README.md",
+          "purpose": "Contrat des en-têtes, lancement et limites de la couverture."
+        }
+      ],
+      "setup": [
+        {
+          "label": "Vérifier Python",
+          "command": "python --version",
+          "note": "Utilise python3 si nécessaire."
+        },
+        {
+          "label": "Vérifier Git",
+          "command": "git --version",
+          "note": "Confirme l’accès au dépôt de l’école."
+        },
+        {
+          "label": "Cloner le dépôt",
+          "command": "git clone <URL_DU_DEPOT> .",
+          "note": "Le dossier du parcours est vide : clone directement ici avant de créer les fichiers. Le point signifie « dossier courant ». Pour une session Git interactive, utilise docker compose exec atelier bash depuis le dossier Cyber Atelier ; un cd du terminal web ne persiste pas entre deux commandes."
+        },
+        {
+          "label": "Créer la branche MR1",
+          "command": "git switch -c feat/regles-entetes",
+          "note": "Crée-la depuis la branche principale."
+        }
+      ],
+      "steps": [
+        {
+          "id": "headerscope-mr1",
+          "title": "MR1 — Règles pures et tests",
+          "branch": "feat/regles-entetes",
+          "minutes": 85,
+          "mission": "Écris une fonction pure qui évalue trois en-têtes et retourne des alertes prévisibles. La CI doit pouvoir tourner sans réseau.",
+          "tasks": [
+            "Reconnais les noms d’en-tête sans tenir compte de la casse.",
+            "Exige une CSP présente et non vide après retrait des espaces externes.",
+            "Accepte nosniff pour X-Content-Type-Options après retrait des espaces et sans tenir compte de la casse.",
+            "Accepte DENY ou SAMEORIGIN pour X-Frame-Options avec la même normalisation.",
+            "Teste succès complet, en-têtes absents, noms minuscules, CSP vide, valeur nosniff correcte/incorrecte, valeurs X-Frame-Options admises/refusées et une seule règle en échec.",
+            "Fais exécuter les tests par la CI de MR. Une assertion doit pouvoir faire échouer le processus."
+          ],
+          "tests": [
+            {
+              "id": "H1",
+              "title": "Profil conforme",
+              "input": "Les trois en-têtes requis avec valeurs admises",
+              "expected": "Zéro alerte."
+            },
+            {
+              "id": "H2",
+              "title": "Aucun en-tête",
+              "input": "Dictionnaire vide",
+              "expected": "Trois alertes, une par règle."
+            },
+            {
+              "id": "H3",
+              "title": "Noms minuscules",
+              "input": "Noms en minuscules et valeurs valides",
+              "expected": "Zéro alerte."
+            },
+            {
+              "id": "H4",
+              "title": "CSP absente ou vide",
+              "input": "Clé manquante, valeur vide ou espaces seulement",
+              "expected": "Alerte CSP."
+            },
+            {
+              "id": "H5",
+              "title": "Options MIME",
+              "input": "nosniff avec espaces et casse variables, puis valeur incorrecte",
+              "expected": "Première entrée acceptée ; seconde signalée."
+            },
+            {
+              "id": "H6",
+              "title": "Options de frame",
+              "input": "DENY, SAMEORIGIN et valeur non admise avec espaces/casse variables",
+              "expected": "Deux admises ; valeur non admise signalée."
+            },
+            {
+              "id": "H7",
+              "title": "Règles indépendantes",
+              "input": "Deux valeurs conformes et une incorrecte",
+              "expected": "Une alerte exactement."
+            }
+          ],
+          "acceptance": [
+            "Les tests s’exécutent localement et sur un runner sans service de laboratoire.",
+            "Les noms sont comparés sans casse ; les valeurs appliquent exactement les normalisations du contrat.",
+            "Les trois alertes de /fragile et zéro alerte de /durci sont les résultats de référence pour la démonstration."
+          ],
+          "hint": "Normalise les clés une fois dans une fonction pure, puis écris une vérification lisible pour chaque politique."
+        },
+        {
+          "id": "headerscope-mr2",
+          "title": "MR2 — Client HTTP et erreurs distinctes",
+          "branch": "feat/client-http",
+          "minutes": 85,
+          "mission": "Ajoute un client avec timeout de 2 secondes pour les chemins fixes du laboratoire et une fonction pure classer_reponse(statut, entetes), testée par injection directe de données.",
+          "tasks": [
+            "Demande uniquement une URL construite à partir de 127.0.0.1:8000 et d’un chemin autorisé, avec timeout de 2 secondes.",
+            "Le client récupère statut et en-têtes puis appelle classer_reponse(statut, entetes).",
+            "Définis classer_reponse comme fonction pure : statut 200 retourne le statut, HTTP_OK et les alertes calculées ; 404 ou 500 retourne le code, HTTP_ERREUR et une liste vide.",
+            "H8 et H9 injectent directement statuts et dictionnaires dans classer_reponse, sans mocks : 200 conforme donne zéro alerte ; 404 et 500 sont conservés comme HTTP_ERREUR sans alertes.",
+            "Les tests injectés ne prouvent pas le fonctionnement réel des entrées/sorties réseau ; démontre le client séparément avec le laboratoire démarré explicitement.",
+            "Après fusion de MR1, mets à jour la principale avant de créer cette branche."
+          ],
+          "tests": [
+            {
+              "id": "H8",
+              "title": "Classement d’une réponse 200",
+              "input": "Appel pur à classer_reponse(200, dictionnaire des trois en-têtes conformes)",
+              "expected": "Retourne le statut 200, HTTP_OK et zéro alerte."
+            },
+            {
+              "id": "H9",
+              "title": "Classement d’erreurs HTTP",
+              "input": "Appels purs avec statut 404 puis 500 et un dictionnaire d’en-têtes quelconque",
+              "expected": "Chaque code est conservé avec HTTP_ERREUR et une liste d’alertes vide."
+            }
+          ],
+          "acceptance": [
+            "Le timeout du client vaut 2 secondes et l’URL reste limitée au laboratoire local.",
+            "La fonction pure classe 200, 404 et 500 selon le contrat et H8/H9 couvrent ces retours sans mock avancé.",
+            "Les tests injectés ne sont pas présentés comme preuve de l’I/O réseau ; la CI reste exécutable sans serveur web."
+          ],
+          "hint": "HTTPError représente une réponse HTTP d’erreur ; une panne de transport ou un timeout n’a pas de statut reçu."
+        },
+        {
+          "id": "headerscope-mr3",
+          "title": "MR3 — Orchestration, bilan et README",
+          "branch": "feat/bilan",
+          "minutes": 80,
+          "mission": "Relie le client et les règles, affiche un bilan compréhensible, documente les limites puis livre une dernière MR testée.",
+          "tasks": [
+            "Traite un chemin choisi parmi les quatre chemins nommés, appelle le classement de réponse et affiche statut, alertes et résumé.",
+            "Vérifie en démonstration que /fragile donne trois alertes et /durci zéro ; traite /absent et /erreur comme 404 et 500.",
+            "Démarre explicitement le laboratoire intégré avec son bouton avant la démonstration, puis arrête-le après.",
+            "Documente le contrat, le délai, les tests et le fait que le laboratoire du portail n’est pas supposé présent sur le runner scolaire.",
+            "Ouvre la troisième MR depuis la branche principale actualisée et vérifie le pipeline du dernier commit."
+          ],
+          "tests": [
+            {
+              "id": "H11",
+              "title": "Résultat fragile",
+              "input": "Réponse locale du chemin /fragile",
+              "expected": "Trois alertes de politique."
+            },
+            {
+              "id": "H12",
+              "title": "Résultat durci",
+              "input": "Réponse locale du chemin /durci",
+              "expected": "Zéro alerte."
+            },
+            {
+              "id": "H13",
+              "title": "Statuts d’erreur",
+              "input": "/absent puis /erreur pendant une démonstration locale",
+              "expected": "404 puis 500 identifiés comme erreurs HTTP."
+            }
+          ],
+          "acceptance": [
+            "La CI vérifie des tests locaux reproductibles et ne prétend pas démarrer le laboratoire scolaire.",
+            "Les quatre chemins restent limités à 127.0.0.1:8000.",
+            "Le README et le bilan distinguent résultats de tests, démonstration et limites des en-têtes."
+          ],
+          "hint": "Le laboratoire local est un outil de démonstration ; son état ne doit pas changer la fiabilité des tests purs."
+        }
+      ],
+      "timeline": [
+        {
+          "label": "Préparer GitLab et lire le contrat",
+          "minutes": 30
+        },
+        {
+          "label": "MR1 — règles pures et tests",
+          "minutes": 85
+        },
+        {
+          "label": "MR2 — client HTTP, timeout et erreurs",
+          "minutes": 85
+        },
+        {
+          "label": "MR3 — orchestration, bilan et README",
+          "minutes": 80
+        },
+        {
+          "label": "Démonstration, relecture et marge",
+          "minutes": 20
+        }
+      ],
+      "references": [
+        {
+          "label": "urllib.request",
+          "url": "https://docs.python.org/3/library/urllib.request.html"
+        },
+        {
+          "label": "urllib.error",
+          "url": "https://docs.python.org/3/library/urllib.error.html"
+        },
+        {
+          "label": "En-têtes HTTP — MDN",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers"
+        }
+      ],
+      "completion": [
+        "Programme, tests, CI et README versionnés dans le dépôt de cours.",
+        "Trois MR successives basées sur la principale actualisée.",
+        "Tests locaux de règles reproductibles sur le runner, plus démonstration distincte avec le laboratoire démarré."
+      ],
+      "limits": [
+        "Le client ne contacte que le laboratoire local et les quatre chemins définis.",
+        "La CI ne suppose pas que le laboratoire du portail est accessible au runner scolaire ; les tests de classement n’attestent pas le client réseau réel.",
+        "Les en-têtes sont des contrôles ciblés ; ils ne prouvent pas à eux seuls la sécurité complète d’une application."
+      ],
+      "resources": [
+        {
+          "label": "Télécharger le guide HeaderScope (Markdown)",
+          "url": "/content/headerscope.md"
+        }
+      ]
+    },
+    {
+      "id": "fileguard",
+      "title": "FileGuard",
+      "subtitle": "Manifeste SHA-256 et comparaison contrôlée",
+      "description": "Crée un inventaire JSON déterministe d’un petit dossier fictif et distingue fichiers inchangés, modifiés, supprimés et ajoutés.",
+      "level": "Débutant",
+      "color": "#81552B",
+      "durationMinutes": 300,
+      "goals": [
+        "Calculer des empreintes SHA-256 sur les octets d’un fichier.",
+        "Écrire un manifeste déterministe pour les fichiers réguliers du premier niveau.",
+        "Comparer deux inventaires en quatre catégories.",
+        "Tester avec des fichiers temporaires et trois MR dont la CI ne dépend pas du portail."
+      ],
+      "prerequisites": [
+        "Connaître les variables, listes et fonctions Python.",
+        "Avoir Python 3 et Git ; pour les fusions avec gate, disposer d’un runner GitLab d’école."
+      ],
+      "scope": [
+        "Utilise hashlib, pathlib et json de la bibliothèque standard.",
+        "Examine les fichiers réguliers au premier niveau seulement ; aucun parcours récursif.",
+        "Le manifeste est déterministe, exclu de son propre inventaire et contient des empreintes de contenu binaire.",
+        "Refuse les liens symboliques ; aucune analyse disque complète, antivirus ou recherche de secrets."
+      ],
+      "concepts": [
+        "octets",
+        "SHA-256",
+        "fichiers temporaires",
+        "pathlib",
+        "JSON",
+        "tri déterministe",
+        "comparaison d’ensembles",
+        "symlinks",
+        "tests",
+        "GitLab CI"
+      ],
+      "files": [
+        {
+          "name": "fileguard.py",
+          "purpose": "Calcul des empreintes, création et vérification du manifeste."
+        },
+        {
+          "name": "verification.py",
+          "purpose": "Tests isolés basés sur des fichiers temporaires."
+        },
+        {
+          "name": "manifest.json",
+          "purpose": "Inventaire déterministe produit par l’apprenant et exclu de l’inventaire."
+        },
+        {
+          "name": "fixtures/",
+          "purpose": "Exemples fictifs README.txt, settings.ini et message.txt copiés par l’apprenant."
+        },
+        {
+          "name": ".gitlab-ci.yml",
+          "purpose": "Exécute les tests locaux sans dépendance au dossier du portail."
+        }
+      ],
+      "setup": [
+        {
+          "label": "Vérifier Python",
+          "command": "python --version",
+          "note": "Utilise python3 si nécessaire."
+        },
+        {
+          "label": "Vérifier Git",
+          "command": "git --version",
+          "note": "Utilise un dépôt de cours autorisé."
+        },
+        {
+          "label": "Cloner le dépôt",
+          "command": "git clone <URL_DU_DEPOT> .",
+          "note": "Le dossier du parcours est vide : clone directement ici avant de créer les fichiers. Le point signifie « dossier courant ». Pour une session Git interactive, utilise docker compose exec atelier bash depuis le dossier Cyber Atelier ; un cd du terminal web ne persiste pas entre deux commandes."
+        },
+        {
+          "label": "Créer la branche MR1",
+          "command": "git switch -c feat/empreinte",
+          "note": "Commence depuis la branche principale."
+        }
+      ],
+      "steps": [
+        {
+          "id": "fileguard-mr1",
+          "title": "MR1 — Empreinte de fichier",
+          "branch": "feat/empreinte",
+          "minutes": 85,
+          "mission": "Écris une fonction qui produit un SHA-256 hexadécimal minuscule à partir des octets d’un fichier et teste-la sur deux oracles publiés dans des fichiers temporaires.",
+          "tasks": [
+            "Lis en mode binaire afin que l’empreinte dépende des octets exacts.",
+            "Vérifie indépendamment le fichier vide : e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855.",
+            "Écris exactement les trois octets ASCII abc, sans saut de ligne final, puis vérifie l’oracle ba7816bf8f01cfea414140de5dae2223b00361a396177a9cb410ff61f20015ad.",
+            "Teste aussi que deux fichiers temporaires identiques ont la même empreinte.",
+            "Crée les fichiers dans un répertoire temporaire ; ne lis pas le dossier utilisateur ni des journaux.",
+            "Fais exécuter la suite par la CI sans dépendance au portail."
+          ],
+          "tests": [
+            {
+              "id": "F1",
+              "title": "Empreinte du fichier vide",
+              "input": "Fichier temporaire de zéro octet",
+              "expected": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+            },
+            {
+              "id": "F2",
+              "title": "Empreinte des trois octets abc",
+              "input": "Fichier temporaire contenant exactement b\"abc\", sans saut de ligne final",
+              "expected": "ba7816bf8f01cfea414140de5dae2223b00361a396177a9cb410ff61f20015ad"
+            },
+            {
+              "id": "F3",
+              "title": "Contenus identiques",
+              "input": "Deux fichiers temporaires contenant les mêmes octets",
+              "expected": "Empreintes identiques."
+            }
+          ],
+          "acceptance": [
+            "La fonction lit les octets et renvoie une empreinte SHA-256 hexadécimale minuscule.",
+            "Les tests comparent aux deux oracles fixes fournis ; la fonction testée ne calcule pas elle-même les valeurs attendues.",
+            "Les tests ne dépendent pas du dossier personnel, d’un journal ou d’une fixture externe."
+          ],
+          "hint": "Garde les deux valeurs d’attente constantes dans les tests : vide et les trois octets ASCII abc."
+        },
+        {
+          "id": "fileguard-mr2",
+          "title": "MR2 — Manifeste déterministe",
+          "branch": "feat/manifest",
+          "minutes": 85,
+          "mission": "Inventorie les fichiers réguliers au premier niveau, trie les noms et écrit un JSON stable sans inclure le manifeste.",
+          "tasks": [
+            "Définis un format explicite : liste d’entrées avec nom et empreinte SHA-256 hexadécimale minuscule.",
+            "Trie les noms avant écriture, utilise une indentation stable et ajoute un saut de ligne final.",
+            "Exclus manifest.json ; refuse les liens symboliques et ne parcours pas les sous-dossiers.",
+            "Teste un répertoire vide, plusieurs noms triés, exclusion du manifeste et refus d’un lien symbolique quand le système en permet la création.",
+            "Copie les fixtures fictives README.txt, settings.ini et message.txt dans le dépôt de cours ; elles ne sont pas présumées présentes sur le runner."
+          ],
+          "tests": [
+            {
+              "id": "F4",
+              "title": "Dossier vide",
+              "input": "Dossier temporaire vide",
+              "expected": "Manifeste valide avec une liste vide."
+            },
+            {
+              "id": "F5",
+              "title": "Ordre déterministe",
+              "input": "Fichiers créés dans un ordre non trié",
+              "expected": "Entrées JSON triées par nom."
+            },
+            {
+              "id": "F6",
+              "title": "Exclusion du manifeste",
+              "input": "Manifeste écrit au même endroit que les données",
+              "expected": "Le manifeste ne figure pas dans ses propres entrées."
+            },
+            {
+              "id": "F7",
+              "title": "Lien symbolique",
+              "input": "Lien symbolique vers un fichier temporaire, si supporté",
+              "expected": "Refus clair selon le contrat."
+            }
+          ],
+          "acceptance": [
+            "Chaque entrée désigne un fichier régulier directement dans le dossier et ne contient aucun chemin absolu.",
+            "Le manifeste est déterministe et exclu de l’inventaire.",
+            "Aucun lien n’est suivi et aucun sous-dossier n’est parcouru."
+          ],
+          "hint": "Choisis une représentation JSON stable et documente-la ; le contrat demande la même sortie pour le même dossier."
+        },
+        {
+          "id": "fileguard-mr3",
+          "title": "MR3 — Comparaison et bilan",
+          "branch": "feat/comparaison",
+          "minutes": 80,
+          "mission": "Compare le manifeste à l’inventaire courant et affiche quatre catégories de changements sans analyser le disque entier.",
+          "tasks": [
+            "Classe les noms en inchangé, modifié, supprimé et ajouté selon présence et empreinte.",
+            "Teste tous les inchangés, un fichier modifié, un supprimé, un ajouté, plusieurs changements mêlés, un manifeste vide et son exclusion.",
+            "Utilise des fichiers temporaires autonomes plutôt que des journaux ou un état local conservé.",
+            "Ajoute une orchestration simple et un README qui explique format, commandes, liens, sous-dossiers et limites.",
+            "Ouvre trois MR successives depuis une branche principale actualisée après chaque fusion."
+          ],
+          "tests": [
+            {
+              "id": "F8",
+              "title": "Aucun changement",
+              "input": "Le dossier correspond exactement au manifeste",
+              "expected": "Tous les fichiers dans inchangé."
+            },
+            {
+              "id": "F9",
+              "title": "Fichier modifié",
+              "input": "Même nom, contenu dont l’empreinte diffère",
+              "expected": "Nom dans modifié."
+            },
+            {
+              "id": "F10",
+              "title": "Fichier supprimé",
+              "input": "Nom du manifeste absent du dossier",
+              "expected": "Nom dans supprimé."
+            },
+            {
+              "id": "F11",
+              "title": "Fichier ajouté",
+              "input": "Nouveau fichier régulier au premier niveau",
+              "expected": "Nom dans ajouté."
+            },
+            {
+              "id": "F12",
+              "title": "Plusieurs catégories",
+              "input": "Dossier avec cas inchangé, modifié, supprimé et ajouté",
+              "expected": "Chaque nom dans sa catégorie exacte."
+            },
+            {
+              "id": "F13",
+              "title": "Manifeste vide",
+              "input": "Manifeste avec zéro entrée et dossier contenant des données",
+              "expected": "Les fichiers sont ajoutés."
+            },
+            {
+              "id": "F14",
+              "title": "Manifeste exclu",
+              "input": "Manifeste conservé à proximité des données",
+              "expected": "Il n’est jamais signalé comme ajouté ou modifié."
+            }
+          ],
+          "acceptance": [
+            "Les quatre catégories ont des tests reproductibles et le manifeste lui-même est ignoré.",
+            "Le programme reste limité au dossier choisi, au premier niveau, sans suivre de symlinks.",
+            "Le README indique que le manifeste doit être digne de confiance et que le projet n’est pas un antivirus."
+          ],
+          "hint": "Compare séparément l’ensemble des noms et les empreintes pour rendre les quatre catégories faciles à vérifier."
+        }
+      ],
+      "timeline": [
+        {
+          "label": "Préparer GitLab et lire le contrat",
+          "minutes": 30
+        },
+        {
+          "label": "MR1 — empreinte et tests",
+          "minutes": 85
+        },
+        {
+          "label": "MR2 — manifeste et tests",
+          "minutes": 85
+        },
+        {
+          "label": "MR3 — comparaison, bilan et README",
+          "minutes": 80
+        },
+        {
+          "label": "Relecture et marge",
+          "minutes": 20
+        }
+      ],
+      "references": [
+        {
+          "label": "hashlib",
+          "url": "https://docs.python.org/3/library/hashlib.html"
+        },
+        {
+          "label": "pathlib",
+          "url": "https://docs.python.org/3/library/pathlib.html"
+        },
+        {
+          "label": "json",
+          "url": "https://docs.python.org/3/library/json.html"
+        },
+        {
+          "label": "Fichiers temporaires",
+          "url": "https://docs.python.org/3/library/tempfile.html"
+        }
+      ],
+      "completion": [
+        "fileguard.py, verification.py, README et fixtures fictives dans le dépôt.",
+        "CI qui exécute des tests temporaires autonomes.",
+        "Trois MR successives et une démonstration des quatre catégories de comparaison."
+      ],
+      "limits": [
+        "Le manifeste est une référence de comparaison, pas une preuve d’authenticité ; protège sa provenance.",
+        "Aucun antivirus, détection de malware, recherche de secrets ou analyse récursive.",
+        "Les symlinks sont refusés et seuls les fichiers réguliers du premier niveau sont inclus."
+      ],
+      "resources": [
+        {
+          "label": "Télécharger le guide FileGuard (Markdown)",
+          "url": "/content/fileguard.md"
+        }
+      ]
+    }
+  ],
+  "gitlabGuide": [
+    {
+      "title": "Préparer le projet",
+      "body": "Utilise l’instance GitLab et les règles fournies par ton école. Vérifie les droits sur le projet, le runner, la branche principale et les réglages de fusion avant de commencer.",
+      "items": [
+        "Les dossiers de cours sont vides : clone le dépôt directement dans le dossier courant avec git clone <URL_DU_DEPOT> . avant de créer les fichiers. Remplace le placeholder par l’URL réelle ; le point signifie « ici ».",
+        "Initialise seulement le README et le .gitignore demandé par le parcours ; n’ajoute pas de corrigé préfabriqué.",
+        "Protège la branche principale selon les règles de l’école : désactive le push direct et le force push si les droits le permettent.",
+        "Exige un pipeline réussi pour fusionner. Laisse l’option pipeline ignoré considéré comme réussi désactivée quand elle existe.",
+        "Vérifie le runner actif, son affectation au projet, les jobs sans tag ou les tags exacts, et son accès aux branches non protégées."
+      ]
+    },
+    {
+      "title": "Travailler par MR",
+      "body": "Une MR correspond à une étape du parcours. Après chaque fusion, actualise la branche principale et crée la suivante depuis cette base à jour.",
+      "items": [
+        "Exécute les tests localement, puis lis git status et git diff avant le commit.",
+        "Ajoute explicitement les fichiers prévus au lieu d’ajouter tout le dossier aveuglément.",
+        "Pousse la branche et ouvre une MR vers la branche principale.",
+        "Relis le diff, le dernier commit testé et les journaux du pipeline ; fusionne uniquement quand le dernier commit est vert.",
+        "Un test local réussi ne coche pas automatiquement la MR et ne prouve pas que GitLab autorise la fusion."
+      ],
+      "command": "git status"
+    },
+    {
+      "title": "Aide-mémoire des commandes Git",
+      "body": "Le clone se fait une seule fois dans le dossier vide du cours. Pour chaque MR suivante, repars de la branche principale mise à jour, puis crée une branche distincte. Remplace main par le nom réel de la branche principale (main ou master), NOM_BRANCHE par le nom demandé dans le parcours, et les placeholders de fichiers par les vrais noms.",
+      "items": [
+        "Après une fusion, actualise la base puis démarre la nouvelle étape : git switch main ; git pull --ff-only ; git switch -c NOM_BRANCHE.",
+        "Après les tests et la relecture : git status ; git diff ; git add fichier1 fichier2 ; git commit -m \"Décris le changement\" ; git push -u origin NOM_BRANCHE.",
+        "Répète le cycle depuis main actualisée après chaque fusion. Le terminal web ne garde pas un cd entre commandes ; pour une session interactive, utilise docker compose exec atelier bash depuis le dossier Cyber Atelier."
+      ],
+      "command": "git switch main\ngit pull --ff-only\ngit switch -c NOM_BRANCHE\ngit add fichier1 fichier2\ngit commit -m \"Décris le changement\"\ngit push -u origin NOM_BRANCHE"
+    },
+    {
+      "title": "Repères pour configurer la CI",
+      "body": "Écris la configuration dans .gitlab-ci.yml à la racine du dépôt. Consulte la documentation GitLab et les contraintes du runner de ton école ; le parcours donne les critères, pas un YAML à recopier.",
+      "items": [
+        "Choisis une image Python compatible avec le runner : un Docker executor peut télécharger/utiliser une image autorisée ; un Shell executor utilise Python déjà installé sur la machine du runner.",
+        "Le job de test exécute python verification.py (ou python3 verification.py si nécessaire) et doit échouer si les tests échouent.",
+        "Configure des règles de pipeline limitées aux merge requests avec CI_PIPELINE_SOURCE égal à merge_request_event ; évite une règle finale qui accepte tous les push.",
+        "Ne configure pas allow_failure et ne masque pas le code de sortie de la commande de test. Vérifie une vraie exécution de pipeline, pas seulement CI Lint.",
+        "Documentation : https://docs.gitlab.com/ci/pipelines/merge_request_pipelines/ et https://docs.gitlab.com/ci/yaml/workflow/."
+      ]
+    },
+    {
+      "title": "Interpréter le pipeline",
+      "body": "Le lint vérifie la configuration ; seul un job exécuté par un runner fournit une preuve d’exécution. Un pipeline rouge doit conduire à corriger la cause, pas à supprimer un test pertinent.",
+      "items": [
+        "Pas de pipeline : confirme que la MR est ouverte et que les règles de pipeline incluent le type merge request attendu.",
+        "Job en attente : contrôle runner, tags, disponibilité, accès aux branches non protégées et image autorisée par l’école.",
+        "Job rouge : lis le premier échec, reproduis-le localement et corrige le code ou la configuration fautive.",
+        "Une interdiction de fusion due au rôle du compte ne démontre pas le blocage par échec CI."
+      ],
+      "command": "git diff"
+    },
+    {
+      "title": "Gate et preuve de fusion",
+      "body": "Pour vérifier un gate, utilise un compte autorisé à fusionner, une MR non-Draft sans conflit et une vraie exécution en échec. Vérifie que le motif de blocage est bien le pipeline, puis corrige et vérifie le dernier commit vert.",
+      "items": [
+        "Conserve le lien de la MR et du pipeline utile au bilan.",
+        "Ne déclare pas le gate validé si le runner manque, si le pipeline est ignoré ou si les droits ne permettent pas la vérification.",
+        "Les parcours demandent trois MR distinctes et progressives, pas une seule livraison finale."
+      ]
+    }
+  ],
+  "environmentGuide": [
+    {
+      "title": "Lancer Cyber Atelier",
+      "body": "Démarre l’application locale avec Docker Compose depuis le dossier du projet. L’interface web est publiée uniquement sur la boucle locale de ta machine.",
+      "items": [
+        "Vérifie que Docker et le plugin Compose sont installés et que le moteur Docker fonctionne.",
+        "Le navigateur de l’hôte ouvre l’application sur http://127.0.0.1:8080, sauf si tu as choisi une autre valeur de port.",
+        "Le code de tes exercices est enregistré dans le volume de travail ; arrêter puis relancer le conteneur conserve les fichiers et la progression.",
+        "Les modifications de code sont des fichiers dans ton espace de travail local au conteneur, pas des changements publiés sur GitLab."
+      ],
+      "command": "docker compose up --build"
+    },
+    {
+      "title": "Utiliser le terminal local",
+      "body": "Les commandes de l’onglet terminal s’exécutent dans le projet de cours choisi. Utilise-le pour Python, les tests et les commandes simples disponibles.",
+      "items": [
+        "Le terminal de l’interface lance chaque commande avec un dossier courant explicite et une limite de temps.",
+        "Pour une session interactive Git, SSH ou une commande qui attend une saisie, ouvre un terminal de ta machine et utilise docker compose exec.",
+        "Dans le conteneur, 127.0.0.1 désigne le conteneur lui-même. Le navigateur de l’hôte atteint l’application publiée via 127.0.0.1:8080.",
+        "Le laboratoire HeaderScope est un serveur local distinct. Démarre-le explicitement dans l’interface avant la démonstration et arrête-le ensuite."
+      ],
+      "command": "docker compose exec atelier bash"
+    },
+    {
+      "title": "Arrêter, reprendre et sauvegarder",
+      "body": "Compose garde les données dans ses volumes nommés quand le conteneur est arrêté. Sauvegarde régulièrement les dépôts par Git ou export ZIP et télécharge le fichier de progression si tu veux une copie indépendante.",
+      "items": [
+        "Arrête les services avec docker compose down ; les volumes nommés sont conservés.",
+        "Ne supprime les volumes que si tu veux aussi effacer code et progression.",
+        "La progression est déclarée par toi : réussite des tests locaux ne coche pas automatiquement une MR GitLab.",
+        "Le contenu des journaux de commandes n’est pas conservé comme historique."
+      ],
+      "command": "docker compose down"
+    },
+    {
+      "title": "Réseau et limites",
+      "body": "Cyber Atelier est une application personnelle exécutée localement. Les commandes de l’apprenant tournent dans un conteneur non-root. GitLab et les runners de l’école sont des services distincts soumis aux accès fournis par ton établissement.",
+      "items": [
+        "Le port de l’interface est accessible seulement depuis la machine locale par défaut ; le laboratoire interne n’est pas publié à l’hôte.",
+        "Un runner GitLab n’hérite pas des services ou fichiers du conteneur Cyber Atelier.",
+        "Pour HeaderScope, les tests de CI doivent injecter des réponses ou vérifier les règles pures ; le serveur intégré sert à la démonstration locale.",
+        "N’envoie pas de secret, mot de passe d’école ou jeton GitLab dans les notes ou le code partagé."
+      ]
+    }
+  ]
+}
