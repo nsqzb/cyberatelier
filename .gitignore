@@ -1,6 +1,8 @@
 # Tes projets d'exercice ont chacun leur propre dépôt Git dans workspaces/.
 workspaces/
 backups/
+userdata/
+.atelier-build.json
 .env
 __pycache__/
 *.py[cod]
