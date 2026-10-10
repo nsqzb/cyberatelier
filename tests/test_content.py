@@ -1,3 +1,5 @@
+import ast
+import importlib.util
 import json
 import unittest
 from pathlib import Path
@@ -64,7 +66,7 @@ class CourseContentTests(unittest.TestCase):
                     self.assertEqual(sum(p["minutes"] for p in paliers), step["minutes"])
                     known = {t["id"] for t in step.get("tests", [])}
                     used = [t for p in paliers for t in p.get("tests", [])]
-                    self.assertEqual(set(used), known, "chaque test est demandé dans un palier")
+                    self.assertCountEqual(used, known, "chaque test est demandé dans exactement un palier")
                     for p in paliers:
                         self.assertTrue(all(p.get(k) for k in ("title", "goal", "do", "check", "hint")), p["id"])
 
@@ -92,6 +94,39 @@ class CourseContentTests(unittest.TestCase):
                 with self.subTest(course=course["id"], step=item["label"]):
                     self.assertTrue(item["label"].strip())
                     self.assertIsInstance(item.get("interactive", False), bool)
+
+    def test_missions_explain_start_deliverable_and_test_command(self):
+        for course in self.courses.values():
+            for step in course["steps"]:
+                with self.subTest(step=step["id"]):
+                    self.assertTrue(all(step["learning"].get(key) for key in
+                                        ("startingPoint", "deliverable", "why", "testCommand")))
+                    self.assertTrue(all(p.get("workspace") for p in step["paliers"]))
+
+    def test_editor_examples_are_typed_and_valid_python(self):
+        for course in self.courses.values():
+            for step in course["steps"]:
+                for palier in step["paliers"]:
+                    self.assertNotIn("commands", palier, "les exemples ne sont plus tous des commandes")
+                    for block in palier["blocks"]:
+                        with self.subTest(palier=palier["id"], title=block["title"]):
+                            self.assertIn(block["kind"], ("shell", "python", "yaml", "markdown"))
+                            self.assertTrue(all(block.get(key) for key in ("title", "context", "code")))
+                            if block["kind"] == "python":
+                                ast.parse(block["code"])
+                            else:
+                                self.assertFalse(block["code"].startswith("Exemple travaillé"))
+
+    def test_downloadable_missions_match_the_displayed_content(self):
+        spec = importlib.util.spec_from_file_location("generate_exercises", BASE / "scripts" / "generate_exercises.py")
+        generator = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(generator)
+        for course in self.courses.values():
+            with self.subTest(course=course["id"]):
+                text = (BASE / "content" / f"{course['id']}.md").read_text(encoding="utf-8")
+                self.assertEqual(text, generator.document(self.data, course, text),
+                                 "régénère les énoncés après une modification de courses.json")
+
 
 
 if __name__ == "__main__":

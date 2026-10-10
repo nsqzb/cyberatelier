@@ -116,4 +116,20 @@ Les tests de l’application (serveur, laboratoire et cohérence des contenus) s
 docker compose exec -T atelier python -m unittest discover -s tests -p 'test_*.py' -v
 ```
 
-Ces 46 tests vérifient Cyber Atelier lui-même, pas tes exercices : tes exercices sont testés par tes propres tests (`verification.py` ou `unittest`, selon le parcours).
+Ces tests vérifient Cyber Atelier lui-même, pas tes exercices : tes exercices sont testés par tes propres tests (`verification.py` ou `unittest`, selon le parcours).
+
+
+## Maintenir les énoncés
+
+Les consignes des 18 missions sont définies dans `content/courses.json`. Chaque mission précise son point de départ, son livrable et sa commande de tests ; chaque palier précise les fichiers concernés, les actions dans l’ordre et les blocs typés (`shell`, `python`, `yaml`, `markdown`). Les contrats de programme et les limites restent dans l’introduction et la fin de chaque énoncé Markdown.
+
+Après une modification des missions, synchronise les six énoncés :
+
+```bash
+python3 scripts/generate_exercises.py
+python3 scripts/generate_exercises.py --check
+```
+
+Le second appel vérifie la synchronisation sans écrire. Les tests de contenu font aussi ce contrôle. Édite les missions dans le JSON : les sections Markdown entre `BEGIN GENERATED EXERCISES` et `END GENERATED EXERCISES` sont régénérées.
+
+Pour PortPilot, régénère également le PDF depuis son Markdown avec `python3 scripts/generate_portpilot_pdf.py`. Ce script d’édition utilise ReportLab ; cette dépendance reste hors de l’application et du conteneur d’apprentissage. L’application et les tests de contenu utilisent uniquement la bibliothèque standard.
