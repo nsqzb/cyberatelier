@@ -206,3 +206,15 @@ Vérifications : 46 tests OK en local (macOS, hors Docker) le 2026-10-10 ; 46 OK
 - Régénérer le PDF PortPilot en tutoiement si la source est retrouvée.
 - Décider d'un éventuel 4ᵉ parcours ou d'autres outils (par exemple ffuf ou nuclei) : non tranché.
 - Publier un patch (`git diff main > cyberatelier.patch`) ou une archive à chaque livraison.
+
+
+## Refonte des consignes pour débutant (2026-10-10)
+
+- Les 18 missions gardent leurs identifiants, leurs branches, leurs temps et tous les cas de test / démonstration. Les 153 paliers gardent leurs identifiants : aucune migration de progression.
+- `learningGuide` dans `courses.json` contient la méthode et le glossaire. `steps[].learning` décrit le point de départ, le livrable, l’utilité et la commande des tests.
+- `paliers[].workspace` indique les fichiers ; `explanation` donne les notions ; `do` contient les actions ; `blocks` remplace `commands` avec `kind`, `title`, `context`, `code`. Ne mélange plus un extrait Python/YAML/Markdown avec une commande shell. Le rendu garde un fallback pour les anciens contenus.
+- Les branches MR1 sont créées dans les missions, après la préparation. Le bouton « Lancer les tests » utilise la commande du parcours (unittest pour Socle/ToolWrap/ReconWrap, verification.py pour les autres).
+- `scripts/generate_exercises.py` synchronise uniquement la section balisée des six Markdown ; `--check` et un test détectent les divergences. Le contrat avant et les limites après ne sont pas remplacés.
+- `scripts/generate_portpilot_pdf.py` reconstruit le PDF depuis le Markdown avec ReportLab (dépendance d’édition uniquement). Le PDF n’a plus de source absente.
+- Corrections de guidage : appeler les tests PortPilot explicitement ; lancer unittest.main dans verification.py ; lire echo $? dans la même exécution web ; exemples d’import sans sortie ; erreurs de transport fabriquées sans réseau ; branche et livraison de ReconWrap MR2 explicites ; commandes de conflit exécutables ; ERROR est le niveau logging, ERREUR le statut du contrat.
+- La seule précision de livrable en Socle MR1 est l’inclusion du .gitignore déjà demandé par le parcours : caches et fixtures restent exclus.
