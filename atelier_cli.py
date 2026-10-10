@@ -3,6 +3,8 @@
 from __future__ import annotations
 
 import argparse
+import fcntl
+import hashlib
 import json
 import os
 from pathlib import Path
@@ -24,13 +26,14 @@ class AtelierError(Exception):
     """Erreur que l'apprenant peut lire sans traceback."""
 
 
-def read_json(path: Path):
+def read_json(path: Path, with_revision=False):
     try:
         with path.open("rb") as stream:
             data = stream.read(MAX_JSON + 1)
         if len(data) > MAX_JSON:
             raise AtelierError(f"Fichier trop volumineux : {path}.")
-        return json.loads(data.decode("utf-8"))
+        value = json.loads(data.decode("utf-8"))
+        return (value, hashlib.sha256(data).hexdigest()) if with_revision else value
     except (OSError, UnicodeError, json.JSONDecodeError) as exc:
         raise AtelierError(f"Impossible de lire {path} : {exc}. Le fichier est conservé.") from exc
 
@@ -170,9 +173,10 @@ class StateStore:
     def __init__(self, path: Path, curriculum: Curriculum, root: Path, import_remote=True):
         self.path = path
         self.curriculum = curriculum
+        self.root = root
         self.notice = ""
         if path.exists():
-            raw = read_json(path)
+            raw, self._revision = read_json(path, with_revision=True)
             self.data = normalize_progression(raw, curriculum)
             terminal = raw.get("terminal", {})
             if not isinstance(terminal, dict):
@@ -187,6 +191,7 @@ class StateStore:
                 raise AtelierError("Position ou indices invalides dans la progression. Le fichier est conservé.")
             self.data["terminal"] = {**terminal, "currentByCourse": cursors.copy(), "hintLevels": levels.copy()}
         else:
+            self._revision = None
             raw, source = fetch_local_progression(root) if import_remote else (None, "désactivé")
             if raw is None:
                 raw = {"version": 1, "selectedCourse": next(iter(curriculum.courses))}
@@ -203,19 +208,36 @@ class StateStore:
         temporary = None
         try:
             self.path.parent.mkdir(parents=True, exist_ok=True)
-            with tempfile.NamedTemporaryFile(mode="w", encoding="utf-8", dir=self.path.parent,
-                                             prefix=f".{self.path.name}.", delete=False) as stream:
-                temporary = Path(stream.name)
-                json.dump(self.data, stream, ensure_ascii=False, indent=2)
-                stream.write("\n")
-                stream.flush()
-                os.fsync(stream.fileno())
-            os.replace(temporary, self.path)
+            # Le verrou sérialise les écritures ; la révision refuse une ancienne copie en mémoire.
+            with (self.path.parent / f".{self.path.name}.lock").open("a") as lock:
+                try:
+                    fcntl.flock(lock.fileno(), fcntl.LOCK_EX | fcntl.LOCK_NB)
+                except BlockingIOError as exc:
+                    raise AtelierError("Une autre commande enregistre la progression. Réessaie dans un instant.") from exc
+                current = hashlib.sha256(self.path.read_bytes()).hexdigest() if self.path.exists() else None
+                if current != self._revision:
+                    raise AtelierError("La progression a changé dans un autre terminal. Relance la commande ; aucune donnée n'a été écrasée.")
+                serialized = json.dumps(self.data, ensure_ascii=False, indent=2) + "\n"
+                with tempfile.NamedTemporaryFile(mode="w", encoding="utf-8", dir=self.path.parent,
+                                                 prefix=f".{self.path.name}.write-", delete=False) as stream:
+                    temporary = Path(stream.name)
+                    stream.write(serialized)
+                    stream.flush()
+                    os.fsync(stream.fileno())
+                os.replace(temporary, self.path)
+                self._revision = hashlib.sha256(serialized.encode("utf-8")).hexdigest()
         except OSError as exc:
             raise AtelierError(f"Impossible d'enregistrer {self.path} : {exc}.") from exc
         finally:
             if temporary is not None and temporary.exists():
                 temporary.unlink()
+
+    def reload(self):
+        if not self.path.exists():
+            raise AtelierError("Le fichier de progression a été retiré. Relance le compagnon pour continuer.")
+        latest = StateStore(self.path, self.curriculum, self.root, import_remote=False)
+        self.data = latest.data
+        self._revision = latest._revision
 
     @property
     def cid(self):
@@ -364,7 +386,8 @@ class Companion:
             self.paragraph(block.get("context", ""))
             if kind == "shell":
                 code = block.get("code", "")
-                cwd = self.root if "docker compose" in code else self.workspace_root / self.state.cid
+                application = block.get("cwd") == "application" or ("cwd" not in block and "docker compose" in code)
+                cwd = self.root if application else self.workspace_root / self.state.cid
                 self.line(f"Dossier sur ton Mac : {cwd}")
             self.line(block.get("code", ""))
 
@@ -572,6 +595,7 @@ def interactive(companion: Companion, argument_parser):
             continue
         try:
             args = argument_parser.parse_args(shlex.split(raw))
+            companion.state.reload()
             if args.action == "version":
                 companion.line(version(companion.root))
             else:

@@ -107,7 +107,31 @@ class CompanionTests(unittest.TestCase):
             with self.assertRaises(cli.AtelierError):
                 state.select("socle-mr1-p6")
         self.assertEqual(self.state_file.read_bytes(), original)
-        self.assertEqual(list(self.state_file.parent.glob(".terminal.json.*")), [])
+        self.assertEqual(list(self.state_file.parent.glob(".terminal.json.write-*")), [])
+
+    def test_stale_session_refuses_to_erase_cases_and_notes_from_other_terminal(self):
+        first = self.state()
+        second = self.state()
+        first.data["notes"]["socle"] = "note récente"
+        first.mark(True)
+        original = self.state_file.read_bytes()
+        with self.assertRaisesRegex(cli.AtelierError, "autre terminal"):
+            second.select("socle-mr1-p6")
+        self.assertEqual(self.state_file.read_bytes(), original)
+        second.reload()
+        second.select("socle-mr1-p6")
+        current = self.state()
+        self.assertEqual(current.data["notes"]["socle"], "note récente")
+        self.assertEqual(current.data["paliers"], ["socle-mr1-p1"])
+        self.assertEqual(current.pid, "socle-mr1-p6")
+
+    def test_explicit_application_block_does_not_need_docker_to_show_correct_folder(self):
+        companion = self.companion()
+        block = {"kind": "shell", "code": "python3 labs.py", "cwd": "application",
+                 "context": "Terminal du Mac", "title": "Lancer le labo"}
+        companion.blocks({"blocks": [block]}, "after_actions")
+        self.assertIn(f"Dossier sur ton Mac : {self.root.resolve()}", self.out.getvalue())
+        self.assertNotIn(f"Dossier sur ton Mac : {self.root.resolve() / 'workspaces' / 'socle'}", self.out.getvalue())
 
     def test_unknown_historical_progression_ids_are_preserved(self):
         data = {"version": 1, "selectedCourse": "socle", "paliers": ["ancien-palier"],
