@@ -23,11 +23,11 @@ Le laboratoire local répond aux chemins /fragile, /durci, /absent et /erreur su
 <!-- BEGIN GENERATED EXERCISES -->
 ## Comment travailler un exercice
 
-Chaque mission construit une partie du projet. Commence par « Avant de commencer », puis avance palier par palier. Les durées sont des repères : prends le temps de comprendre chaque résultat.
+Ces exercices sont ton entraînement. Chaque palier explique les notions utiles, montre les données ou les règles attendues, puis te fait écrire et vérifier ton propre code. Les durées sont des repères : avance quand tu comprends le résultat.
 
-1. Lis l’objectif et les fichiers concernés. Un fichier indiqué comme « à créer » n’est pas fourni : c’est toi qui l’écris.
+1. Lis « Pour comprendre » et l’exemple lorsqu’il y en a un. Repère ce qui entre dans le programme, ce qui doit en sortir et les règles à respecter.
 2. Les cartes de tests donnent l’entrée et le résultat attendu. Écris les tests correspondants dans le fichier indiqué ; cocher un palier ne les exécute pas. Avec unittest, « Ran 0 tests » signifie qu’aucun test n’a été exécuté : ce n’est pas une validation. Un cas décrit peut contenir plusieurs valeurs ; le nombre de méthodes Python n’est donc pas forcément le nombre d’identifiants.
-3. Suis les actions numérotées. Les blocs Python se placent dans l’éditeur ; les commandes se lancent au moment demandé. Relis les blocs Git : des modifications et des actions dans GitHub/GitLab peuvent être nécessaires entre deux commandes.
+3. Suis les actions numérotées, une à la fois. Les exemples servent à apprendre une notion ; tu écris toi-même la solution de l’exercice. Les blocs Terminal donnent les commandes à lancer au moment indiqué.
 4. Vérifie le résultat indiqué avant de poursuivre. Un échec attendu (phase rouge, argument refusé ou conflit volontaire) est expliqué dans le palier.
 5. Si tu bloques, lis la dernière ligne de l’erreur, compare l’entrée et l’attendu, puis ouvre l’indice. Fais un petit changement et relance.
 
@@ -42,6 +42,16 @@ La console web repart à neuf à chaque exécution : un `cd`, une activation de 
 Un venv créé sur le Mac ne fonctionne pas dans le conteneur : utilise `python3` dans ce dernier. Remplace `main` par `master` si nécessaire. Si une branche existe déjà, reprends-la avec `git switch NOM` sans `-c`. Après chaque fusion, actualise la branche principale avant la mission suivante.
 
 ### Les mots utiles
+
+**Chaîne / champ.** Une chaîne (str) est du texte. Un champ est un morceau de donnée, comme l’utilisateur dans une ligne de journal.
+
+**Liste / position.** Une liste conserve plusieurs valeurs dans un ordre. Sa première position porte le numéro 0, la suivante 1, etc.
+
+**Dictionnaire / clé.** Un dictionnaire associe un nom à une valeur : {"fruit": "pomme"}. fruit est la clé ; pomme est sa valeur.
+
+**None.** Une valeur Python qui représente l’absence de résultat. Dans analyser_ligne, elle signifie que la ligne est refusée. Elle s’écrit sans guillemets.
+
+**split / strip.** split() sans argument découpe une chaîne sur ses espaces. split(".") découpe sur les points. strip() retire les espaces aux bords.
 
 **Contrat.** Les règles à respecter : arguments reçus, valeur retournée, erreurs et cas limites. Tu choisis le code qui respecte ces règles.
 
@@ -104,12 +114,16 @@ Partir d’une branche de travail propre, dédiée à cette MR.
 
 **Pour comprendre**
 
-- Une branche est une ligne de travail séparée de main : main ne bouge pas tant que tu n’as pas fusionné.
+- La branche principale (main) contient le travail déjà fusionné. Ta branche feat/... reçoit les changements de cette mission.
+- Un dépôt « propre » n’a aucune modification en attente : git status te le confirme.
 
 **Actions dans l’ordre**
 
-1. Ouvre le dossier workspaces/headerscope dans VS Code, puis un terminal (Terminal > New Terminal).
-2. Après la préparation de l’onglet Environnement, vérifie que tu es sur la principale à jour, puis crée feat/regles-entetes. Si cette branche existe déjà, reprends-la avec git switch feat/regles-entetes.
+1. Ouvre workspaces/headerscope dans VS Code, ou Coder dans Cyber Atelier avec cwd sur « . ».
+2. Termine la préparation de l’onglet Environnement : Python, Git et dépôt cloné.
+3. Lis git status ; enregistre ton travail en cours avant de changer de branche.
+4. Reviens sur main avec git switch main, mets-la à jour avec git pull --ff-only, puis crée feat/regles-entetes. Remplace main par master si ton dépôt utilise ce nom.
+5. Vérifie le nom de ta branche avec git status. Si elle existe déjà, reprends-la avec git switch sans -c.
 
 **Terminal · Relire l’état du dépôt**
 
@@ -143,12 +157,8 @@ Savoir lire un test qui passe ou échoue, et comprendre pourquoi la CI se fie au
 
 **Pour comprendre**
 
-- Pourquoi : la CI décide si la merge request passe d’après le code de sortie de python3 verification.py. Un test qui échoue doit donc faire sortir le programme avec un code non nul.
-
-**Actions dans l’ordre**
-
-1. Crée un fichier exemple.py jetable (il ne sera pas livré) avec le code ci-dessous. saluer est un exemple sans rapport avec HeaderScope.
-2. Lance-le avec la bonne valeur, puis change la valeur attendue en « Bonjour Ada !! » pour voir un échec. Remets la bonne valeur, puis supprime le fichier : rm exemple.py.
+- unittest découvre les méthodes test_ dans une classe qui hérite de TestCase. assertEqual compare le résultat au texte attendu.
+- unittest.main() lance les vérifications ; sans lancement, un fichier peut terminer avec 0 sans avoir testé quoi que ce soit.
 
 **Éditeur · Exemple Python à lire ou essayer**
 
@@ -167,6 +177,13 @@ class TestSaluer(unittest.TestCase):
 if __name__ == '__main__':
     unittest.main()
 ```
+
+**Actions dans l’ordre**
+
+1. Crée exemple.py avec l’exemple saluer. Lance le fichier puis echo $? dans la même exécution.
+2. Observe OK et 0 avec l’attendu correct.
+3. Change seulement l’attendu en « Bonjour Ada !! » : observe FAILED et 1.
+4. Rétablis l’attendu correct, puis supprime exemple.py sans le livrer.
 
 **Terminal · Commande à lancer au moment indiqué**
 
@@ -196,12 +213,8 @@ Chercher une valeur par clé, après avoir normalisé le texte saisi.
 
 **Pour comprendre**
 
-- Pourquoi : les noms d’en-têtes HTTP ne dépendent pas de la casse. Il faut donc comparer des textes normalisés, pas les textes bruts.
-
-**Actions dans l’ordre**
-
-1. Crée un fichier exemple2.py jetable avec le code ci-dessous. Les fruits sont un exemple sans rapport avec HeaderScope.
-2. Lance-le, puis ajoute une saisie avec d’autres espaces et une autre casse. Supprime exemple2.py ensuite.
+- Un dictionnaire associe un nom (clé) à une valeur. get(clé, défaut) donne la valeur de la clé, ou le défaut si elle manque.
+- Normaliser un nom signifie lui donner une forme commune : strip retire les espaces aux bords ; lower met les lettres en minuscules.
 
 **Éditeur · Exemple Python à lire ou essayer**
 
@@ -217,6 +230,13 @@ print(prix.get('banane', 0))
 for nom, valeur in prix.items():
     print(nom, valeur)
 ```
+
+**Actions dans l’ordre**
+
+1. Crée exemple2.py avec l’exemple des fruits et lance-le.
+2. Repère la saisie d’origine, la clé nettoyée et la valeur trouvée. Observe aussi le résultat pour une clé absente.
+3. Change la casse et les espaces de la saisie ; vérifie que la clé obtenue reste identique.
+4. Observe items() dans la boucle : il fournit chaque paire clé/valeur. Supprime le fichier d’essai.
 
 **Terminal · Commande à lancer au moment indiqué**
 
@@ -236,6 +256,33 @@ python3 exemple2.py
 
 **Où tu travailles :** headerscope.py ; verification.py
 
+**Pour comprendre**
+
+- Un en-tête HTTP est une information nommée dans une réponse. Ici, tu reçois déjà ces informations sous forme de dictionnaire.
+- Une alerte est un texte qui explique une règle en échec ; la fonction retourne une liste de ces textes, sans requête réseau.
+
+**Exemple de résultat attendu**
+
+Ce que tu donnes :
+
+```text
+evaluer_entetes({})
+```
+
+Ce que tu dois obtenir :
+
+```text
+Une liste de 3 alertes : CSP absente, options MIME absentes, options de frame absentes.
+```
+
+La formulation reste lisible et prévisible ; ce palier vérifie le nombre.
+
+**Règles à respecter**
+
+- Trois règles indépendantes : Content-Security-Policy, X-Content-Type-Options et X-Frame-Options.
+- Un contrôle en échec produit une alerte ; tous les contrôles conformes donnent [].
+- Les noms d’en-tête sont comparés sans tenir compte des majuscules/minuscules.
+
 **Cas de test à écrire**
 
 L’entrée est ce que tu donnes au code ; l’attendu est ce que ton test doit vérifier.
@@ -246,12 +293,11 @@ L’entrée est ce que tu donnes au code ; l’attendu est ce que ton test doit 
 
 **Actions dans l’ordre**
 
-1. Crée headerscope.py (vide au départ) et verification.py avec une classe TestRegles, sur le modèle de l’exemple du palier 2.
-2. Dans verification.py, importe unittest, crée une classe héritant de unittest.TestCase et des méthodes commençant par test_. Ajoute le point d’entrée unittest.main() sous la garde if __name__ == "__main__". Sans ce lancement, python3 verification.py peut finir avec 0 sans exécuter aucun test.
-3. Écris H2 : un dictionnaire d’en-têtes vide donne trois alertes, une par règle. Le test ne vérifie que le nombre d’alertes.
-4. Lance les tests : ils échouent parce que la fonction n’existe pas encore (phase rouge, c’est normal).
-5. Écris dans headerscope.py la fonction evaluer_entetes(entetes), qui retourne une liste d’alertes. Ce palier ne traite que les absences : une règle absente ajoute une alerte lisible. Lance : H2 passe (phase verte).
-6. Commit.
+1. Crée headerscope.py et verification.py avec TestRegles(unittest.TestCase) et unittest.main() sous la garde __main__.
+2. Écris H2 : evaluer_entetes({}) retourne une liste de trois alertes. Vérifie leur nombre.
+3. Lance : l’absence de fonction explique le rouge.
+4. Crée evaluer_entetes(entetes) : pour chaque en-tête requis absent, ajoute une alerte lisible.
+5. Relance H2 puis commite ; les valeurs et leur normalisation arrivent ensuite.
 
 **Terminal · Commande à lancer au moment indiqué**
 
@@ -280,7 +326,13 @@ Reconnaître les noms d’en-têtes quelle que soit la casse, et refuser une CSP
 
 **Pour comprendre**
 
-- Pourquoi : un serveur peut envoyer content-security-policy ou Content-Security-Policy. La règle doit trouver l’en-tête dans les deux cas.
+- La casse distingue majuscules et minuscules. Content-Security-Policy et content-security-policy désignent le même en-tête.
+- Une valeur "   " n’est pas utile : strip() la transforme en texte vide.
+
+**Règles à respecter**
+
+- Pour CSP, seule la présence d’une valeur non vide est demandée ; tu n’analyses pas le contenu de sa politique.
+- Une CSP absente ou vide produit une alerte CSP.
 
 **Cas de test à écrire**
 
@@ -296,10 +348,10 @@ L’entrée est ce que tu donnes au code ; l’attendu est ce que ton test doit 
 
 **Actions dans l’ordre**
 
-1. Écris H3 : des noms en minuscules avec des valeurs valides donnent zéro alerte. Lance : rouge si la recherche est sensible à la casse.
-2. Écris H4 : clé absente, valeur vide ou valeur faite seulement d’espaces donnent une alerte CSP. Lance : rouge.
-3. Corrige evaluer_entetes : normalise les noms une seule fois, puis, pour la CSP, retire les espaces au début et à la fin de la valeur avant de vérifier qu’elle n’est pas vide. Lance : H2, H3 et H4 passent.
-4. Commit.
+1. Écris H3 : les trois noms en minuscules avec des valeurs conformes donnent zéro alerte.
+2. Écris les trois sous-cas de H4 : CSP absente, vide, puis avec seulement des espaces. Garde les deux autres en-têtes conformes pour isoler ce contrôle.
+3. Normalise les noms une fois et vérifie une valeur CSP non vide après strip.
+4. Relance H2, H3 et H4 puis commite.
 
 **Terminal · Commande à lancer au moment indiqué**
 
@@ -328,7 +380,24 @@ Comparer les valeurs nosniff, DENY et SAMEORIGIN après normalisation.
 
 **Pour comprendre**
 
-- Pourquoi : la liste des valeurs admises se lit mieux qu’une suite de conditions quand il y en a plusieurs.
+- Les valeurs sont comparées après strip() et sans tenir compte de la casse.
+- « valeur in liste » permet de vérifier l’appartenance à plusieurs valeurs admises.
+
+**Éditeur · Exemple Python à lire ou essayer**
+
+Éditeur : copie cet exemple dans exemple.py (jetable), enregistre-le, puis lance python3 exemple.py. Si plusieurs exemples sont proposés, essaie-les un par un en remplaçant le contenu du fichier. Retire ensuite les fichiers générés et le fichier d’exemple.
+
+```python
+fruits_admis = ['pomme', 'poire']
+print('poire' in fruits_admis)
+print('kiwi' in fruits_admis)
+```
+
+**Règles à respecter**
+
+- X-Content-Type-Options : valeur normalisée nosniff.
+- X-Frame-Options : valeur normalisée deny ou sameorigin.
+- Chaque valeur refusée ajoute une alerte pour sa propre règle.
 
 **Cas de test à écrire**
 
@@ -344,20 +413,10 @@ L’entrée est ce que tu donnes au code ; l’attendu est ce que ton test doit 
 
 **Actions dans l’ordre**
 
-1. Écris H5 : nosniff avec espaces et casse variables est accepté ; une autre valeur est signalée. Lance : rouge.
-2. Écris H6 : DENY et SAMEORIGIN avec espaces et casse variables sont admis ; une valeur non admise est signalée. Lance : rouge.
-3. Corrige les deux règles : normalise la valeur (retrait des espaces puis passage en minuscules) avant la comparaison. Pour les valeurs admises, une liste de textes en minuscules suffit.
-4. Commit.
-
-**Éditeur · Exemple Python à lire ou essayer**
-
-Éditeur : copie cet exemple dans exemple.py (jetable), enregistre-le, puis lance python3 exemple.py. Si plusieurs exemples sont proposés, essaie-les un par un en remplaçant le contenu du fichier. Retire ensuite les fichiers générés et le fichier d’exemple.
-
-```python
-fruits_admis = ['pomme', 'poire']
-print('poire' in fruits_admis)
-print('kiwi' in fruits_admis)
-```
+1. Écris H5 : variantes de nosniff avec casse/espaces admises ; une autre valeur signalée.
+2. Écris H6 : variantes de DENY et SAMEORIGIN admises ; une autre valeur signalée.
+3. Pour chaque test, garde les deux autres en-têtes conformes.
+4. Complète les deux contrôles, relance H2 à H6 puis commite.
 
 **Terminal · Commande à lancer au moment indiqué**
 
@@ -384,6 +443,11 @@ Vérifier qu’un profil complet ne donne aucune alerte, et qu’une seule règl
 
 **Où tu travailles :** headerscope.py ; verification.py
 
+**Pour comprendre**
+
+- Les trois règles se cumulent : un contrôle conforme ne retire pas l’alerte d’un autre.
+- Une liste vide [] est attendue quand toutes les règles passent.
+
 **Cas de test à écrire**
 
 L’entrée est ce que tu donnes au code ; l’attendu est ce que ton test doit vérifier.
@@ -398,11 +462,10 @@ L’entrée est ce que tu donnes au code ; l’attendu est ce que ton test doit 
 
 **Actions dans l’ordre**
 
-1. Écris H1 : les trois en-têtes requis avec des valeurs admises donnent zéro alerte.
-2. Écris H7 : deux valeurs conformes et une incorrecte donnent exactement une alerte. Ce test prouve qu’une règle n’en annule pas une autre.
-3. Lance les tests. Si H1 ou H7 échoue, relis chaque règle séparément : une règle ne doit regarder que son propre en-tête.
-4. Corrige le minimum, puis lance tous les tests : H1 à H7 doivent passer sans que tu modifies les tests déjà verts.
-5. Commit.
+1. Écris H1 avec les trois en-têtes et des valeurs conformes : attends [].
+2. Écris H7 avec deux valeurs conformes et une incorrecte : attends exactement une alerte.
+3. Relis les contrôles séparément si le nombre d’alertes est incorrect.
+4. Relance H1 à H7 sans changer les attendus déjà verts, puis commite.
 
 **Terminal · Commande à lancer au moment indiqué**
 
@@ -431,14 +494,8 @@ Faire exécuter les tests par la CI de la merge request, puis fusionner seulemen
 
 **Pour comprendre**
 
-- Pourquoi : quatre choses ne se confondent pas. Ton test local réussi n’est pas un pipeline GitLab exécuté ; un pipeline vert n’est pas encore une fusion autorisée ; et une case cochée dans Cyber Atelier ne prouve rien.
-
-**Actions dans l’ordre**
-
-1. Crée .gitlab-ci.yml à la racine : un job qui lance python3 verification.py et qui tourne sur les merge requests. Ne rends pas le job facultatif et ne masque pas ses erreurs.
-2. Le job n’a pas besoin du laboratoire : le runner de l’école n’en a pas. Si le job échoue, lis la dernière ligne du journal : elle dit quelle commande a échoué.
-3. Relis le diff, pousse la branche, ouvre la merge request dans GitLab de l’école (branche feat/regles-entetes vers main), puis attends le pipeline du dernier commit.
-4. Fusionne seulement si le pipeline est vert. Après fusion, reviens sur main à jour.
+- git diff montre les lignes modifiées ; git diff --staged montre celles choisies pour le prochain commit. Le diff de la MR compare toute ta branche à main.
+- La demande de fusion (MR dans GitLab, PR dans GitHub) permet de relire le travail avant de l’intégrer à main.
 
 **Éditeur · Exemple YAML à lire**
 
@@ -450,6 +507,17 @@ saluer:
   script:
     - echo bonjour
 ```
+
+**Actions dans l’ordre**
+
+1. Lance la suite complète avec la commande indiquée au début de la mission.
+2. Avant de livrer, rédige .gitlab-ci.yml toi-même : job bloquant sur les MR avec python3 verification.py. Il ne démarre pas le labo. Teste cette commande en local puis commite la CI.
+3. Relis git status et git diff : la livraison doit contenir headerscope.py, verification.py et .gitlab-ci.yml, avec les modifications nécessaires de cette mission.
+4. Ajoute les fichiers par leur nom, relis git diff --staged, puis commite ce qui ne l’est pas encore.
+5. Pousse feat/regles-entetes et ouvre la demande de fusion vers main.
+6. Dans GitLab, ouvre le pipeline du dernier commit : vérifie qu’il a réellement exécuté les tests et qu’il est vert. Un test local réussi ne le remplace pas.
+7. Relis le diff et fusionne lorsque le pipeline et les règles de l’école le permettent.
+8. Après la fusion, reviens sur main et lance git pull --ff-only avant la mission suivante.
 
 **Terminal · Relire l’état du dépôt**
 
@@ -517,12 +585,16 @@ Partir de la version fusionnée de la MR1, sans mélanger deux merge requests.
 
 **Pour comprendre**
 
-- Pourquoi : chaque merge request part de la base à jour. Sinon tu relis du code qui n’est pas encore dans main.
+- La branche principale (main) contient le travail déjà fusionné. Ta branche feat/... reçoit les changements de cette mission.
+- Un dépôt « propre » n’a aucune modification en attente : git status te le confirme.
 
 **Actions dans l’ordre**
 
-1. Vérifie que ton dépôt est propre, reviens sur main et récupère la fusion de la MR1.
-2. Crée la branche de la MR2 à partir de ce main à jour.
+1. Ouvre workspaces/headerscope dans VS Code, ou Coder dans Cyber Atelier avec cwd sur « . ».
+2. Vérifie que MR1 est fusionnée et que H1 à H7 passent sur main.
+3. Lis git status ; enregistre ton travail en cours avant de changer de branche.
+4. Reviens sur main avec git switch main, mets-la à jour avec git pull --ff-only, puis crée feat/client-http. Remplace main par master si ton dépôt utilise ce nom.
+5. Vérifie le nom de ta branche avec git status. Si elle existe déjà, reprends-la avec git switch sans -c.
 
 **Terminal · Relire l’état du dépôt**
 
@@ -574,12 +646,8 @@ Comprendre qu’une réponse HTTP d’erreur et une panne de connexion ne sont p
 
 **Pour comprendre**
 
-- Pourquoi : un 404 a un code et des en-têtes ; une connexion refusée n’a ni l’un ni l’autre. Ton client doit traiter les deux cas séparément.
-
-**Actions dans l’ordre**
-
-1. Crée un fichier exemple_reseau.py jetable avec le code ci-dessous. Il fabrique une erreur de connexion et une erreur HTTP sans contacter aucun serveur : tu peux observer leur différence de forme.
-2. Lance-le. Puis supprime le fichier : rm exemple_reseau.py.
+- HTTPError signifie que le serveur a répondu avec un code HTTP d’erreur, comme 404 : il existe une réponse et des en-têtes.
+- URLError peut signaler une panne de connexion : aucune réponse HTTP utilisable n’a été reçue.
 
 **Éditeur · Exemple Python à lire ou essayer**
 
@@ -593,6 +661,12 @@ print("panne :", erreur_connexion.reason)
 erreur_http = urllib.error.HTTPError("http://127.0.0.1/exemple", 404, "Introuvable", {}, None)
 print(erreur_http.code, erreur_http.reason)
 ```
+
+**Actions dans l’ordre**
+
+1. Crée exemple_reseau.py avec l’exemple fourni. Il fabrique les erreurs sans contacter de serveur.
+2. Lance-le, repère reason pour la panne et code/reason pour l’erreur HTTP.
+3. Explique la différence entre ces deux observations, puis supprime le fichier d’essai.
 
 **Terminal · Commande à lancer au moment indiqué**
 
@@ -614,21 +688,8 @@ python3 exemple_reseau.py
 
 **Pour comprendre**
 
-- Pourquoi : classer une réponse n’a pas besoin de réseau. Tu passes directement les valeurs : pas de mock, pas de serveur.
-
-**Cas de test à écrire**
-
-L’entrée est ce que tu donnes au code ; l’attendu est ce que ton test doit vérifier.
-
-**H8 — Classement d’une réponse 200**
-- Entrée : Appel pur à classer_reponse(200, dictionnaire des trois en-têtes conformes)
-- Résultat attendu : Retourne le statut 200, HTTP_OK et zéro alerte.
-
-**Actions dans l’ordre**
-
-1. Écris H8 : classer_reponse(200, trois en-têtes conformes) doit retourner le statut 200, l’état HTTP_OK et zéro alerte. Lance : rouge, la fonction n’existe pas encore.
-2. Écris classer_reponse dans headerscope.py en réutilisant evaluer_entetes de la MR1. Pour un statut 200, retourne le statut, HTTP_OK et les alertes. Lance : H8 passe, H1 à H7 restent verts.
-3. Commit.
+- Un triplet est un tuple de trois valeurs : ici le code HTTP, un état de classement et la liste des alertes.
+- classer_reponse reçoit les données directement ; seule demander fera le réseau.
 
 **Éditeur · Exemple Python à lire ou essayer**
 
@@ -641,6 +702,37 @@ def bornes(liste):
 petit, grand = bornes([4, 9, 2])
 print(petit, grand)
 ```
+
+**Exemple de résultat attendu**
+
+Ce que tu donnes :
+
+```text
+classer_reponse(200, trois en-têtes conformes)
+```
+
+Ce que tu dois obtenir :
+
+```text
+(200, "HTTP_OK", [])
+```
+
+HTTP_OK indique la réponse réussie ; les alertes décrivent les contrôles d’en-têtes.
+
+**Cas de test à écrire**
+
+L’entrée est ce que tu donnes au code ; l’attendu est ce que ton test doit vérifier.
+
+**H8 — Classement d’une réponse 200**
+- Entrée : Appel pur à classer_reponse(200, dictionnaire des trois en-têtes conformes)
+- Résultat attendu : Retourne le statut 200, HTTP_OK et zéro alerte.
+
+**Actions dans l’ordre**
+
+1. Écris H8 avec 200 et les trois en-têtes conformes ; vérifie le triplet entier.
+2. Lance le test et repère la fonction manquante.
+3. Crée classer_reponse(statut, entetes), réutilise evaluer_entetes pour le code 200.
+4. Relance H1 à H8 et commite.
 
 **Terminal · Commande à lancer au moment indiqué**
 
@@ -667,6 +759,27 @@ Classer les erreurs HTTP sans leur donner d’alertes de politique.
 
 **Où tu travailles :** headerscope.py ; verification.py
 
+**Pour comprendre**
+
+- Une erreur HTTP garde son numéro : 404 et 500 ne deviennent pas une panne sans code.
+- Le contrat n’évalue pas la politique d’en-têtes sur ces réponses d’erreur.
+
+**Exemple de résultat attendu**
+
+Ce que tu donnes :
+
+```text
+classer_reponse(404, {})
+```
+
+Ce que tu dois obtenir :
+
+```text
+(404, "HTTP_ERREUR", [])
+```
+
+L’absence d’alerte de politique ici n’indique pas une requête réussie.
+
 **Cas de test à écrire**
 
 L’entrée est ce que tu donnes au code ; l’attendu est ce que ton test doit vérifier.
@@ -677,10 +790,10 @@ L’entrée est ce que tu donnes au code ; l’attendu est ce que ton test doit 
 
 **Actions dans l’ordre**
 
-1. Écris H9 : des appels purs avec 404, puis 500, et un dictionnaire d’en-têtes quelconque. Chaque code doit ressortir avec HTTP_ERREUR et une liste d’alertes vide.
-2. Lance : rouge, les codes 404 et 500 ne sont pas encore traités.
-3. Ajoute dans classer_reponse le cas des autres codes : statut conservé, HTTP_ERREUR, alertes vides. Lance : tous les tests passent.
-4. Commit.
+1. Ajoute H9, séparément pour 404 et 500, avec un dictionnaire d’en-têtes quelconque.
+2. Attends le code d’origine, "HTTP_ERREUR" et [].
+3. Complète classer_reponse pour les codes autres que 200, sans réseau.
+4. Relance H1 à H9 puis commite.
 
 **Terminal · Commande à lancer au moment indiqué**
 
@@ -709,13 +822,21 @@ Demander un chemin fixe du laboratoire avec un délai maximal de 2 secondes.
 
 **Pour comprendre**
 
-- Pourquoi : le client est la seule partie qui parle au réseau. Tout le reste reste pur et testable sans réseau.
+- L’URL désigne la ressource complète ; le chemin est sa partie finale, comme /durci. La base reste fixe.
+- urlopen lit la réponse ; timeout=2 borne l’attente à deux secondes.
+
+**Règles à respecter**
+
+- Chemins admis : /fragile, /durci, /absent, /erreur.
+- Base : http://127.0.0.1:8000 ; timeout de deux secondes.
+- H8 et H9 restent hors réseau.
 
 **Actions dans l’ordre**
 
-1. Écris une fonction demander(chemin) qui construit l’URL à partir de http://127.0.0.1:8000 et du chemin. Elle n’accepte que /fragile, /durci, /absent et /erreur ; un autre chemin lève ValueError avant tout appel réseau.
-2. Appelle urlopen avec timeout=2 pour le cas d’une réponse réussie, puis retourne le statut et les en-têtes reçus.
-3. Ce palier n’a pas de test automatique : H8 et H9 ne touchent pas le réseau. La vérification réelle est la démonstration du palier 7.
+1. Crée demander(chemin) et la liste des quatre chemins admis.
+2. Refuse tout autre chemin par ValueError avant tout appel réseau.
+3. Construis l’URL avec la base fixe, puis récupère statut et en-têtes de la réponse réussie. Ferme la réponse après lecture.
+4. Vérifie à la main le refus de /autre, relance les tests purs et commite. Le client réel sera essayé au palier 7.
 
 **Terminal · Commande à lancer au moment indiqué**
 
@@ -744,13 +865,15 @@ Rendre une panne de connexion ou un délai dépassé comme un résultat distinct
 
 **Pour comprendre**
 
-- Pourquoi : l’utilisateur doit voir la différence entre « le serveur a répondu 404 » et « le serveur n’a pas répondu ».
+- HTTPError hérite d’URLError : traite-la d’abord pour conserver la réponse HTTP.
+- Panne de connexion et délai dépassé restent distincts des codes 404 et 500.
 
 **Actions dans l’ordre**
 
-1. Dans demander, attrape HTTPError et récupère son code et ses en-têtes comme pour une réponse réussie. Le classement reste dans classer_reponse, appelée par executer_bilan en MR3 : ne classe pas une même réponse deux fois.
-2. Attrape ensuite URLError et TimeoutError : retourne un résultat de panne distinct, sans code HTTP, et sans appeler classer_reponse.
-3. Vérifie que le fichier compile et que les tests restent verts.
+1. Dans demander, attrape HTTPError, récupère code et en-têtes puis ferme la ressource.
+2. Traite ensuite URLError et TimeoutError : rends une panne sans code HTTP et distingue le délai dépassé d’une autre panne.
+3. Garde le classement dans classer_reponse ; la prochaine mission coordonnera les fonctions.
+4. Vérifie la compilation, relance H1 à H9 puis commite.
 
 **Terminal · Commande à lancer au moment indiqué**
 
@@ -785,15 +908,16 @@ Voir le client contre le vrai laboratoire, séparément des tests automatiques.
 
 **Pour comprendre**
 
-- Pourquoi : cette démonstration exige le laboratoire. Elle n’entre ni dans verification.py ni dans la CI : le runner de l’école n’a pas le laboratoire.
+- 127.0.0.1 désigne la machine du programme : client du Mac et client du conteneur atteignent chacun leur propre labo.
+- Cette démonstration dépend d’un serveur réel et reste hors tests automatiques.
 
 **Actions dans l’ordre**
 
-1. Option A, dans Cyber Atelier (Docker) : vérifie que le laboratoire intégré est actif. Il démarre avec l’application ; son bouton permet de le relancer.
-2. Option B, sur ton Mac : depuis le dossier cyberatelier, lance python3 labs.py dans un terminal. Il répond sur 127.0.0.1:8000. Arrête-le avec Ctrl+C.
-3. Choisis une seule source à la fois. Le client du Mac interroge le laboratoire du Mac ; la console Docker interroge celui du conteneur.
-4. Demande /fragile, /durci, /absent et /erreur, un par un. Arrête ensuite le laboratoire et relance le client : tu dois voir une panne, distincte d’un code HTTP.
-5. N’envoie aucune requête vers une autre cible.
+1. Choisis ton environnement : bouton du labo dans Docker, ou python3 labs.py depuis cyberatelier sur le Mac.
+2. Depuis le même environnement, demande /fragile, /durci, /absent et /erreur, un par un.
+3. Observe 200 pour les deux premiers, 404 pour /absent et 500 pour /erreur.
+4. Arrête le labo et réessaie : attends une panne sans code HTTP.
+5. Relance le labo pour la suite. Garde ces appels hors de verification.py et dans le périmètre prévu.
 
 **Terminal · Option Mac : démarrer le laboratoire dans un autre terminal**
 
@@ -827,12 +951,21 @@ Relire ce que tu livres, pousser la branche, et fusionner seulement après un pi
 
 **Où tu travailles :** MR GitLab
 
+**Pour comprendre**
+
+- git diff montre les lignes modifiées ; git diff --staged montre celles choisies pour le prochain commit. Le diff de la MR compare toute ta branche à main.
+- La demande de fusion (MR dans GitLab, PR dans GitHub) permet de relire le travail avant de l’intégrer à main.
+
 **Actions dans l’ordre**
 
-1. Relis le diff comme si c’était le code de quelqu’un d’autre : ce qui est ajouté, ce qui est retiré, et l’absence de fichiers parasites.
-2. Pousse la branche, puis ouvre la merge request dans GitLab de l’école (feat/client-http vers main).
-3. Attends le pipeline du dernier commit. Un test local vert ne remplace pas ce pipeline, et ce pipeline ne prouve pas que le laboratoire fonctionne.
-4. Fusionne seulement si le pipeline est vert.
+1. Lance la suite complète avec la commande indiquée au début de la mission.
+2. Décris séparément la démonstration du client : le pipeline teste seulement les règles et le classement pur.
+3. Relis git status et git diff : la livraison doit contenir headerscope.py et verification.py, avec les modifications nécessaires de cette mission.
+4. Ajoute les fichiers par leur nom, relis git diff --staged, puis commite ce qui ne l’est pas encore.
+5. Pousse feat/client-http et ouvre la demande de fusion vers main.
+6. Dans GitLab, ouvre le pipeline du dernier commit : vérifie qu’il a réellement exécuté les tests et qu’il est vert. Un test local réussi ne le remplace pas.
+7. Relis le diff et fusionne lorsque le pipeline et les règles de l’école le permettent.
+8. Après la fusion, reviens sur main et lance git pull --ff-only avant la mission suivante.
 
 **Terminal · Relire l’état du dépôt**
 
@@ -880,11 +1013,16 @@ Partir de la version fusionnée des MR1 et MR2, dans une branche dédiée au bil
 
 **Pour comprendre**
 
-- Pourquoi : le bilan s’appuie sur le client et sur les règles fusionnés. Repars donc de main à jour, pas d’une ancienne branche.
+- La branche principale (main) contient le travail déjà fusionné. Ta branche feat/... reçoit les changements de cette mission.
+- Un dépôt « propre » n’a aucune modification en attente : git status te le confirme.
 
 **Actions dans l’ordre**
 
-1. Vérifie que ton dépôt est propre, reviens sur main, récupère les fusions, puis crée la branche feat/bilan.
+1. Ouvre workspaces/headerscope dans VS Code, ou Coder dans Cyber Atelier avec cwd sur « . ».
+2. Vérifie que MR2 est fusionnée : main contient les deux premières missions.
+3. Lis git status ; enregistre ton travail en cours avant de changer de branche.
+4. Reviens sur main avec git switch main, mets-la à jour avec git pull --ff-only, puis crée feat/bilan. Remplace main par master si ton dépôt utilise ce nom.
+5. Vérifie le nom de ta branche avec git status. Si elle existe déjà, reprends-la avec git switch sans -c.
 
 **Terminal · Relire l’état du dépôt**
 
@@ -936,12 +1074,8 @@ Lire un argument passé au programme et le refuser s’il n’est pas dans la li
 
 **Pour comprendre**
 
-- Pourquoi : le programme ne traite qu’un seul chemin, choisi parmi les quatre chemins du laboratoire. Un argument hors liste doit être refusé avant tout appel réseau.
-
-**Actions dans l’ordre**
-
-1. Crée un fichier exemple_choix.py jetable avec le code ci-dessous. Les fruits sont un exemple sans rapport avec HeaderScope.
-2. Lance-le avec un fruit de la liste, puis avec un fruit absent, et sans argument. Supprime exemple_choix.py ensuite.
+- sys.argv contient le nom du script puis les arguments du terminal. Le premier argument utilisateur est à la position 1.
+- Vérifie la longueur avant de lire cette position pour gérer un lancement sans argument.
 
 **Éditeur · Exemple Python à lire ou essayer**
 
@@ -957,6 +1091,13 @@ if choix in FRUITS:
 else:
     print('inconnu :', choix)
 ```
+
+**Actions dans l’ordre**
+
+1. Crée exemple_choix.py avec l’exemple des fruits.
+2. Lance avec poire : choix admis. Lance avec kiwi : refus.
+3. Lance sans argument : valeur par défaut pomme.
+4. Repère la lecture de l’argument et la liste autorisée, puis supprime le fichier d’essai.
 
 **Terminal · Commande à lancer au moment indiqué**
 
@@ -988,13 +1129,18 @@ python3 exemple_choix.py
 
 **Où tu travailles :** headerscope.py
 
+**Pour comprendre**
+
+- Orchestrer signifie appeler les étapes dans le bon ordre. Une entrée refusée s’arrête avant toute requête.
+- Une panne n’a pas de réponse HTTP à classer.
+
 **Actions dans l’ordre**
 
-1. Écris executer_bilan(chemin) : elle vérifie que le chemin est l’un des quatre chemins fixes, appelle demander(chemin), puis classe la réponse avec classer_reponse.
-2. Garde l’ordre : vérifier le chemin, puis demander, puis classer. Un chemin refusé s’arrête avant tout appel réseau.
-3. Ajoute un bloc if __name__ == '__main__': qui lit le chemin dans sys.argv, comme dans l’exemple du palier 2.
-4. Ne sors aucun crawl, aucune URL arbitraire et aucun scan : le programme reste sur les quatre chemins.
-5. Commit.
+1. Crée executer_bilan(chemin) : contrôle le chemin, appelle demander, puis classe une réponse HTTP avec classer_reponse.
+2. Pour une panne ou un timeout, conserve le résultat distinct sans classement HTTP.
+3. Sous la garde __main__, lis le chemin depuis sys.argv comme dans l’exemple précédent.
+4. Garde la cible et les quatre chemins fixes : aucun crawl ni URL arbitraire.
+5. Vérifie la compilation, relance H1 à H9 et commite.
 
 **Terminal · Commande à lancer au moment indiqué**
 
@@ -1029,13 +1175,8 @@ Produire un texte de bilan avec statut, alertes et résumé, et séparer 404, 50
 
 **Pour comprendre**
 
-- Pourquoi : un texte qui retourne au lieu d’afficher se teste et se réutilise sans modifier l’écran.
-
-**Actions dans l’ordre**
-
-1. Écris une fonction qui reçoit le résultat et retourne un texte : le statut, la liste des alertes et un résumé comme « 3 alertes » ou « aucune alerte ». Elle retourne le texte sans l’afficher, pour rester pure.
-2. Pour une panne et pour un délai dépassé, retourne un libellé distinct de tout code HTTP.
-3. Commit.
+- La présentation reçoit le résultat et retourne une chaîne ; le lancement principal l’affiche.
+- Le texte distingue réponse réussie, erreur HTTP, panne de connexion et timeout.
 
 **Éditeur · Exemple Python à lire ou essayer**
 
@@ -1046,6 +1187,13 @@ produits = [('pomme', 3), ('poire', 0)]
 for nom, quantite in produits:
     print(f'{nom} : {quantite} en stock')
 ```
+
+**Actions dans l’ordre**
+
+1. Écris la présentation sans print : statut, liste d’alertes, résumé « 3 alertes » ou « aucune alerte ».
+2. Prévois un libellé différent pour les quatre issues et garde le numéro des erreurs HTTP.
+3. Essaie sur les résultats observés ; une panne ne doit pas afficher un faux code HTTP.
+4. Vérifie la compilation et commite.
 
 **Terminal · Commande à lancer au moment indiqué**
 
@@ -1074,12 +1222,15 @@ Prouver que la CI reste verte sans laboratoire, en contrôlant que les tests ne 
 
 **Pour comprendre**
 
-- Pourquoi : sur le runner de l’école, le laboratoire n’existe pas. Si un test dépend de lui, la CI devient rouge pour une mauvaise raison.
+- Les tests des règles et du classement reçoivent des dictionnaires et des nombres fabriqués.
+- Ils doivent passer même quand aucun serveur n’écoute.
 
 **Actions dans l’ordre**
 
-1. Arrête le laboratoire (Ctrl+C dans le terminal de labs.py, ou son bouton dans Cyber Atelier), puis lance les tests.
-2. Vérifie que verification.py n’appelle ni urlopen ni demander : c’est H8 et H9 qui passent des valeurs directement.
+1. Arrête le labo avec son bouton ou Ctrl+C.
+2. Lance verification.py : attends 0 avec des tests réellement exécutés.
+3. Relis les tests : aucun appel à demander ni urlopen. La recherche proposée doit être vide.
+4. Si un appel réel s’est glissé dans la suite, remplace-le par les données directes prévues par H8 et H9.
 
 **Terminal · Commande à lancer au moment indiqué**
 
@@ -1109,13 +1260,15 @@ Documenter ce que le programme fait, comment le lancer et ce qu’il ne prouve p
 
 **Pour comprendre**
 
-- Pourquoi : un README qui promet trop trompe le lecteur. Écris ce que la CI prouve, et ce qu’elle ne prouve pas.
+- Le README explique où travailler, quelles règles sont vérifiées et comment lancer le programme.
+- Une alerte décrit un contrôle d’en-tête précis, sans démontrer qu’un site est exploitable.
 
 **Actions dans l’ordre**
 
-1. Rédige README.md avec : le périmètre (127.0.0.1:8000 et les quatre chemins seulement) ; les règles des trois en-têtes et leur normalisation ; le délai de 2 secondes ; la commande des tests (python3 verification.py) ; le fait que la CI ne suppose pas le laboratoire.
-2. Ajoute une section « limites » : un en-tête n’est pas une preuve de sécurité, une alerte ne dit pas qu’un site est exploitable, et le laboratoire est un outil de démonstration.
-3. Commit.
+1. Documente 127.0.0.1:8000 et les quatre chemins admis.
+2. Explique les trois règles, les normalisations et le timeout de deux secondes.
+3. Ajoute lancement, python3 verification.py et la distinction tests hors ligne / labo de démonstration.
+4. Écris les limites d’interprétation des en-têtes, puis commite README.md.
 
 **Terminal · Commande à lancer au moment indiqué**
 
@@ -1148,13 +1301,18 @@ Vérifier le comportement réel du programme sur le laboratoire, sans le confond
 
 **Où tu travailles :** Laboratoire local ; headerscope.py
 
+**Pour comprendre**
+
+- D1 à D3 observent manuellement le programme complet et restent séparées de H1 à H9.
+- Labo arrêté, l’affichage doit distinguer une panne d’une réponse HTTP d’erreur.
+
 **Actions dans l’ordre**
 
-1. Ces démonstrations (HeaderScope D1 à D3) exigent le laboratoire. Elles ne sont pas des tests de verification.py et ne doivent pas y entrer.
-2. Option A, dans Cyber Atelier : vérifie que le laboratoire intégré est actif ; son bouton permet de l’arrêter ou de le relancer.
-3. Option B, sur ton Mac : depuis le dossier cyberatelier, lance python3 labs.py, puis Ctrl+C pour l’arrêter.
-4. D1 : /fragile doit donner trois alertes. D2 : /durci doit donner zéro alerte. D3 : /absent puis /erreur doivent être identifiés comme 404 puis 500, des erreurs HTTP.
-5. Arrête ensuite le laboratoire et relance une fois le programme : tu dois voir une panne, distincte des 404 et 500.
+1. Démarre le labo dans le même environnement que le client.
+2. D1 : /fragile donne trois alertes.
+3. D2 : /durci donne zéro alerte.
+4. D3 : /absent puis /erreur donnent HTTP_ERREUR avec 404 puis 500, sans alerte de politique.
+5. Arrête le labo et relance : attends une panne distincte. Consigne les observations hors de verification.py.
 
 **Terminal · Option Mac : démarrer le laboratoire dans un autre terminal**
 
@@ -1200,12 +1358,21 @@ Pousser la dernière branche, vérifier le pipeline du dernier commit, puis fusi
 
 **Où tu travailles :** MR GitLab
 
+**Pour comprendre**
+
+- git diff montre les lignes modifiées ; git diff --staged montre celles choisies pour le prochain commit. Le diff de la MR compare toute ta branche à main.
+- La demande de fusion (MR dans GitLab, PR dans GitHub) permet de relire le travail avant de l’intégrer à main.
+
 **Actions dans l’ordre**
 
-1. Relis le diff de la branche : headerscope.py, verification.py et README.md, sans fichier parasite.
-2. Pousse la branche, puis ouvre la merge request dans GitLab de l’école (feat/bilan vers main).
-3. Attends le pipeline du dernier commit. Pour cette MR : test local vert, pipeline GitLab exécuté, autorisation de fusion et case cochée dans Cyber Atelier sont quatre choses différentes. Seul le pipeline et la règle de fusion de l’école comptent pour la fusion.
-4. Fusionne seulement si le pipeline est vert. Après fusion, reviens sur main à jour.
+1. Lance la suite complète avec la commande indiquée au début de la mission.
+2. Cocher Cyber Atelier indique ton avancement ; cela n’exécute aucun test et n’autorise aucune fusion.
+3. Relis git status et git diff : la livraison doit contenir headerscope.py, verification.py et README.md, avec les modifications nécessaires de cette mission.
+4. Ajoute les fichiers par leur nom, relis git diff --staged, puis commite ce qui ne l’est pas encore.
+5. Pousse feat/bilan et ouvre la demande de fusion vers main.
+6. Dans GitLab, ouvre le pipeline du dernier commit : vérifie qu’il a réellement exécuté les tests et qu’il est vert. Un test local réussi ne le remplace pas.
+7. Relis le diff et fusionne lorsque le pipeline et les règles de l’école le permettent.
+8. Après la fusion, reviens sur main et lance git pull --ff-only avant la mission suivante.
 
 **Terminal · Relire l’état du dépôt**
 

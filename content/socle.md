@@ -27,11 +27,11 @@ Par exemple : `2026-01-05 08:12:44 LOGIN_OK alice 192.0.2.10`. Les événements 
 <!-- BEGIN GENERATED EXERCISES -->
 ## Comment travailler un exercice
 
-Chaque mission construit une partie du projet. Commence par « Avant de commencer », puis avance palier par palier. Les durées sont des repères : prends le temps de comprendre chaque résultat.
+Ces exercices sont ton entraînement. Chaque palier explique les notions utiles, montre les données ou les règles attendues, puis te fait écrire et vérifier ton propre code. Les durées sont des repères : avance quand tu comprends le résultat.
 
-1. Lis l’objectif et les fichiers concernés. Un fichier indiqué comme « à créer » n’est pas fourni : c’est toi qui l’écris.
+1. Lis « Pour comprendre » et l’exemple lorsqu’il y en a un. Repère ce qui entre dans le programme, ce qui doit en sortir et les règles à respecter.
 2. Les cartes de tests donnent l’entrée et le résultat attendu. Écris les tests correspondants dans le fichier indiqué ; cocher un palier ne les exécute pas. Avec unittest, « Ran 0 tests » signifie qu’aucun test n’a été exécuté : ce n’est pas une validation. Un cas décrit peut contenir plusieurs valeurs ; le nombre de méthodes Python n’est donc pas forcément le nombre d’identifiants.
-3. Suis les actions numérotées. Les blocs Python se placent dans l’éditeur ; les commandes se lancent au moment demandé. Relis les blocs Git : des modifications et des actions dans GitHub/GitLab peuvent être nécessaires entre deux commandes.
+3. Suis les actions numérotées, une à la fois. Les exemples servent à apprendre une notion ; tu écris toi-même la solution de l’exercice. Les blocs Terminal donnent les commandes à lancer au moment indiqué.
 4. Vérifie le résultat indiqué avant de poursuivre. Un échec attendu (phase rouge, argument refusé ou conflit volontaire) est expliqué dans le palier.
 5. Si tu bloques, lis la dernière ligne de l’erreur, compare l’entrée et l’attendu, puis ouvre l’indice. Fais un petit changement et relance.
 
@@ -46,6 +46,16 @@ La console web repart à neuf à chaque exécution : un `cd`, une activation de 
 Un venv créé sur le Mac ne fonctionne pas dans le conteneur : utilise `python3` dans ce dernier. Remplace `main` par `master` si nécessaire. Si une branche existe déjà, reprends-la avec `git switch NOM` sans `-c`. Après chaque fusion, actualise la branche principale avant la mission suivante.
 
 ### Les mots utiles
+
+**Chaîne / champ.** Une chaîne (str) est du texte. Un champ est un morceau de donnée, comme l’utilisateur dans une ligne de journal.
+
+**Liste / position.** Une liste conserve plusieurs valeurs dans un ordre. Sa première position porte le numéro 0, la suivante 1, etc.
+
+**Dictionnaire / clé.** Un dictionnaire associe un nom à une valeur : {"fruit": "pomme"}. fruit est la clé ; pomme est sa valeur.
+
+**None.** Une valeur Python qui représente l’absence de résultat. Dans analyser_ligne, elle signifie que la ligne est refusée. Elle s’écrit sans guillemets.
+
+**split / strip.** split() sans argument découpe une chaîne sur ses espaces. split(".") découpe sur les points. strip() retire les espaces aux bords.
 
 **Contrat.** Les règles à respecter : arguments reçus, valeur retournée, erreurs et cas limites. Tu choisis le code qui respecte ces règles.
 
@@ -108,14 +118,17 @@ Avoir un dossier propre, relié à GitHub, sur la branche de la mission.
 
 **Pour comprendre**
 
-- Une branche est une ligne de travail séparée de main : tu codes dessus sans risque, et main ne bouge pas tant que tu n’as pas fusionné.
+- La branche principale (main) contient le travail déjà fusionné. Ta branche feat/... reçoit les changements de cette mission.
+- Un dépôt « propre » n’a aucune modification en attente : git status te le confirme.
 
 **Actions dans l’ordre**
 
-1. Ouvre le dossier workspaces/socle de Cyber Atelier dans VS Code, puis un terminal (Terminal > New Terminal).
-2. Si le dépôt n’est pas cloné, fais d’abord la préparation dans l’onglet Environnement. Vérifie que la principale est à jour, puis crée feat/bases avant ton premier commit.
-3. Crée .gitignore avec __pycache__/ et fixtures/, un motif par ligne. Enregistre ce fichier dans un commit : les caches et les copies de données resteront hors des commits.
-4. Vérifie ensuite que tu es sur feat/bases et que le dépôt est propre.
+1. Ouvre workspaces/socle dans VS Code, ou Coder dans Cyber Atelier avec cwd sur « . ».
+2. Termine la préparation de l’onglet Environnement : le dépôt doit déjà être cloné.
+3. Lis git status ; enregistre ton travail en cours avant de changer de branche.
+4. Reviens sur main avec git switch main, mets-la à jour avec git pull --ff-only, puis crée feat/bases. Remplace main par master si ton dépôt utilise ce nom.
+5. Crée .gitignore avec __pycache__/ et fixtures/, un motif par ligne. Commite ce fichier ; git status doit ensuite être propre.
+6. Vérifie le nom de ta branche avec git status. Si elle existe déjà, reprends-la avec git switch sans -c.
 
 **Terminal · Relire l’état du dépôt**
 
@@ -154,12 +167,10 @@ Comprendre à quoi sert un test avant d’en écrire pour de vrai.
 
 **Où tu travailles :** exemple.py (jetable)
 
-**Actions dans l’ordre**
+**Pour comprendre**
 
-1. Crée un fichier exemple.py (jetable, il ne sera pas livré) et recopie le code ci-dessous. Ici, doubler est un exemple sans rapport avec ton exercice.
-2. Lance-le. Puis remplace 8 par 9, relance et lis le message : c’est ainsi que Python te dit qu’un test échoue. Remets 8.
-3. Retiens la forme : une classe qui hérite de unittest.TestCase, des méthodes dont le nom commence par test_, et assertEqual(obtenu, attendu).
-4. Quand c’est compris, supprime le fichier : rm exemple.py.
+- Un test appelle une fonction puis compare sa réponse à une valeur prévue. assertEqual compare deux valeurs ; un écart fait échouer le test.
+- unittest.TestCase regroupe les vérifications. Chaque méthode dont le nom commence par test_ est découverte par unittest.
 
 **Éditeur · Exemple Python à lire ou essayer**
 
@@ -179,6 +190,13 @@ if __name__ == "__main__":
     unittest.main()
 ```
 
+**Actions dans l’ordre**
+
+1. Crée exemple.py, fichier jetable, et recopie l’exemple doubler ci-dessous.
+2. Lance-le : 4 doublé doit donner 8, donc le test affiche OK.
+3. Change uniquement l’attendu 8 en 9, relance et lis FAILED : le test détecte maintenant l’écart.
+4. Remets 8, vérifie OK, puis supprime exemple.py sans le commiter.
+
 **Terminal · Commande à lancer au moment indiqué**
 
 Terminal du parcours : reste à la racine du dépôt. Exécute ces lignes au moment demandé dans les actions, avec les modifications manuelles entre les blocs.
@@ -197,6 +215,36 @@ python3 exemple.py -v
 
 **Où tu travailles :** outils.py ; test_outils.py
 
+**Pour comprendre**
+
+- Une chaîne (str) est du texte ; True et False sont des booléens qui expriment « accepté » ou « refusé ».
+- La fonction reçoit un nom et retourne sa décision. Ton test vérifie ce retour ; afficher le nom avec print ne suffit pas.
+
+**Exemple de résultat attendu**
+
+Ce que tu donnes :
+
+```text
+valider_nom_utilisateur("Alice_01")
+```
+
+Ce que tu dois obtenir :
+
+```text
+True
+```
+
+Les guillemets indiquent une chaîne. Le booléen True ne prend pas de guillemets.
+
+**Règles à respecter**
+
+- Le nom est du texte ; un autre type doit lever TypeError.
+- Retire les espaces au début et à la fin avant de vérifier.
+- Longueur admise après ce retrait : de 3 à 16 caractères inclus.
+- Le premier caractère est une lettre ASCII : A à Z ou a à z.
+- Les autres caractères sont des lettres ASCII, des chiffres, _ ou -.
+- Retour : True pour un nom admis, False pour un texte refusé.
+
 **Cas de test à écrire**
 
 L’entrée est ce que tu donnes au code ; l’attendu est ce que ton test doit vérifier.
@@ -207,10 +255,10 @@ L’entrée est ce que tu donnes au code ; l’attendu est ce que ton test doit 
 
 **Actions dans l’ordre**
 
-1. Crée test_outils.py : importe unittest et from outils import valider_nom_utilisateur, puis une classe TestValiderNomUtilisateur avec un test pour S1.
-2. Lance les tests : ils échouent parce que outils.py n’existe pas encore. C’est la phase « rouge », elle est normale.
-3. Crée outils.py avec valider_nom_utilisateur(nom), qui retourne True ou False. Fais passer S1 : c’est la phase « verte ».
-4. Contrat complet de la fonction, que tu vas compléter aux deux paliers suivants : le nom fait de 3 à 16 caractères, commence par une lettre ASCII, puis ne contient que des lettres ASCII, des chiffres, _ ou -. Les espaces de début et de fin sont retirés avant le contrôle. Un nom qui n’est pas une chaîne lève TypeError.
+1. Crée test_outils.py avec une classe unittest qui importe valider_nom_utilisateur depuis outils.
+2. Écris S1 : alice, Alice_01 et a-b-c doivent chacun donner True. Lance les tests et comprends l’erreur de fonction ou module absent.
+3. Crée outils.py et valider_nom_utilisateur(nom). Fais passer S1 avec une logique qui accepte ces noms.
+4. Relance la suite, puis commite outils.py et test_outils.py. Les autres règles seront testées aux deux paliers suivants.
 
 **Terminal · Commande à lancer au moment indiqué**
 
@@ -237,6 +285,11 @@ Faire échouer un test, puis compléter la fonction règle par règle.
 
 **Où tu travailles :** outils.py ; test_outils.py
 
+**Pour comprendre**
+
+- len(texte) donne le nombre de caractères. « Inclus » signifie que les deux bornes sont autorisées.
+- ASCII désigne ici les lettres A–Z et a–z. isalpha() accepte aussi des lettres accentuées : ce seul contrôle ne respecte pas le contrat.
+
 **Cas de test à écrire**
 
 L’entrée est ce que tu donnes au code ; l’attendu est ce que ton test doit vérifier.
@@ -251,9 +304,10 @@ L’entrée est ce que tu donnes au code ; l’attendu est ce que ton test doit 
 
 **Actions dans l’ordre**
 
-1. Ajoute les tests S2 et S3, lance-les : certains échouent.
-2. Complète valider_nom_utilisateur : longueur de 3 à 16, première lettre ASCII, caractères suivants autorisés.
-3. Relance les tests après chaque règle ajoutée : tu avances par petits pas, jamais à l’aveugle.
+1. Ajoute S2 : des noms de 3 et 16 caractères sont acceptés ; des noms de 2 et 17 sont refusés.
+2. Ajoute S3 : 1alice, _alice, ali ce, ali.ce, alicé et le texte vide sont refusés, chacun dans un cas distinct.
+3. Lance les tests, puis complète les contrôles de longueur, du premier caractère et des caractères suivants.
+4. Relance S1 à S3 et commite lorsque tout passe.
 
 **Terminal · Commande à lancer au moment indiqué**
 
@@ -280,6 +334,20 @@ Gérer deux cas limites, dont une erreur levée volontairement.
 
 **Où tu travailles :** outils.py ; test_outils.py
 
+**Pour comprendre**
+
+- strip() enlève les espaces aux bords du texte ; les espaces au milieu restent présents.
+- TypeError signale que l’argument n’est pas du type demandé. assertRaises vérifie qu’une exception attendue est bien levée.
+
+**Éditeur · Exemple Python à lire ou essayer**
+
+Éditeur : place ce code dans un fichier d’exemple jetable, puis lance ce fichier avec python3. Un extrait avec self se place dans une méthode de test.
+
+```python
+with self.assertRaises(ValueError):
+    int("abc")
+```
+
 **Cas de test à écrire**
 
 L’entrée est ce que tu donnes au code ; l’attendu est ce que ton test doit vérifier.
@@ -294,19 +362,11 @@ L’entrée est ce que tu donnes au code ; l’attendu est ce que ton test doit 
 
 **Actions dans l’ordre**
 
-1. Ajoute les tests S4 et S5.
-2. S4 : les espaces autour du nom sont retirés avant le contrôle.
-3. S5 : un nom qui n’est pas une chaîne lève TypeError. Pour tester une exception avec unittest, la forme est celle de l’exemple ci-dessous (ici avec int, sans rapport avec ton exercice).
-4. Écris le code pour que tout passe, puis fais un commit.
-
-**Éditeur · Exemple Python à lire ou essayer**
-
-Éditeur : place ce code dans un fichier d’exemple jetable, puis lance ce fichier avec python3. Un extrait avec self se place dans une méthode de test.
-
-```python
-with self.assertRaises(ValueError):
-    int("abc")
-```
+1. Ajoute S4 : " bob " donne True et " b " donne False après retrait des espaces.
+2. Ajoute S5 avec assertRaises(TypeError), séparément pour None et 42.
+3. Contrôle le type avant d’utiliser une méthode de chaîne, puis applique les règles au texte nettoyé.
+4. Relance S1 à S5. L’exception attendue doit être TypeError ; une autre exception ne valide pas S5.
+5. Commite les changements.
 
 **Terminal · Commande à lancer au moment indiqué**
 
@@ -329,9 +389,62 @@ git commit -m "Gère les espaces et les types invalides"
 
 #### Palier 6 — Lire une ligne de journal (15 min)
 
-Transformer une ligne de texte en données avec split, un dictionnaire et None.
+Passer d’une ligne de journal fictif à cinq informations nommées, et refuser les lignes incorrectes.
 
 **Où tu travailles :** outils.py ; test_outils.py
+
+**Pour comprendre**
+
+- Un journal est un texte qui raconte des événements. Ici, une ligne représente une connexion fictive : date, heure, événement, utilisateur et adresse IP. Tu travailles sur cette chaîne, sans lire de fichier à ce palier.
+- Un champ est un morceau de la ligne. split() sans argument sépare le texte sur les espaces et produit une liste ; ses positions commencent à 0.
+- Un dictionnaire associe une clé à une valeur : la clé utilisateur permet de retrouver le nom sans se souvenir d’une position.
+- None est la valeur Python qui signifie ici « ligne refusée ». Ce n’est ni le texte "None", ni un dictionnaire vide, ni une exception.
+
+**Éditeur · Découper un ticket de courses (exemple à part)**
+
+À lire ou essayer dans un fichier jetable, puis supprimer. Ce petit exemple explique split ; il ne résout pas analyser_ligne.
+
+```python
+ticket = "pain 2 EUR"
+morceaux = ticket.split()
+print(morceaux)       # ['pain', '2', 'EUR']
+print(morceaux[0])    # pain : première position
+print(morceaux[1])    # 2 : c’est encore une chaîne
+print(morceaux[2])    # EUR
+```
+
+**Exemple de résultat attendu**
+
+Ce que tu donnes :
+
+```text
+"2026-01-05 08:12:44 LOGIN_OK alice 192.0.2.10"
+```
+
+Ce que tu dois obtenir :
+
+```text
+{
+  "date": "2026-01-05",
+  "heure": "08:12:44",
+  "evenement": "LOGIN_OK",
+  "utilisateur": "alice",
+  "ip": "192.0.2.10"
+}
+```
+
+Tu écris la fonction qui produit ce résultat. Cet exemple montre les données attendues, pas son code.
+
+**Règles à respecter**
+
+- La fonction s’appelle analyser_ligne(ligne) et reçoit une chaîne.
+- Une ligne admise contient exactement cinq champs, dans l’ordre date, heure, événement, utilisateur, IP. Les valeurs du dictionnaire restent des chaînes.
+- L’événement admis est LOGIN_OK ou LOGIN_FAIL.
+- L’IP contient exactement quatre nombres entiers séparés par des points, chacun entre 0 et 255 inclus.
+- Ligne vide après retrait des espaces aux bords → None.
+- Nombre de champs différent de cinq → None.
+- Événement différent de LOGIN_OK et LOGIN_FAIL → None.
+- IP qui ne respecte pas la règle ci-dessus → None.
 
 **Cas de test à écrire**
 
@@ -351,9 +464,12 @@ L’entrée est ce que tu donnes au code ; l’attendu est ce que ton test doit 
 
 **Actions dans l’ordre**
 
-1. Le journal fictif contient des lignes comme « 2026-01-05 08:12:44 LOGIN_OK alice 192.0.2.10 » : date, heure, événement, utilisateur, adresse IP.
-2. Contrat de analyser_ligne(ligne) : elle retourne un dictionnaire avec les clés date, heure, evenement, utilisateur et ip. Elle retourne None si la ligne est vide (après retrait des espaces de bord), si elle n’a pas exactement 5 champs, si l’événement n’est ni LOGIN_OK ni LOGIN_FAIL, ou si l’adresse n’a pas exactement 4 nombres entiers de 0 à 255 séparés par des points.
-3. Procède test par test : S6 d’abord, puis S7, puis S8. Un test, un correctif.
+1. Dans test_outils.py, écris S6 avec la ligne affichée ci-dessus. Compare le retour à tout le dictionnaire attendu, avec ses cinq clés et ses cinq valeurs.
+2. Dans outils.py, crée analyser_ligne(ligne). Découpe le texte et associe chaque champ à la bonne clé. Fais passer S6.
+3. Ajoute S7 : une ligne vide, une ligne de quatre champs, une de six champs, puis une avec LOGIN_BOOM donnent toutes None. Complète ces refus.
+4. Ajoute S8 : remplace seulement l’IP d’une ligne valide par 192.0.2.300, puis 192.0.2, puis abc.def.ghi.jkl. Chaque cas donne None.
+5. Complète la vérification de l’IP, puis relance S1 à S8. Garde le même retour pour tous les cas refusés.
+6. Commite outils.py et test_outils.py une fois la suite verte.
 
 **Terminal · Commande à lancer au moment indiqué**
 
@@ -372,13 +488,40 @@ git commit -m "Ajoute analyser_ligne"
 
 **Tu sais que c’est bon quand :** S1 à S8 passent.
 
-*Indice si tu bloques :* split() sans argument découpe sur les espaces et ignore ceux des bords. Pour l’adresse, découpe sur les points puis vérifie chaque morceau : est-ce des chiffres, puis est-ce entre 0 et 255 ?
+*Indice si tu bloques :* Essaie d’abord split() sur une phrase courte : observe la liste et ses positions. Pour l’IP, découpe sur les points, vérifie le nombre de morceaux, puis chaque nombre. Termine les contrôles avant de construire le dictionnaire.
 
 #### Palier 7 — Compter les événements (13 min)
 
 Parcourir une liste avec une boucle et construire des dictionnaires.
 
 **Où tu travailles :** outils.py ; test_outils.py
+
+**Pour comprendre**
+
+- Une liste d’événements contient les dictionnaires construits au palier précédent. Une boucle permet d’en lire un à la fois.
+- Un compteur commence à zéro et augmente pour chaque événement concerné. Compter ne doit ni retirer ni modifier les événements reçus.
+
+**Exemple de résultat attendu**
+
+Ce que tu donnes :
+
+```text
+Deux échecs pour alice, seulement une réussite pour bob, un échec pour carol.
+```
+
+Ce que tu dois obtenir :
+
+```text
+{"alice": 2, "carol": 1}
+```
+
+C’est le retour de echecs_par_utilisateur. Bob est absent du résultat.
+
+**Règles à respecter**
+
+- compter_evenements retourne toujours les deux clés LOGIN_OK et LOGIN_FAIL, avec des compteurs entiers ; les deux valent zéro pour une liste vide.
+- echecs_par_utilisateur compte uniquement LOGIN_FAIL. Un utilisateur sans échec n’apparaît pas ; une liste vide donne {}.
+- Les fonctions laissent la liste et les dictionnaires reçus intacts.
 
 **Cas de test à écrire**
 
@@ -394,9 +537,10 @@ L’entrée est ce que tu donnes au code ; l’attendu est ce que ton test doit 
 
 **Actions dans l’ordre**
 
-1. compter_evenements(evenements) reçoit une liste de dictionnaires renvoyés par analyser_ligne. Elle retourne toujours les deux clés LOGIN_OK et LOGIN_FAIL, même à zéro, et ne modifie pas la liste reçue.
-2. echecs_par_utilisateur(evenements) ne garde que les utilisateurs ayant au moins un LOGIN_FAIL, avec leur nombre d’échecs. Une liste vide donne un dictionnaire vide.
-3. Écris S9 puis la première fonction, puis S10 et la seconde.
+1. Écris S9 pour compter_evenements : liste vide, puis deux LOGIN_OK et un LOGIN_FAIL. Conserve une copie de l’entrée et vérifie qu’elle n’a pas changé après l’appel.
+2. Crée compter_evenements(evenements) dans outils.py et fais passer S9.
+3. Écris S10 pour echecs_par_utilisateur : liste vide, puis alice avec deux échecs, bob avec seulement une réussite et carol avec un échec.
+4. Crée echecs_par_utilisateur(evenements), relance S1 à S10 et commite.
 
 **Terminal · Commande à lancer au moment indiqué**
 
@@ -423,12 +567,21 @@ Relire ton travail, le pousser sur GitHub et le fusionner proprement.
 
 **Où tu travailles :** Branche feat/bases et PR GitHub
 
+**Pour comprendre**
+
+- git diff montre les lignes modifiées ; git diff --staged montre celles choisies pour le prochain commit. Le diff de la MR compare toute ta branche à main.
+- La demande de fusion (MR dans GitLab, PR dans GitHub) permet de relire le travail avant de l’intégrer à main.
+
 **Actions dans l’ordre**
 
-1. Regarde ce que tu vas livrer : fichiers modifiés et historique.
-2. Pousse la branche, puis ouvre la pull request (GitHub dit pull request ; GitLab dit merge request, c’est la même idée).
-3. Relis le diff dans GitHub comme si c’était le code de quelqu’un d’autre. Ici aucun contrôle automatique ne tourne : c’est toi qui vérifies que les 10 tests passent en local avant de fusionner. Un pipeline viendra avec les parcours GitLab.
-4. Clique sur « Merge pull request » dans GitHub, puis reviens sur main à jour pour préparer la mission suivante.
+1. Lance la suite complète avec la commande indiquée au début de la mission.
+2. Dans GitHub, vérifie que la PR n’inclut ni fixtures/ ni caches Python. Si gh n’est pas installé, ouvre la PR depuis le site : cet outil est facultatif.
+3. Relis git status et git diff : la livraison doit contenir outils.py, test_outils.py et .gitignore, avec les modifications nécessaires de cette mission.
+4. Ajoute les fichiers par leur nom, relis git diff --staged, puis commite ce qui ne l’est pas encore.
+5. Pousse feat/bases et ouvre la demande de fusion vers main.
+6. Relis le diff dans la demande de fusion. Cette mission n’a pas encore de pipeline : la relecture et les conditions de fusion restent nécessaires.
+7. Fusionne après relecture et, pour GitLab de l’école, après son autorisation.
+8. Après la fusion, reviens sur main et lance git pull --ff-only avant la mission suivante.
 
 **Terminal · Relire l’état du dépôt**
 
@@ -485,11 +638,19 @@ Partir de main à jour, sur une branche neuve, avant d’écrire la moindre lign
 
 **Où tu travailles :** Dépôt ; journal.py ; test_journal.py
 
+**Pour comprendre**
+
+- La branche principale (main) contient le travail déjà fusionné. Ta branche feat/... reçoit les changements de cette mission.
+- Un dépôt « propre » n’a aucune modification en attente : git status te le confirme.
+
 **Actions dans l’ordre**
 
-1. Reviens sur main, mets-la à jour, puis crée la branche de la MR2. Pourquoi : chaque MR part d’une base à jour, sinon tu travailles sur un code périmé.
-2. Relis l’historique : la MR1 doit y être.
-3. Crée les deux fichiers vides journal.py et test_journal.py : tes premiers tests vont les utiliser.
+1. Ouvre workspaces/socle dans VS Code, ou Coder dans Cyber Atelier avec cwd sur « . ».
+2. Vérifie que MR1 est fusionnée et que outils.py est présent sur main.
+3. Lis git status ; enregistre ton travail en cours avant de changer de branche.
+4. Reviens sur main avec git switch main, mets-la à jour avec git pull --ff-only, puis crée feat/fichiers-erreurs. Remplace main par master si ton dépôt utilise ce nom.
+5. Crée journal.py et test_journal.py, puis lance les tests déjà écrits : ils doivent tous passer.
+6. Vérifie le nom de ta branche avec git status. Si elle existe déjà, reprends-la avec git switch sans -c.
 
 **Terminal · Après la fusion : actualiser la principale**
 
@@ -541,22 +702,8 @@ git status
 
 **Pour comprendre**
 
-- Pourquoi : un chemin vide ou blanc est une erreur d’appel ; il faut la signaler avant d’ouvrir quoi que ce soit.
-
-**Cas de test à écrire**
-
-L’entrée est ce que tu donnes au code ; l’attendu est ce que ton test doit vérifier.
-
-**S13 — Chemin vide ou blanc**
-- Entrée : Chaîne vide, une chaîne de trois espaces, puis « dossier/auth.log »
-- Résultat attendu : ValueError pour les deux premiers cas ; aucune exception pour le troisième, sans accès au disque.
-
-**Actions dans l’ordre**
-
-1. Dans test_journal.py, écris la classe TestVerifierChemin avec le test S13 : chaîne vide, trois espaces, puis « dossier/auth.log » qui ne doit lever aucune exception.
-2. Lance les tests : ils échouent, puisque verifier_chemin n’existe pas encore. C’est la phase rouge.
-3. Écris verifier_chemin(chemin) dans journal.py : elle lève ValueError si le chemin, après retrait des espaces de bord, est vide. Elle ne lit aucun fichier. Relance : c’est la phase verte.
-4. Fais un commit.
+- Un chemin est le texte qui désigne un fichier, par exemple dossier/auth.log. Vérifier sa forme et vérifier son existence sont deux opérations différentes.
+- ValueError signale ici une valeur vide ou inutilisable, même si son type est une chaîne.
 
 **Éditeur · Exemple Python à lire ou essayer**
 
@@ -568,6 +715,21 @@ def diviser(a, b):
         raise ZeroDivisionError("b ne doit pas être zéro")
     return a / b
 ```
+
+**Cas de test à écrire**
+
+L’entrée est ce que tu donnes au code ; l’attendu est ce que ton test doit vérifier.
+
+**S13 — Chemin vide ou blanc**
+- Entrée : Chaîne vide, une chaîne de trois espaces, puis « dossier/auth.log »
+- Résultat attendu : ValueError pour les deux premiers cas ; aucune exception pour le troisième, sans accès au disque.
+
+**Actions dans l’ordre**
+
+1. Dans test_journal.py, écris S13 avant les tests de lecture : texte vide et espaces seuls doivent lever ValueError.
+2. Ajoute un cas non vide, dossier/auth.log : il est admis même si le fichier n’existe pas.
+3. Dans journal.py, écris verifier_chemin(chemin) pour contrôler ce texte sans ouvrir le fichier.
+4. Relance la suite ; commite quand S13 passe.
 
 **Terminal · Commande à lancer au moment indiqué**
 
@@ -596,22 +758,8 @@ Lire un fichier avec pathlib, puis écarter les lignes vides et les espaces de b
 
 **Pour comprendre**
 
-- Pourquoi : pathlib donne un chemin qui marche partout ; l’encodage UTF-8 évite les surprises avec les accents.
-
-**Cas de test à écrire**
-
-L’entrée est ce que tu donnes au code ; l’attendu est ce que ton test doit vérifier.
-
-**S11 — Lecture nettoyée**
-- Entrée : Fichier temporaire de trois lignes, une ligne vide et des espaces en fin de ligne
-- Résultat attendu : Liste de trois chaînes, dans l’ordre, sans espaces de bord et sans ligne vide.
-
-**Actions dans l’ordre**
-
-1. Exemple sans rapport (une liste de courses) : écrire puis relire un fichier dans un dossier temporaire.
-2. Écris le test S11 : un fichier temporaire de trois lignes, une ligne vide et des espaces en fin de ligne. lire_journal doit renvoyer trois chaînes propres, dans l’ordre.
-3. Lance les tests : rouge. Écris lire_journal(chemin) : elle appelle verifier_chemin en premier, lit le fichier en UTF-8, puis retourne une liste sans espaces de bord et sans lignes vides.
-4. Relance : vert, puis commit.
+- open(..., encoding="utf-8") lit un fichier texte ; with garantit sa fermeture. UTF-8 permet de lire notamment les accents.
+- Un dossier temporaire est créé par le test et supprimé à sa fin. Le test écrit lui-même les données dont il a besoin.
 
 **Éditeur · Exemple Python à lire ou essayer**
 
@@ -626,6 +774,37 @@ with tempfile.TemporaryDirectory() as dossier:
     chemin.write_text("pain\nlait\n", encoding="utf-8")
     print(chemin.read_text(encoding="utf-8").splitlines())
 ```
+
+**Exemple de résultat attendu**
+
+Ce que tu donnes :
+
+```text
+Un fichier contenant "  première  \n\n deuxième\n troisième \n"
+```
+
+Ce que tu dois obtenir :
+
+```text
+["première", "deuxième", "troisième"]
+```
+
+Le résultat est une liste de chaînes ; les lignes vides ne deviennent pas des événements.
+
+**Cas de test à écrire**
+
+L’entrée est ce que tu donnes au code ; l’attendu est ce que ton test doit vérifier.
+
+**S11 — Lecture nettoyée**
+- Entrée : Fichier temporaire de trois lignes, une ligne vide et des espaces en fin de ligne
+- Résultat attendu : Liste de trois chaînes, dans l’ordre, sans espaces de bord et sans ligne vide.
+
+**Actions dans l’ordre**
+
+1. Écris S11 : dans un dossier temporaire, crée un fichier avec trois lignes non vides, des lignes vides et des espaces aux bords.
+2. Vérifie que lire_journal renvoie les trois lignes nettoyées, dans le même ordre.
+3. Dans journal.py, écris lire_journal(chemin) : appelle verifier_chemin, ouvre en UTF-8, nettoie les lignes et écarte celles devenues vides.
+4. Relance tous les tests puis commite. Le test ne lit pas la fixture auth.log.
 
 **Terminal · Commande à lancer au moment indiqué**
 
@@ -654,22 +833,8 @@ Comprendre qu’une erreur qui n’est pas attrapée remonte jusqu’à l’appe
 
 **Pour comprendre**
 
-- Pourquoi : un fichier absent est une situation normale. lire_journal ne décide pas quoi en faire : c’est à l’appelant de décider. Donc tu ne l’attrapes pas.
-
-**Cas de test à écrire**
-
-L’entrée est ce que tu donnes au code ; l’attendu est ce que ton test doit vérifier.
-
-**S12 — Fichier absent**
-- Entrée : Chemin inexistant dans un dossier temporaire
-- Résultat attendu : lire_journal lève FileNotFoundError (assertRaises).
-
-**Actions dans l’ordre**
-
-1. Exemple : try/except attrape une erreur ; sans except, elle remonte.
-2. Écris le test S12 : chemin inexistant dans un dossier temporaire, avec assertRaises(FileNotFoundError).
-3. Lance les tests : le test passe déjà. Ce n’est pas une erreur : c’est la preuve que tu n’as rien caché. Si ton code attrape l’erreur, retire le try.
-4. Fais un commit du test.
+- FileNotFoundError est l’erreur Python pour un fichier absent. À ce niveau, lire_journal la laisse remonter : la CLI la traduira plus tard en message utilisateur.
+- Un chemin dans un dossier temporaire permet de tester cette absence sans dépendre du contenu de ton ordinateur.
 
 **Éditeur · Exemple Python à lire ou essayer**
 
@@ -681,6 +846,21 @@ try:
 except ValueError:
     print("ce n’est pas un nombre")
 ```
+
+**Cas de test à écrire**
+
+L’entrée est ce que tu donnes au code ; l’attendu est ce que ton test doit vérifier.
+
+**S12 — Fichier absent**
+- Entrée : Chemin inexistant dans un dossier temporaire
+- Résultat attendu : lire_journal lève FileNotFoundError (assertRaises).
+
+**Actions dans l’ordre**
+
+1. Ajoute S12 : fabrique le chemin d’un fichier absent dans un dossier temporaire.
+2. Avec assertRaises(FileNotFoundError), appelle lire_journal sur ce chemin.
+3. Lance la suite. Si S12 passe déjà, garde le test : aucune modification du code n’est nécessaire.
+4. Vérifie que lire_journal ne transforme pas cette erreur en liste vide, puis commite le test.
 
 **Terminal · Commande à lancer au moment indiqué**
 
@@ -709,22 +889,8 @@ Parcourir des lignes avec une boucle, compter les refusées, et renvoyer un coup
 
 **Pour comprendre**
 
-- Pourquoi : une ligne abîmée est comptée, elle ne doit pas arrêter le programme.
-
-**Cas de test à écrire**
-
-L’entrée est ce que tu donnes au code ; l’attendu est ce que ton test doit vérifier.
-
-**S14 — Lignes valides et malformées**
-- Entrée : Quatre lignes dont deux invalides (une mauvaise structure, un événement inconnu), puis une liste vide
-- Résultat attendu : Deux événements dans l’ordre d’arrivée et malformees = 2 ; liste vide : ([], 0).
-
-**Actions dans l’ordre**
-
-1. Réutilise analyser_ligne de outils.py : from outils import analyser_ligne. Une ligne refusée donne None.
-2. Écris le test S14 : quatre lignes dont deux invalides, puis une liste vide. Le résultat attendu est un couple (liste, nombre).
-3. Lance les tests : rouge. Écris charger_evenements(lignes) : une boucle for, une liste pour les valides, un compteur pour les refusées. Retourne le couple.
-4. Relance : vert, puis commit.
+- Une fonction peut réutiliser une autre fonction : analyser_ligne connaît déjà les règles d’une ligne.
+- Un tuple peut rendre deux résultats à la fois : la liste des événements admis et le nombre de lignes refusées.
 
 **Éditeur · Exemple Python à lire ou essayer**
 
@@ -743,6 +909,37 @@ def separer_pairs(nombres):
 
 print(separer_pairs([1, 2, 4, 7]))
 ```
+
+**Exemple de résultat attendu**
+
+Ce que tu donnes :
+
+```text
+charger_evenements([])
+```
+
+Ce que tu dois obtenir :
+
+```text
+([], 0)
+```
+
+Les parenthèses regroupent les deux résultats ; tu peux les récupérer dans deux variables.
+
+**Cas de test à écrire**
+
+L’entrée est ce que tu donnes au code ; l’attendu est ce que ton test doit vérifier.
+
+**S14 — Lignes valides et malformées**
+- Entrée : Quatre lignes dont deux invalides (une mauvaise structure, un événement inconnu), puis une liste vide
+- Résultat attendu : Deux événements dans l’ordre d’arrivée et malformees = 2 ; liste vide : ([], 0).
+
+**Actions dans l’ordre**
+
+1. Écris S14 : quatre lignes dont deux refusées doivent donner deux événements dans l’ordre et le compteur 2. Vérifie aussi l’entrée vide.
+2. Crée charger_evenements(lignes) dans journal.py en important analyser_ligne depuis outils.
+3. Pour chaque ligne, conserve le dictionnaire obtenu ou augmente le compteur si le retour vaut None.
+4. Retourne les deux résultats ensemble, relance la suite et commite.
 
 **Terminal · Commande à lancer au moment indiqué**
 
@@ -771,26 +968,8 @@ Assembler un dictionnaire de résultats à partir de fonctions déjà testées.
 
 **Pour comprendre**
 
-- Pourquoi : un rapport est d’abord une donnée. Son affichage viendra en MR3, pas ici.
-
-**Cas de test à écrire**
-
-L’entrée est ce que tu donnes au code ; l’attendu est ce que ton test doit vérifier.
-
-**S15 — Construction du rapport**
-- Entrée : Trois LOGIN_OK, deux LOGIN_FAIL dont deux pour alice, et un nombre de lignes malformées de 1
-- Résultat attendu : lignes_valides 5, login_ok 3, login_fail 2, lignes_malformees 1, echecs_par_utilisateur {"alice": 2}.
-
-**S18 — Journal vide**
-- Entrée : construire_rapport([], 0)
-- Résultat attendu : lignes_valides 0, login_ok 0, login_fail 0, lignes_malformees 0, echecs_par_utilisateur {} ; aucune exception.
-
-**Actions dans l’ordre**
-
-1. Exemple : un dictionnaire se lit par sa clé, rapport["quantite"].
-2. Écris le test S18 (construire_rapport([], 0) donne des zéros et {}), puis S15 (trois LOGIN_OK, deux LOGIN_FAIL dont deux pour alice, une ligne malformée).
-3. Réutilise compter_evenements et echecs_par_utilisateur de outils.py : ne recopie pas leur logique. lignes_valides vaut le nombre d’événements.
-4. Fais passer les deux tests, puis commit.
+- Le rapport rassemble les compteurs déjà calculés ; il ne relit pas les fichiers.
+- Réutiliser compter_evenements et echecs_par_utilisateur évite de maintenir plusieurs versions des mêmes règles.
 
 **Éditeur · Exemple Python à lire ou essayer**
 
@@ -808,6 +987,46 @@ print(rapport["quantite"])
 ```python
 from outils import compter_evenements, echecs_par_utilisateur
 ```
+
+**Exemple de résultat attendu**
+
+Ce que tu donnes :
+
+```text
+construire_rapport([], 0)
+```
+
+Ce que tu dois obtenir :
+
+```text
+{"lignes_valides": 0, "login_ok": 0, "login_fail": 0, "lignes_malformees": 0, "echecs_par_utilisateur": {}}
+```
+
+Même sans données, les cinq clés sont présentes.
+
+**Règles à respecter**
+
+- Le rapport a les clés lignes_valides, login_ok, login_fail, lignes_malformees et echecs_par_utilisateur.
+- Les quatre premiers champs sont des compteurs ; le dernier est le dictionnaire des échecs par utilisateur.
+
+**Cas de test à écrire**
+
+L’entrée est ce que tu donnes au code ; l’attendu est ce que ton test doit vérifier.
+
+**S15 — Construction du rapport**
+- Entrée : Trois LOGIN_OK, deux LOGIN_FAIL dont deux pour alice, et un nombre de lignes malformées de 1
+- Résultat attendu : lignes_valides 5, login_ok 3, login_fail 2, lignes_malformees 1, echecs_par_utilisateur {"alice": 2}.
+
+**S18 — Journal vide**
+- Entrée : construire_rapport([], 0)
+- Résultat attendu : lignes_valides 0, login_ok 0, login_fail 0, lignes_malformees 0, echecs_par_utilisateur {} ; aucune exception.
+
+**Actions dans l’ordre**
+
+1. Écris d’abord S18 : aucun événement et zéro ligne malformée donnent le rapport vide décrit ci-dessus.
+2. Écris S15 : trois réussites, deux échecs pour alice et une ligne malformée donnent 5, 3, 2, 1 et {"alice": 2}.
+3. Crée construire_rapport(evenements, malformees) avec les fonctions de outils.py.
+4. Compare les dictionnaires entiers dans les tests, relance toute la suite et commite.
 
 **Terminal · Commande à lancer au moment indiqué**
 
@@ -836,27 +1055,8 @@ git commit -m "Ajoute construire_rapport"
 
 **Pour comprendre**
 
-- Pourquoi : un rapport doit pouvoir être lu par un autre outil ; un fichier abîmé doit donner une erreur claire, pas une trace illisible.
-
-**Cas de test à écrire**
-
-L’entrée est ce que tu donnes au code ; l’attendu est ce que ton test doit vérifier.
-
-**S16 — Aller-retour JSON avec accents**
-- Entrée : Rapport contenant la clé « échecs » et une valeur accentuée, sauvegardé puis rechargé
-- Résultat attendu : Le rapport rechargé est égal à l’original, et le fichier est relu sans erreur par json.load.
-
-**S17 — Erreurs de chargement JSON**
-- Entrée : Fichier contenant « {pas du json » ; chemin absent
-- Résultat attendu : ValueError pour le fichier corrompu ; FileNotFoundError pour le chemin absent.
-
-**Actions dans l’ordre**
-
-1. Exemple : json.dump écrit dans un fichier ouvert, json.load relit. Lance-le dans un dossier jetable, pas dans ton dépôt.
-2. Écris le test S16 : une clé et une valeur accentuées, sauvegardées puis rechargées. Le résultat doit être égal à l’original.
-3. Écris le test S17 : un fichier contenant « {pas du json » lève ValueError ; un chemin absent lève FileNotFoundError.
-4. Écris sauvegarder_rapport et charger_rapport. Dans charger_rapport, attrape json.JSONDecodeError seulement, et lève ValueError avec un message en français qui nomme le fichier. FileNotFoundError reste levée telle quelle.
-5. Fais un commit.
+- JSON est un format de fichier pour conserver des dictionnaires et des listes. dump écrit dans un fichier ; load lit depuis un fichier.
+- JSONDecodeError signifie que le fichier existe mais que son texte n’est pas un JSON valide. Ce cas diffère d’un fichier absent.
 
 **Éditeur · Exemple Python à lire ou essayer**
 
@@ -880,6 +1080,26 @@ try:
 except json.JSONDecodeError as exc:
     print("erreur :", exc)
 ```
+
+**Cas de test à écrire**
+
+L’entrée est ce que tu donnes au code ; l’attendu est ce que ton test doit vérifier.
+
+**S16 — Aller-retour JSON avec accents**
+- Entrée : Rapport contenant la clé « échecs » et une valeur accentuée, sauvegardé puis rechargé
+- Résultat attendu : Le rapport rechargé est égal à l’original, et le fichier est relu sans erreur par json.load.
+
+**S17 — Erreurs de chargement JSON**
+- Entrée : Fichier contenant « {pas du json » ; chemin absent
+- Résultat attendu : ValueError pour le fichier corrompu ; FileNotFoundError pour le chemin absent.
+
+**Actions dans l’ordre**
+
+1. Essaie l’exemple panier.json dans un fichier jetable ; observe l’écriture et la relecture, puis nettoie ces fichiers d’essai.
+2. Écris S16 : sauvegarde un rapport avec des accents dans un dossier temporaire, recharge-le et compare au rapport initial.
+3. Crée sauvegarder_rapport(chemin, rapport) et charger_rapport(chemin). Ouvre les fichiers en UTF-8 et utilise ensure_ascii=False pour écrire ; garde le même ordre d’arguments dans tes tests.
+4. Écris S17 : JSON cassé → ValueError avec message français citant le fichier ; fichier absent → FileNotFoundError conservée.
+5. Attrape uniquement JSONDecodeError dans le chargement, puis relance la suite et commite.
 
 **Terminal · Commande à lancer au moment indiqué**
 
@@ -908,15 +1128,16 @@ Défaire un commit sans réécrire l’historique, mettre une modification de c�
 
 **Pour comprendre**
 
-- Pourquoi : quand une CI devient rouge, tu n’effaces pas l’historique partagé ; tu ajoutes un commit qui défait le précédent.
+- git revert crée un nouveau commit qui annule un commit précédent : l’erreur et sa correction restent visibles dans l’historique.
+- git stash met des modifications non commitées de côté ; pop les remet. git restore efface les changements non committés du fichier nommé.
 
 **Actions dans l’ordre**
 
-1. Étape 1 : casse volontairement verifier_chemin (par exemple supprime sa ligne de contrôle), fais le commit, puis constate les échecs.
-2. Étape 2 : annule ce commit avec git revert, sans éditeur. Les tests repassent.
-3. Étape 3 : ajoute une ligne de brouillon à la fin de journal.py, mets-la de côté avec git stash, liste la réserve, puis reprends-la avec git stash pop.
-4. Étape 4 : jette le brouillon avec git restore, puis vérifie que git status est propre.
-5. Étape 5 : relis git log --oneline. git stash list doit être vide.
+1. Commence avec un dépôt propre et tous les tests verts. Introduis une erreur dans verifier_chemin, sans changer les tests.
+2. Lance les tests, observe l’échec et commite uniquement cette erreur volontaire.
+3. Lance git revert HEAD --no-edit : les tests doivent redevenir verts. Relis les deux commits dans git log.
+4. Ajoute seulement un commentaire # brouillon dans journal.py ; lance stash push, observe status propre et stash list, puis stash pop.
+5. Vérifie que le commentaire est revenu. Utilise restore uniquement pour retirer ce brouillon, puis vérifie status propre et stash list vide.
 
 **Terminal · Enregistrer le travail vérifié**
 
@@ -998,11 +1219,21 @@ Vérifier le rapport sur le journal fictif, puis livrer la MR.
 
 **Où tu travailles :** fixtures/socle/auth.log ; PR GitHub
 
+**Pour comprendre**
+
+- git diff montre les lignes modifiées ; git diff --staged montre celles choisies pour le prochain commit. Le diff de la MR compare toute ta branche à main.
+- La demande de fusion (MR dans GitLab, PR dans GitHub) permet de relire le travail avant de l’intégrer à main.
+
 **Actions dans l’ordre**
 
-1. Démonstration D1 (hors tests, hors CI) : lance la lecture de fixtures/socle/auth.log avec lire_journal, charger_evenements et construire_rapport depuis le terminal. Ce n’est pas un test : le fichier n’est pas versionné.
-2. Compte les lignes non vides du fichier avec la commande ci-dessous. lignes_valides + lignes_malformees doit égaler ce nombre.
-3. Relis le diff contre main, pousse la branche, ouvre la pull request (GitLab dit merge request). Fusionne seulement quand python3 -m unittest passe en local : ici aucun pipeline ne tourne.
+1. Lance la suite complète avec la commande indiquée au début de la mission.
+2. Avant la livraison, fais D1 avec une copie locale du journal fictif : lire → charger les événements → construire le rapport. Le nombre de lignes non vides doit égaler lignes_valides + lignes_malformees. Ne commite pas la fixture ni un rapport d’essai.
+3. Relis git status et git diff : la livraison doit contenir journal.py et test_journal.py, avec les modifications nécessaires de cette mission.
+4. Ajoute les fichiers par leur nom, relis git diff --staged, puis commite ce qui ne l’est pas encore.
+5. Pousse feat/fichiers-erreurs et ouvre la demande de fusion vers main.
+6. Relis le diff dans la demande de fusion. Cette mission n’a pas encore de pipeline : la relecture et les conditions de fusion restent nécessaires.
+7. Fusionne après relecture et, pour GitLab de l’école, après son autorisation.
+8. Après la fusion, reviens sur main et lance git pull --ff-only avant la mission suivante.
 
 **Terminal · Commande à lancer au moment indiqué**
 
@@ -1069,10 +1300,19 @@ Partir d’une base à jour, avant d’écrire le programme complet.
 
 **Où tu travailles :** Dépôt
 
+**Pour comprendre**
+
+- La branche principale (main) contient le travail déjà fusionné. Ta branche feat/... reçoit les changements de cette mission.
+- Un dépôt « propre » n’a aucune modification en attente : git status te le confirme.
+
 **Actions dans l’ordre**
 
-1. Reviens sur main, mets-la à jour, puis crée feat/analyseur.
-2. Vérifie que outils.py et journal.py sont bien là : la suite du programme s’appuie dessus.
+1. Ouvre workspaces/socle dans VS Code, ou Coder dans Cyber Atelier avec cwd sur « . ».
+2. Vérifie que MR2 est fusionnée : outils.py et journal.py doivent être présents.
+3. Lis git status ; enregistre ton travail en cours avant de changer de branche.
+4. Reviens sur main avec git switch main, mets-la à jour avec git pull --ff-only, puis crée feat/analyseur. Remplace main par master si ton dépôt utilise ce nom.
+5. Lance la suite existante avant de créer analyseur.py : cette base doit être verte.
+6. Vérifie le nom de ta branche avec git status. Si elle existe déjà, reprends-la avec git switch sans -c.
 
 **Terminal · Après la fusion : actualiser la principale**
 
@@ -1113,21 +1353,8 @@ Séparer le calcul du texte et son affichage : une fonction qui renvoie une cha�
 
 **Pour comprendre**
 
-- Pourquoi : si formater_rapport renvoie du texte au lieu d’afficher, tu peux tester ce texte sans lancer le programme.
-
-**Cas de test à écrire**
-
-L’entrée est ce que tu donnes au code ; l’attendu est ce que ton test doit vérifier.
-
-**S19 — Formatage complet**
-- Entrée : Rapport avec 5 lignes valides, 3 connexions réussies, 2 échecs répartis entre bob (1) et alice (1), 1 malformée
-- Résultat attendu : Les quatre lignes de compteurs ont leurs valeurs ; la ligne alice apparaît avant la ligne bob.
-
-**Actions dans l’ordre**
-
-1. Exemple sans rapport (un panier de courses) : construire une chaîne ligne par ligne, avec les clés triées.
-2. Crée analyseur.py (vide) et test_analyseur.py. Écris le test S19 : rapport avec 5 lignes valides, 3 connexions réussies, 2 échecs répartis entre bob (1) et alice (1), et 1 malformée. Les quatre lignes de compteurs ont leurs valeurs, et la ligne alice vient avant la ligne bob.
-3. Lance les tests : rouge. Écris formater_rapport(rapport) dans analyseur.py : quatre lignes fixes dans l’ordre donné, puis une ligne par utilisateur en échec, triées. Vert, commit.
+- Formater signifie transformer des données en un texte lisible. return rend ce texte au programme qui appelle ; print l’affiche immédiatement.
+- Les clés d’un dictionnaire ne donnent pas forcément l’ordre souhaité : sorted permet un ordre alphabétique stable.
 
 **Éditeur · Exemple Python à lire ou essayer**
 
@@ -1142,6 +1369,26 @@ def afficher_panier(articles):
 
 print(afficher_panier({"pomme": 3, "banane": 1}))
 ```
+
+**Règles à respecter**
+
+- Les quatre libellés sont, dans cet ordre : Lignes valides :, Connexions réussies :, Échecs de connexion :, Lignes malformées :.
+- Les lignes d’utilisateurs suivent, triées par nom.
+
+**Cas de test à écrire**
+
+L’entrée est ce que tu donnes au code ; l’attendu est ce que ton test doit vérifier.
+
+**S19 — Formatage complet**
+- Entrée : Rapport avec 5 lignes valides, 3 connexions réussies, 2 échecs répartis entre bob (1) et alice (1), 1 malformée
+- Résultat attendu : Les quatre lignes de compteurs ont leurs valeurs ; la ligne alice apparaît avant la ligne bob.
+
+**Actions dans l’ordre**
+
+1. Écris S19 dans test_analyseur.py avec le rapport décrit dans le cas de test.
+2. Vérifie les quatre libellés de compteurs dans l’ordre imposé, puis alice avant bob pour les échecs par utilisateur.
+3. Crée formater_rapport(rapport) dans analyseur.py : elle retourne une chaîne et n’affiche rien.
+4. Réutilise les données du rapport ; relance tous les tests puis commite.
 
 **Terminal · Commande à lancer au moment indiqué**
 
@@ -1168,6 +1415,11 @@ Traiter le cas où personne n’a échoué.
 
 **Où tu travailles :** analyseur.py ; test_analyseur.py
 
+**Pour comprendre**
+
+- Un dictionnaire vide {} signifie qu’aucun utilisateur n’a d’échec enregistré. Les autres compteurs du rapport restent utiles.
+- Un cas vide est un comportement à prévoir, pas une raison de faire disparaître tout le rapport.
+
 **Cas de test à écrire**
 
 L’entrée est ce que tu donnes au code ; l’attendu est ce que ton test doit vérifier.
@@ -1178,8 +1430,10 @@ L’entrée est ce que tu donnes au code ; l’attendu est ce que ton test doit 
 
 **Actions dans l’ordre**
 
-1. Écris le test S20 : echecs_par_utilisateur vide. La chaîne doit contenir « Aucun échec » et aucune ligne d’utilisateur.
-2. Lance les tests : rouge. Adapte formater_rapport : sans échec, la ligne « Aucun échec » remplace les lignes d’utilisateurs. Vert, commit.
+1. Ajoute S20 avec echecs_par_utilisateur égal à {}.
+2. Vérifie la présence de « Aucun échec », l’absence de lignes utilisateur et la conservation des quatre compteurs.
+3. Complète formater_rapport pour ce cas, puis relance S19 et S20 avec le reste de la suite.
+4. Commite quand tous les tests passent.
 
 **Terminal · Commande à lancer au moment indiqué**
 
@@ -1208,25 +1462,8 @@ Faire renvoyer un code de retour à main, sans jamais quitter le programme soi-m
 
 **Pour comprendre**
 
-- Pourquoi : main renvoie un entier au lieu d’appeler sys.exit ; ainsi un test peut l’appeler et vérifier le code.
-
-**Cas de test à écrire**
-
-L’entrée est ce que tu donnes au code ; l’attendu est ce que ton test doit vérifier.
-
-**S21 — Usage sans argument**
-- Entrée : main([])
-- Résultat attendu : Code 2 ; message sur la sortie d’erreur ; rien sur la sortie standard.
-
-**S22 — Fichier absent**
-- Entrée : main avec un chemin inexistant dans un dossier temporaire
-- Résultat attendu : Code 1 ; message clair ; aucune exception ne sort de main.
-
-**Actions dans l’ordre**
-
-1. Exemple : print(..., file=sys.stderr) écrit sur la sortie d’erreur, et return donne le code.
-2. Écris les tests S21 (main([]) : code 2, message sur la sortie d’erreur, rien sur la sortie standard) et S22 (chemin absent dans un dossier temporaire : code 1, aucune exception ne sort de main). Capture la sortie avec io.StringIO et contextlib.redirect_stderr / redirect_stdout.
-3. Lance les tests : rouge. Écris main(argv) : argv vide donne le code 2 ; un fichier absent donne le code 1 avec un message clair. main attrape FileNotFoundError et ValueError, et nulle part ailleurs. Vert, commit.
+- argv est ici une liste d’arguments, sans le nom du script. main(argv) la reçoit et rend un entier : les tests peuvent l’appeler comme une fonction.
+- stdout porte le résultat ; stderr porte les erreurs. redirect_stdout et redirect_stderr permettent au test de lire ces sorties dans StringIO.
 
 **Éditeur · Exemple Python à lire ou essayer**
 
@@ -1251,6 +1488,41 @@ try:
 except FileNotFoundError:
     print("fichier introuvable")
 ```
+
+**Exemple de résultat attendu**
+
+Ce que tu donnes :
+
+```text
+main([])
+```
+
+Ce que tu dois obtenir :
+
+```text
+Retour : 2 ; stdout : vide ; stderr : message d’usage.
+```
+
+Le retour est un nombre. Le message est écrit sur un canal séparé.
+
+**Cas de test à écrire**
+
+L’entrée est ce que tu donnes au code ; l’attendu est ce que ton test doit vérifier.
+
+**S21 — Usage sans argument**
+- Entrée : main([])
+- Résultat attendu : Code 2 ; message sur la sortie d’erreur ; rien sur la sortie standard.
+
+**S22 — Fichier absent**
+- Entrée : main avec un chemin inexistant dans un dossier temporaire
+- Résultat attendu : Code 1 ; message clair ; aucune exception ne sort de main.
+
+**Actions dans l’ordre**
+
+1. Écris S21 : main([]) rend 2, écrit l’usage sur stderr et laisse stdout vide.
+2. Écris S22 avec un chemin temporaire absent : main rend 1 et un message clair, sans laisser sortir l’exception.
+3. Crée main(argv). Vérifie les arguments avant la lecture ; traite FileNotFoundError et ValueError au niveau de la CLI.
+4. Capture les sorties dans les tests, relance la suite et commite. N’appelle pas sys.exit dans main.
 
 **Terminal · Commande à lancer au moment indiqué**
 
@@ -1277,6 +1549,11 @@ Faire afficher le rapport et renvoyer 0 quand le fichier est valide.
 
 **Où tu travailles :** analyseur.py ; test_analyseur.py
 
+**Pour comprendre**
+
+- La fonction principale coordonne les étapes que tu as déjà écrites. Elle ne réécrit ni l’analyse ni le comptage.
+- Le fichier de S23 est construit par le test : aucune fixture personnelle ni journal système n’est nécessaire.
+
 **Cas de test à écrire**
 
 L’entrée est ce que tu donnes au code ; l’attendu est ce que ton test doit vérifier.
@@ -1287,9 +1564,10 @@ L’entrée est ce que tu donnes au code ; l’attendu est ce que ton test doit 
 
 **Actions dans l’ordre**
 
-1. Écris le test S23 : fichier temporaire de deux lignes valides et une malformée, passé à main. Code 0, et la sortie contient « Lignes valides : 2 » et « Lignes malformées : 1 ».
-2. Lance les tests : rouge. Complète main : lis le fichier avec lire_journal, puis charger_evenements, construire_rapport et formater_rapport, affiche le texte et retourne 0.
-3. Vert, commit.
+1. Écris S23 : dans un dossier temporaire, crée un journal de deux lignes valides et une malformée.
+2. Vérifie main([chemin]) : retour 0, texte avec « Lignes valides : 2 » et « Lignes malformées : 1 ».
+3. Relie lire_journal → charger_evenements → construire_rapport → formater_rapport, puis affiche le texte dans main.
+4. Relance S21 à S23 et toute la suite, puis commite.
 
 **Terminal · Commande à lancer au moment indiqué**
 
@@ -1318,23 +1596,8 @@ Lancer le programme en ligne de commande, sans qu’importer le module l’exéc
 
 **Pour comprendre**
 
-- Pourquoi : un module peut être importé par un test ou un autre outil sans se lancer tout seul.
-
-**Cas de test à écrire**
-
-L’entrée est ce que tu donnes au code ; l’attendu est ce que ton test doit vérifier.
-
-**S24 — Import sans effet de bord**
-- Entrée : Import du module analyseur dans le test, sortie redirigée
-- Résultat attendu : Aucune sortie : le bloc __main__ ne s’exécute pas à l’import.
-
-**Actions dans l’ordre**
-
-1. Exemple : le bloc if __name__ == "__main__" ne s’exécute que si on lance le fichier directement.
-2. Écris le test S24 : importe analyseur dans le test, sortie redirigée. Aucune sortie ne doit apparaître.
-3. Ajoute en bas de analyseur.py le bloc if __name__ == "__main__" : il transmet sys.argv[1:] à main et utilise le résultat comme code de sortie. Vert, commit.
-4. Pour S24, fais l’import dans un processus Python neuf (ou recharge explicitement le module) et capture sa sortie. Un module déjà importé est mis en cache : le réimporter dans le même test peut masquer un affichage au premier import.
-5. Démonstration D2 (hors tests) : lance le programme avec le journal fictif, puis sans argument, et lis le code de retour.
+- Importer un module rend ses fonctions disponibles. Cela ne doit pas lancer le programme complet.
+- La garde if __name__ == "__main__" distingue lancement direct et import. sys.argv[1:] retire le nom du script ; sys.exit transmet le retour au terminal.
 
 **Éditeur · Exemple Python à lire ou essayer**
 
@@ -1350,6 +1613,22 @@ def saluer():
 if __name__ == "__main__":
     sys.exit(saluer())
 ```
+
+**Cas de test à écrire**
+
+L’entrée est ce que tu donnes au code ; l’attendu est ce que ton test doit vérifier.
+
+**S24 — Import sans effet de bord**
+- Entrée : Import du module analyseur dans le test, sortie redirigée
+- Résultat attendu : Aucune sortie : le bloc __main__ ne s’exécute pas à l’import.
+
+**Actions dans l’ordre**
+
+1. Écris S24 : importe analyseur dans un nouvel interpréteur ou recharge-le pour vérifier l’absence de sortie. Un import déjà en cache ne suffit pas à le prouver.
+2. Sous la garde du script seulement, appelle main avec sys.argv[1:] et transmets son retour à sys.exit.
+3. Relance les tests. Fais D2 avec la copie locale du journal : résultat et code 0.
+4. Lance sans argument : usage et code 2. Dans la console web, exécute le programme et echo $? dans la même commande.
+5. Commite quand les tests passent.
 
 **Terminal · Commande à lancer au moment indiqué**
 
@@ -1392,13 +1671,15 @@ Documenter l’usage, les codes de retour et les limites du programme.
 
 **Pour comprendre**
 
-- Pourquoi : un outil sans mode d’emploi n’est pas livrable, et les limites font partie du contrat.
+- Le README est le mode d’emploi pour quelqu’un qui découvre ton dépôt. Une commande documentée doit fonctionner depuis la racine.
+- Les codes de sortie permettent aussi à un autre programme de savoir si l’analyse a réussi.
 
 **Actions dans l’ordre**
 
-1. Rédige README.md avec : l’objectif, le format du journal (AAAA-MM-JJ HH:MM:SS EVENEMENT utilisateur ip), la commande d’usage, les codes de retour 0, 1 et 2, et les limites (données fictives, aucune connexion réseau).
-2. Vérifie le .gitignore : il doit exclure __pycache__/ et fixtures/. Ajoute ce qui manque.
-3. Relance les tests, puis fais un commit des deux fichiers.
+1. Rédige README.md : objectif, forme des cinq champs d’une ligne, commande de lancement et commande des tests.
+2. Explique les codes 0 (réussite), 1 (lecture/analyse impossible) et 2 (usage incorrect).
+3. Précise le périmètre : journal fictif local, sans réseau.
+4. Vérifie .gitignore : caches et fixtures d’essai exclus. Relance les tests et commite le README.
 
 **Terminal · Commande à lancer au moment indiqué**
 
@@ -1433,15 +1714,17 @@ Lire les marqueurs de conflit, choisir la ligne voulue, et conclure la fusion à
 
 **Pour comprendre**
 
-- Pourquoi : un conflit n’est pas une catastrophe : deux lignes d’historique ont modifié le même endroit, et tu décides. Ce conflit est volontaire et reste local.
+- Un conflit arrive quand Git ne peut pas choisir entre deux modifications de la même ligne. Les marqueurs montrent les deux versions à départager.
+- Les branches exercice/conflit-a et exercice/conflit-b sont des essais locaux. Elles ne sont pas poussées sur GitHub.
 
 **Actions dans l’ordre**
 
-1. Point de départ : README.md n’existe pas encore sur main, donc les branches d’exercice partent de feat/analyseur, où le README est commité.
-2. Branche A : change la première ligne de README.md (par exemple « # Analyseur A »), puis commite.
-3. Branche B : repars de feat/analyseur, change la même ligne différemment (« # Analyseur B »), puis commite.
-4. Depuis la branche A, lance git merge : un conflit apparaît. Lis git status, repère les marqueurs, garde une seule version de la ligne, supprime les marqueurs, puis commite la fusion.
-5. Ne pousse rien de ces branches.
+1. Commite d’abord tout le travail de feat/analyseur ; git status doit être propre.
+2. Crée les deux branches d’essai depuis feat/analyseur et remplace la première ligne de README.md différemment dans chacune. Commite chaque version.
+3. Fusionne la seconde dans la première : lis le conflit attendu, puis ouvre README.md.
+4. Choisis le texte final, enlève <<<<<<<, ======= et >>>>>>>, ajoute le fichier et commite la résolution.
+5. Vérifie l’absence de marqueurs et observe le graphe Git avant le nettoyage.
+6. Reviens sur feat/analyseur et supprime uniquement les deux branches d’essai ; -D abandonne leur historique local non fusionné.
 
 **Terminal · Commande à lancer au moment indiqué**
 
@@ -1546,14 +1829,17 @@ Replacer ta branche au-dessus d’un main qui a avancé, poser un tag annoté, p
 
 **Pour comprendre**
 
-- Pourquoi : un rebase réécrit ta branche par-dessus la base à jour ; tant qu’elle n’est pas poussée, c’est sans risque.
+- Un rebase rejoue les commits de ta branche sur une base qui a avancé. Il peut changer leurs identifiants : fais cet exercice avant le premier push.
+- Un tag annoté associe un nom de version, un message et un auteur à un commit précis.
 
 **Actions dans l’ordre**
 
-1. Fais avancer main en local : ajoute un commentaire d’en-tête à outils.py, puis commite-le sur main. Ne le pousse pas sans l’accord de ton école.
-2. Replace feat/analyseur au-dessus de main, relis l’historique, pose le tag annoté v0.1.0.
-3. Relis le diff de la MR contre main. Si git diff origin/main --stat montre outils.py, la correction de main n’est pas sur GitHub : signale-le à ton école avant d’ouvrir la MR.
-4. Pousse la branche, ouvre la pull request. Pousse le tag seulement si ton école l’autorise.
+1. Commence avec un dépôt propre. Sur main local, ajoute le commentaire d’exercice à outils.py et commite-le ; ce commit sera inclus dans la PR, sans push direct de main.
+2. Reviens sur feat/analyseur et rebase sur main. En cas de conflit : corrige, git add, puis rebase --continue ; rebase --abort annule l’opération.
+3. Relance tous les tests et observe le graphe des commits après le rebase.
+4. Crée le tag annoté v0.1.0 avec un message, puis vérifie le commit désigné avec git show.
+5. Relis le diff contre origin/main, pousse feat/analyseur et ouvre la PR. Mentionne le rebase et le commentaire d’exercice.
+6. Pousse le tag séparément lorsqu’il est autorisé, puis fusionne après relecture et mets main à jour.
 
 **Terminal · Après la fusion : actualiser la principale**
 

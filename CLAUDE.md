@@ -218,3 +218,11 @@ Vérifications : 46 tests OK en local (macOS, hors Docker) le 2026-10-10 ; 46 OK
 - `scripts/generate_portpilot_pdf.py` reconstruit le PDF depuis le Markdown avec ReportLab (dépendance d’édition uniquement). Le PDF n’a plus de source absente.
 - Corrections de guidage : appeler les tests PortPilot explicitement ; lancer unittest.main dans verification.py ; lire echo $? dans la même exécution web ; exemples d’import sans sortie ; erreurs de transport fabriquées sans réseau ; branche et livraison de ReconWrap MR2 explicites ; commandes de conflit exécutables ; ERROR est le niveau logging, ERREUR le statut du contrat.
 - La seule précision de livrable en Socle MR1 est l’inclusion du .gitignore déjà demandé par le parcours : caches et fixtures restent exclus.
+
+## Reprise de tous les paliers après retour apprenant (2026-10-10)
+
+- Les 153 paliers ont leurs notions et actions réécrites. Les 88 cas de test, démonstrations, exigences de livraison, ids et durées restent identiques. Les exemples montrent des données attendues ou une notion sur un autre sujet, sans fonction solution.
+- `paliers[].rules` est une liste facultative de règles ; `example` contient `input`, `output`, `note`. `blocks[].placement` vaut `before_actions` pour expliquer une notion ou `after_actions` pour les commandes de réalisation. Le rendu web et le générateur Markdown suivent ce même ordre.
+- Socle MR1 palier 6 explique champ, positions de liste, dictionnaire, None, puis montre une ligne et son dictionnaire attendu ; S6, S7 et S8 restent obligatoires.
+- ReconWrap R5 est partiellement écrit au palier 4 et complété au palier 6 : aucun appel de module n’est annoncé comme déjà vérifié au palier 4. ERROR est le niveau logging, ERREUR le statut du résultat.
+- ToolWrap D3 utilise `--delay 1` avec délai 0,01 seconde pour produire le timeout indépendamment du démarrage de Docker. Les outils et tests automatiques ne changent pas.

@@ -27,11 +27,11 @@ Reste dans le périmètre : pas de saisie interactive, d’arguments, de classes
 <!-- BEGIN GENERATED EXERCISES -->
 ## Comment travailler un exercice
 
-Chaque mission construit une partie du projet. Commence par « Avant de commencer », puis avance palier par palier. Les durées sont des repères : prends le temps de comprendre chaque résultat.
+Ces exercices sont ton entraînement. Chaque palier explique les notions utiles, montre les données ou les règles attendues, puis te fait écrire et vérifier ton propre code. Les durées sont des repères : avance quand tu comprends le résultat.
 
-1. Lis l’objectif et les fichiers concernés. Un fichier indiqué comme « à créer » n’est pas fourni : c’est toi qui l’écris.
+1. Lis « Pour comprendre » et l’exemple lorsqu’il y en a un. Repère ce qui entre dans le programme, ce qui doit en sortir et les règles à respecter.
 2. Les cartes de tests donnent l’entrée et le résultat attendu. Écris les tests correspondants dans le fichier indiqué ; cocher un palier ne les exécute pas. Avec unittest, « Ran 0 tests » signifie qu’aucun test n’a été exécuté : ce n’est pas une validation. Un cas décrit peut contenir plusieurs valeurs ; le nombre de méthodes Python n’est donc pas forcément le nombre d’identifiants.
-3. Suis les actions numérotées. Les blocs Python se placent dans l’éditeur ; les commandes se lancent au moment demandé. Relis les blocs Git : des modifications et des actions dans GitHub/GitLab peuvent être nécessaires entre deux commandes.
+3. Suis les actions numérotées, une à la fois. Les exemples servent à apprendre une notion ; tu écris toi-même la solution de l’exercice. Les blocs Terminal donnent les commandes à lancer au moment indiqué.
 4. Vérifie le résultat indiqué avant de poursuivre. Un échec attendu (phase rouge, argument refusé ou conflit volontaire) est expliqué dans le palier.
 5. Si tu bloques, lis la dernière ligne de l’erreur, compare l’entrée et l’attendu, puis ouvre l’indice. Fais un petit changement et relance.
 
@@ -46,6 +46,16 @@ La console web repart à neuf à chaque exécution : un `cd`, une activation de 
 Un venv créé sur le Mac ne fonctionne pas dans le conteneur : utilise `python3` dans ce dernier. Remplace `main` par `master` si nécessaire. Si une branche existe déjà, reprends-la avec `git switch NOM` sans `-c`. Après chaque fusion, actualise la branche principale avant la mission suivante.
 
 ### Les mots utiles
+
+**Chaîne / champ.** Une chaîne (str) est du texte. Un champ est un morceau de donnée, comme l’utilisateur dans une ligne de journal.
+
+**Liste / position.** Une liste conserve plusieurs valeurs dans un ordre. Sa première position porte le numéro 0, la suivante 1, etc.
+
+**Dictionnaire / clé.** Un dictionnaire associe un nom à une valeur : {"fruit": "pomme"}. fruit est la clé ; pomme est sa valeur.
+
+**None.** Une valeur Python qui représente l’absence de résultat. Dans analyser_ligne, elle signifie que la ligne est refusée. Elle s’écrit sans guillemets.
+
+**split / strip.** split() sans argument découpe une chaîne sur ses espaces. split(".") découpe sur les points. strip() retire les espaces aux bords.
 
 **Contrat.** Les règles à respecter : arguments reçus, valeur retournée, erreurs et cas limites. Tu choisis le code qui respecte ces règles.
 
@@ -108,13 +118,16 @@ Créer la branche de la MR depuis une branche principale à jour, sans rien empo
 
 **Pour comprendre**
 
-- Une branche est une ligne de travail séparée de la branche principale (main, ou master selon ton école). Tu codes dessus sans toucher à la version livrée.
+- La branche principale (main) contient le travail déjà fusionné. Ta branche feat/... reçoit les changements de cette mission.
+- Un dépôt « propre » n’a aucune modification en attente : git status te le confirme.
 
 **Actions dans l’ordre**
 
-1. Ouvre le dossier workspaces/portpilot dans VS Code, puis un terminal (Terminal > New Terminal).
-2. Vérifie que ton dépôt est propre, puis reviens sur la branche principale et mets-la à jour avant de créer la tienne.
-3. Si ton école utilise master, remplace main par master dans les commandes.
+1. Ouvre workspaces/portpilot dans VS Code, ou Coder dans Cyber Atelier avec cwd sur « . ».
+2. Termine la préparation de l’onglet Environnement avant de commencer.
+3. Lis git status ; enregistre ton travail en cours avant de changer de branche.
+4. Reviens sur main avec git switch main, mets-la à jour avec git pull --ff-only, puis crée feat/validation. Remplace main par master si ton dépôt utilise ce nom.
+5. Vérifie le nom de ta branche avec git status. Si elle existe déjà, reprends-la avec git switch sans -c.
 
 **Terminal · Relire l’état du dépôt**
 
@@ -158,21 +171,10 @@ git status
 
 **Où tu travailles :** verification.py
 
-**Cas de test à écrire**
+**Pour comprendre**
 
-L’entrée est ce que tu donnes au code ; l’attendu est ce que ton test doit vérifier.
-
-**T1 — Liste valide et ordre conservé**
-- Entrée : [1, 8000, 65535]
-- Résultat attendu : La même liste, dans le même ordre, est acceptée.
-
-**Actions dans l’ordre**
-
-1. Crée verification.py à la racine du dépôt. Il importe portpilot et contient une fonction test_t1 qui vérifie que [1, 8000, 65535] est accepté, avec le même ordre et les mêmes valeurs.
-2. Dans le test, une vérification s’écrit avec assert : si la condition est fausse, Python lève une AssertionError et le test échoue.
-3. Définir test_t1 ne suffit pas : appelle-la explicitement à la fin de verification.py. Fais de même pour chaque test ajouté ensuite. Le message de succès vient après la vérification, jamais à sa place.
-4. Lance verification.py. Il doit échouer, car portpilot.py n’existe pas encore : c’est la phase « rouge », elle est normale.
-5. Ne commite rien à ce stade : le commit viendra quand le test passera.
+- assert vérifie une condition : si elle est fausse, le test échoue avec AssertionError. Le message de succès doit venir après la vérification.
+- Définir une fonction test_t1 ne l’exécute pas : verification.py doit aussi l’appeler.
 
 **Éditeur · Exemple Python à lire ou essayer**
 
@@ -185,6 +187,21 @@ def doubler(n):
 assert doubler(4) == 8, "doubler(4) doit valoir 8"
 print("la condition est vraie, rien ne se passe")
 ```
+
+**Cas de test à écrire**
+
+L’entrée est ce que tu donnes au code ; l’attendu est ce que ton test doit vérifier.
+
+**T1 — Liste valide et ordre conservé**
+- Entrée : [1, 8000, 65535]
+- Résultat attendu : La même liste, dans le même ordre, est acceptée.
+
+**Actions dans l’ordre**
+
+1. Crée verification.py à la racine, importe portpilot et écris test_t1.
+2. T1 appelle valider_ports([1, 8000, 65535]) et compare le retour à cette liste, dans le même ordre.
+3. Appelle test_t1 à la fin du fichier, puis lance verification.py.
+4. Lis l’échec attendu : portpilot.py ou valider_ports n’existe pas encore. Ne commite pas ce test seul avant le code du prochain palier.
 
 **Terminal · Commande à lancer au moment indiqué**
 
@@ -204,12 +221,39 @@ python3 verification.py
 
 **Où tu travailles :** portpilot.py ; verification.py
 
+**Pour comprendre**
+
+- Valider une liste signifie décider si toute son entrée respecte les règles. Une liste admise est retournée avec les mêmes valeurs et le même ordre.
+- Tu complètes progressivement les règles ; la fonction finale devra toutes les respecter.
+
+**Exemple de résultat attendu**
+
+Ce que tu donnes :
+
+```text
+valider_ports([1, 8000, 65535])
+```
+
+Ce que tu dois obtenir :
+
+```text
+[1, 8000, 65535]
+```
+
+La validation ne trie pas la liste et ne transforme pas les éléments.
+
+**Règles à respecter**
+
+- De 1 à 10 ports, sans doublon.
+- Chaque port est un entier de 1 à 65535 inclus ; les booléens sont refusés.
+- Une liste invalide lève ValueError. Une liste admise conserve valeurs et ordre.
+
 **Actions dans l’ordre**
 
-1. Crée portpilot.py avec la fonction valider_ports(ports). Pour l’instant, ton but est seulement de faire passer T1 : la fonction n’a pas à être complète.
-2. Relance verification.py : T1 doit passer.
-3. Quand T1 passe, fais ton premier commit. Le message est donné ci-dessous.
-4. Vérifie avec git status que ni __pycache__ ni autre fichier inutile n’est ajouté. Ton .gitignore doit déjà exclure les caches Python.
+1. Crée portpilot.py et valider_ports(ports) pour accepter T1.
+2. Relance verification.py et vérifie que test_t1 a réellement été appelé.
+3. Vérifie que .gitignore exclut __pycache__/ ; relis status et le diff.
+4. Commite portpilot.py et verification.py quand T1 passe.
 
 **Terminal · Commande à lancer au moment indiqué**
 
@@ -250,23 +294,8 @@ Comprendre pourquoi un processus doit rendre un code non nul en cas d’échec, 
 
 **Pour comprendre**
 
-- Un programme se termine par un code de sortie : 0 pour une réussite, une autre valeur pour un échec. C’est ce code que lit le pipeline GitLab, pas le texte affiché.
-
-**Cas de test à écrire**
-
-L’entrée est ce que tu donnes au code ; l’attendu est ce que ton test doit vérifier.
-
-**T2 — Liste vide**
-- Entrée : []
-- Résultat attendu : ValueError.
-
-**Actions dans l’ordre**
-
-1. Exemple sans rapport avec ton exercice : le programme ci-dessous rend 1 à cause de sys.exit(1). Lance-le puis lis le code avec echo $? (zsh).
-2. Un test négatif (T2) attend une ValueError. Si aucune exception n’est levée, c’est un échec. Si une autre exception est levée, c’est aussi un échec : tu ne laisses pas passer une erreur différente.
-3. Ajoute T2 dans verification.py : elle appelle valider_ports([]). Dans verification.py, appelle chaque test explicitement, compte les échecs, et termine avec sys.exit(1) s’il y en a au moins un.
-4. Fais passer T2 en rejetant la liste vide, puis vérifie que T1 et T2 passent ensemble.
-5. Vérifie qu’une assertion ratée rend bien un code non nul : tu peux temporairement modifier une valeur attendue dans un test, observer le code, puis remettre la valeur juste.
+- Le code de sortie indique au terminal si le programme a réussi : 0 pour succès, une valeur non nulle pour échec. sys.exit transmet ce nombre.
+- Un test d’exception ne réussit que si la bonne exception est levée. Aucun refus ou une autre erreur doivent compter comme un échec.
 
 **Éditeur · Exemple Python à lire ou essayer**
 
@@ -280,17 +309,7 @@ print("un autre échoue")
 sys.exit(1)
 ```
 
-**Terminal · Commande à lancer au moment indiqué**
-
-Terminal du parcours : reste à la racine du dépôt. Exécute ces lignes au moment demandé dans les actions, avec les modifications manuelles entre les blocs. Lance le programme et echo $? ensemble : le nombre affiché est le code du programme ; la console peut afficher code 0 pour echo lui-même.
-
-```bash
-python3 exemple.py; echo $?
-```
-
 **Éditeur · Exemple Python à lire ou essayer**
-
-Éditeur : copie cet exemple dans exemple.py (jetable), enregistre-le, puis lance python3 exemple.py. Si plusieurs exemples sont proposés, essaie-les un par un en remplaçant le contenu du fichier. Retire ensuite les fichiers générés et le fichier d’exemple.
 
 ```python
 def diviser(a, b):
@@ -304,9 +323,31 @@ except ValueError:
     print("attendu : ValueError levée")
 ```
 
+**Cas de test à écrire**
+
+L’entrée est ce que tu donnes au code ; l’attendu est ce que ton test doit vérifier.
+
+**T2 — Liste vide**
+- Entrée : []
+- Résultat attendu : ValueError.
+
+**Actions dans l’ordre**
+
+1. Essaie l’exemple sys.exit, puis lis echo $? dans la même exécution que le programme.
+2. Ajoute T2 : valider_ports([]) doit lever ValueError.
+3. Dans verification.py, appelle chaque test, compte les échecs et rends un code non nul dès qu’un test échoue. Ne masque pas les exceptions inattendues.
+4. Complète valider_ports pour refuser la liste vide ; vérifie T1 et T2 ensemble.
+5. Change temporairement un attendu pour vérifier le code non nul, puis restaure l’attendu correct avant de commiter.
+
 **Terminal · Commande à lancer au moment indiqué**
 
 Terminal du parcours : reste à la racine du dépôt. Exécute ces lignes au moment demandé dans les actions, avec les modifications manuelles entre les blocs. Lance le programme et echo $? ensemble : le nombre affiché est le code du programme ; la console peut afficher code 0 pour echo lui-même.
+
+```bash
+python3 exemple.py; echo $?
+```
+
+**Terminal · Commande à lancer au moment indiqué**
 
 ```bash
 python3 verification.py; echo $?
@@ -331,6 +372,21 @@ Ajouter deux règles simples (limite de nombre et unicité), chacune avec son te
 
 **Où tu travailles :** portpilot.py ; verification.py
 
+**Pour comprendre**
+
+- len(liste) compte les éléments. set(liste) crée un ensemble qui ne garde qu’une occurrence de chaque valeur.
+- Le contrat refuse les doublons ; il ne demande pas de les supprimer silencieusement.
+
+**Éditeur · Exemple Python à lire ou essayer**
+
+Éditeur : copie cet exemple dans exemple.py (jetable), enregistre-le, puis lance python3 exemple.py. Si plusieurs exemples sont proposés, essaie-les un par un en remplaçant le contenu du fichier. Retire ensuite les fichiers générés et le fichier d’exemple.
+
+```python
+fruits = ["pomme", "poire", "pomme"]
+print(len(fruits))
+print(len(set(fruits)))
+```
+
 **Cas de test à écrire**
 
 L’entrée est ce que tu donnes au code ; l’attendu est ce que ton test doit vérifier.
@@ -345,21 +401,11 @@ L’entrée est ce que tu donnes au code ; l’attendu est ce que ton test doit 
 
 **Actions dans l’ordre**
 
-1. Ajoute T3 : onze entiers distincts et valides doivent lever ValueError. Ajoute T5 : [8000, 8000] doit lever ValueError.
-2. Une liste a une longueur : len(liste) donne son nombre d’éléments. Un ensemble (set) ne garde pas les doublons.
-3. Exemple sans rapport : une liste de fruits avec un doublon. Lance-le pour voir la différence de taille.
-4. Complète valider_ports pour refuser plus de dix éléments et les doublons, sans casser T1 et T2.
-5. Relance verification.py après chaque règle ajoutée, puis fais un commit.
-
-**Éditeur · Exemple Python à lire ou essayer**
-
-Éditeur : copie cet exemple dans exemple.py (jetable), enregistre-le, puis lance python3 exemple.py. Si plusieurs exemples sont proposés, essaie-les un par un en remplaçant le contenu du fichier. Retire ensuite les fichiers générés et le fichier d’exemple.
-
-```python
-fruits = ["pomme", "poire", "pomme"]
-print(len(fruits))
-print(len(set(fruits)))
-```
+1. Observe l’exemple des fruits avec une valeur répétée : compare les deux longueurs.
+2. Ajoute T3 avec onze ports distincts valides : ValueError attendue.
+3. Ajoute T5 avec [8000, 8000] : ValueError attendue.
+4. Complète les contrôles de taille et de doublon, relance après chaque changement.
+5. Vérifie T1, T2, T3 et T5 puis commite.
 
 **Terminal · Commande à lancer au moment indiqué**
 
@@ -386,20 +432,10 @@ Tester chaque valeur invalide dans sa propre liste, et comprendre pourquoi bool 
 
 **Où tu travailles :** portpilot.py ; verification.py
 
-**Cas de test à écrire**
+**Pour comprendre**
 
-L’entrée est ce que tu donnes au code ; l’attendu est ce que ton test doit vérifier.
-
-**T4 — Valeurs invalides**
-- Entrée : -1, 0, 65536, texte, décimal et booléen, testés séparément
-- Résultat attendu : ValueError pour chacun ; aucune autre exception ne passe.
-
-**Actions dans l’ordre**
-
-1. T4 couvre six cas testés séparément, chacun dans une liste d’un seul élément : [-1], [0], [65536], [« 8000 »] (une chaîne), [80.5] (un décimal) et [True] (un booléen).
-2. Pour que l’échec d’un cas ne cache pas les autres, écris une boucle sur les six cas dans verification.py : chaque cas est vérifié séparément et son nom apparaît si la règle échoue.
-3. Exemple sans rapport : en Python, True est un entier pour isinstance. Lance le code ci-dessous pour le constater.
-4. Complète valider_ports pour que les six cas lèvent ValueError, en contrôlant les booléens avant les entiers. Relance verification.py et fais un commit.
+- Python considère True comme un int avec isinstance : il faut donc refuser explicitement les booléens avant d’accepter les entiers.
+- Une boucle de tests doit rapporter chaque cas ; le premier échec ne doit pas cacher les cinq autres.
 
 **Éditeur · Exemple Python à lire ou essayer**
 
@@ -410,6 +446,22 @@ print(isinstance(3, int))
 print(isinstance(True, int))
 print(isinstance("3", int))
 ```
+
+**Cas de test à écrire**
+
+L’entrée est ce que tu donnes au code ; l’attendu est ce que ton test doit vérifier.
+
+**T4 — Valeurs invalides**
+- Entrée : -1, 0, 65536, texte, décimal et booléen, testés séparément
+- Résultat attendu : ValueError pour chacun ; aucune autre exception ne passe.
+
+**Actions dans l’ordre**
+
+1. Essaie les trois appels isinstance de l’exemple.
+2. Écris les six sous-cas de T4 : [-1], [0], [65536], ["8000"], [80.5] et [True].
+3. Vérifie ValueError pour chacun, avec un nom de cas affiché si le contrôle échoue.
+4. Complète le contrôle du type et des bornes ; relance T1 à T5 avec les six sous-cas.
+5. Commite lorsque la suite rend 0.
 
 **Terminal · Commande à lancer au moment indiqué**
 
@@ -438,16 +490,17 @@ Relier la même commande à GitLab : un job qui n’exécute que sur les merge r
 
 **Pour comprendre**
 
-- Documentation GitLab : https://docs.gitlab.com/ci/pipelines/merge_request_pipelines/
+- GitLab lit .gitlab-ci.yml pour exécuter des jobs sur son runner. Un pipeline de MR est déclenché pour une demande de fusion.
+- Un job bloquant fait échouer le pipeline quand sa commande échoue. Le lint vérifie seulement la configuration YAML.
 
 **Actions dans l’ordre**
 
-1. Le fichier .gitlab-ci.yml est à la racine du dépôt. Tu le rédiges toi-même ; ce parcours ne te fournit pas sa version complète.
-2. Définis la politique de pipeline pour merge_request_event uniquement : les pipelines de MR se lancent, les simples push sur une branche sans MR ne se lancent pas.
-3. Ajoute un job nommé verifier dont la commande est exactement celle que tu lances en local : python verification.py (ou python3 selon l’environnement).
-4. N’ajoute ni allow_failure, ni job manuel, ni règle finale permissive qui lancerait tout. Le job doit être bloquant.
-5. Le job Lint éventuel contrôle la syntaxe du fichier, pas le fonctionnement du runner : un job Lint vert ne prouve pas que ton job verifier tourne.
-6. Commite le fichier, pousse la branche, ouvre la MR non Draft vers la branche principale, puis vérifie le pipeline du dernier commit.
+1. Crée .gitlab-ci.yml à la racine et rédige sa configuration toi-même.
+2. Limite les pipelines à merge_request_event ; un simple push sans MR ne doit pas déclencher le pipeline.
+3. Ajoute le job verifier avec python verification.py, ou python3 selon l’environnement.
+4. Rends-le bloquant : pas de allow_failure, pas de job manuel, pas de règle finale qui accepte tous les événements.
+5. Lance la même commande en local, puis commite et pousse la CI. Ouvre la MR non Draft vers main.
+6. Dans GitLab, vérifie que verifier a réellement tourné et réussi sur le dernier commit.
 
 **Terminal · Enregistrer le travail vérifié**
 
@@ -480,14 +533,19 @@ Observer qu’un pipeline rouge bloque la fusion, corriger le code sans toucher 
 
 **Où tu travailles :** portpilot.py ; MR GitLab
 
+**Pour comprendre**
+
+- Une régression est une modification qui casse un comportement déjà vérifié. Ici, tu la provoques pour voir la CI bloquer la fusion.
+- Après une correction, seul le pipeline du dernier commit décrit l’état à fusionner ; un ancien vert ne suffit pas.
+
 **Actions dans l’ordre**
 
-1. Introduis une petite régression réelle dans portpilot.py, par exemple en retirant l’une des règles déjà écrites. Ne modifie ni verification.py ni les tests.
-2. Commite, pousse, puis attends le pipeline. Il doit passer au rouge. Note le lien du pipeline rouge et le motif du blocage : le test en échec et le message.
-3. Observe le blocage de la fusion dans la MR : le bouton ne doit pas être utilisable tant que le pipeline n’est pas réussi (règle de fusion de l’école).
-4. Corrige le code, commite la correction, pousse, puis vérifie que le pipeline du dernier commit est vert.
-5. Relis le diff de la MR, fusionne le dernier commit vert, puis reviens sur la branche principale : git switch main, git pull --ff-only.
-6. Garde le lien du pipeline rouge : il sert de preuve pour la suite du parcours.
+1. Retire volontairement une règle de portpilot.py, sans modifier les tests.
+2. Commite et pousse cette régression ; attends le pipeline rouge et relève son lien, le test en échec et son message.
+3. Observe le blocage de la fusion selon la règle de l’école.
+4. Corrige le code, commite et pousse ; vérifie le nouveau pipeline vert du dernier commit.
+5. Relis le diff, fusionne lorsque les règles le permettent, puis mets main à jour.
+6. Conserve le lien du pipeline rouge pour le bilan.
 
 **Terminal · Relire l’état du dépôt**
 
@@ -562,11 +620,19 @@ Créer la branche de la MR 2 depuis la branche principale qui contient déjà la
 
 **Où tu travailles :** Dépôt
 
+**Pour comprendre**
+
+- La branche principale (main) contient le travail déjà fusionné. Ta branche feat/... reçoit les changements de cette mission.
+- Un dépôt « propre » n’a aucune modification en attente : git status te le confirme.
+
 **Actions dans l’ordre**
 
-1. Vérifie que la MR 1 est bien fusionnée dans la branche principale. Si ce n’est pas le cas, arrête-toi et règle ça d’abord.
-2. Reviens sur la branche principale, récupère ses derniers commits, puis crée feat/connexion.
-3. Lance verification.py avant de commencer : T1 à T5 doivent passer sur cette base.
+1. Ouvre workspaces/portpilot dans VS Code, ou Coder dans Cyber Atelier avec cwd sur « . ».
+2. Vérifie que MR1 est fusionnée.
+3. Lis git status ; enregistre ton travail en cours avant de changer de branche.
+4. Reviens sur main avec git switch main, mets-la à jour avec git pull --ff-only, puis crée feat/connexion. Remplace main par master si ton dépôt utilise ce nom.
+5. Lance verification.py : T1 à T5 doivent passer sur cette base.
+6. Vérifie le nom de ta branche avec git status. Si elle existe déjà, reprends-la avec git switch sans -c.
 
 **Terminal · Relire l’état du dépôt**
 
@@ -612,21 +678,10 @@ Comprendre une socket d’écoute locale, puis écrire T6 qui en ouvre une et ap
 
 **Où tu travailles :** verification.py
 
-**Cas de test à écrire**
+**Pour comprendre**
 
-L’entrée est ce que tu donnes au code ; l’attendu est ce que ton test doit vérifier.
-
-**T6 — Connexion à une écoute éphémère**
-- Entrée : Le port attribué par le système à une écoute TCP locale encore ouverte
-- Résultat attendu : tester_port retourne exactement OUVERT.
-
-**Actions dans l’ordre**
-
-1. Une socket est un point de communication réseau. Une socket d’écoute attend des connexions : tu la lies à une adresse (bind), tu la mets en écoute (listen), et tu lis le port que le système a choisi (getsockname).
-2. Le port 0 demande au système un port libre. Ce port n’est jamais une cible de scan : il sert uniquement à créer l’écoute du test.
-3. Exemple sans rapport avec ton exercice : le programme ci-dessous ouvre une écoute et affiche le port attribué. Lance-le pour voir le résultat.
-4. Dans verification.py, écris test_t6 : ouvre une socket IPv4 liée à 127.0.0.1 et au port 0, appelle listen, garde l’écoute ouverte pendant l’appel à tester_port et vérifie que le résultat est exactement OUVERT.
-5. Lance verification.py : il doit échouer, car tester_port n’existe pas encore. C’est la phase rouge.
+- Une socket d’écoute attend une connexion. bind choisit l’adresse ; listen démarre l’écoute ; getsockname donne le port effectivement attribué.
+- Le port 0 demande au système un port libre pour le test. Ce n’est pas un port à scanner.
 
 **Éditeur · Exemple Python à lire ou essayer**
 
@@ -640,6 +695,22 @@ with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as ecoute:
     ecoute.listen()
     print("port attribué :", ecoute.getsockname()[1])
 ```
+
+**Cas de test à écrire**
+
+L’entrée est ce que tu donnes au code ; l’attendu est ce que ton test doit vérifier.
+
+**T6 — Connexion à une écoute éphémère**
+- Entrée : Le port attribué par le système à une écoute TCP locale encore ouverte
+- Résultat attendu : tester_port retourne exactement OUVERT.
+
+**Actions dans l’ordre**
+
+1. Essaie l’exemple d’écoute locale et observe le port choisi.
+2. Écris T6 dans verification.py : crée une socket IPv4, lie-la à 127.0.0.1 et au port 0, puis appelle listen.
+3. Lis le port attribué et garde l’écoute ouverte pendant l’appel à tester_port. Vérifie le retour exact "OUVERT".
+4. Assure la fermeture de l’écoute même si le test échoue.
+5. Lance : l’absence de tester_port explique le rouge attendu.
 
 **Terminal · Commande à lancer au moment indiqué**
 
@@ -659,13 +730,17 @@ python3 verification.py
 
 **Où tu travailles :** portpilot.py ; verification.py
 
+**Pour comprendre**
+
+- socket.create_connection tente d’ouvrir une connexion vers un couple (hôte, port). Le timeout borne son attente.
+- Une connexion réussie doit être fermée après son usage, même si elle ne sert qu’à vérifier l’ouverture.
+
 **Actions dans l’ordre**
 
-1. Ajoute tester_port(port) dans portpilot.py. L’hôte est la constante 127.0.0.1, le délai est de 0,5 seconde, une seule tentative.
-2. socket.create_connection((hote, port), timeout=...) tente la connexion. Lis son aide pour voir ses arguments : python3 -c "import socket; help(socket.create_connection)" (appuie sur q pour sortir).
-3. Le minimum pour T6 : une connexion réussie retourne OUVERT. Tu traiteras les autres cas au palier suivant.
-4. Relance verification.py : T1 à T6 doivent passer.
-5. Fais un commit pour T6 et tester_port.
+1. Consulte l’aide locale de socket.create_connection avec la commande proposée.
+2. Ajoute tester_port(port) dans portpilot.py : hôte fixe 127.0.0.1, timeout 0,5 seconde et une seule tentative.
+3. Pour ce palier, une connexion réussie retourne "OUVERT". Ferme la connexion créée.
+4. Relance T1 à T6 puis commite. Les erreurs sont traitées au prochain palier.
 
 **Terminal · Commande à lancer au moment indiqué**
 
@@ -702,13 +777,10 @@ Classer les exceptions réseau dans le bon état, avec le bon ordre des except.
 
 **Où tu travailles :** portpilot.py
 
-**Actions dans l’ordre**
+**Pour comprendre**
 
-1. tester_port retourne exactement OUVERT, REFUSE, TIMEOUT ou ERREUR. REFUSE correspond à ConnectionRefusedError, TIMEOUT à un dépassement du délai, ERREUR à tout autre OSError.
-2. Les exceptions sont classées en arbre : ConnectionRefusedError est une sorte d’OSError. Un except OSError placé en premier attrape donc tout, y compris les cas plus précis.
-3. Exemple sans rapport avec ton exercice : ouvrir un fichier qui n’existe pas. Lance-le pour voir quelle exception apparaît, puis compare l’ordre des except.
-4. Ajoute les branches REFUSE, TIMEOUT et ERREUR dans tester_port, en mettant les exceptions précises avant OSError. T6 doit toujours passer.
-5. Relis le code et vérifie l’ordre : une exception précise doit toujours être traitée avant son parent.
+- Les exceptions forment une hiérarchie : ConnectionRefusedError est un cas particulier d’OSError. Un except trop général placé en premier masque les cas précis.
+- Les états sont des chaînes qui décrivent ce qui s’est passé pendant la tentative.
 
 **Éditeur · Exemple Python à lire ou essayer**
 
@@ -723,6 +795,20 @@ except FileNotFoundError:
 except OSError:
     print("autre erreur du système")
 ```
+
+**Règles à respecter**
+
+- Connexion réussie → OUVERT.
+- ConnectionRefusedError → REFUSE.
+- Dépassement du délai → TIMEOUT.
+- Autre OSError → ERREUR.
+
+**Actions dans l’ordre**
+
+1. Essaie l’exemple FileNotFoundError/OSError et repère l’ordre des except.
+2. Ajoute les traitements dans tester_port, avec les exceptions précises avant OSError.
+3. Relis chaque branche : elle retourne un seul des quatre états du contrat.
+4. Relance T1 à T6. T6 vérifie le succès ; relis aussi le traitement des trois autres états.
 
 **Terminal · Commande à lancer au moment indiqué**
 
@@ -751,12 +837,10 @@ Garantir la fermeture de toute socket créée, même quand une exception survien
 
 **Où tu travailles :** portpilot.py
 
-**Actions dans l’ordre**
+**Pour comprendre**
 
-1. Une socket ouverte et non fermée reste allouée. Avec with, Python ferme l’objet à la sortie du bloc, même en cas d’exception.
-2. Exemple sans rapport : finally s’exécute toujours, qu’une exception soit levée ou non. Lance le code ci-dessous avec un diviseur nul puis avec un diviseur valide.
-3. Relis tester_port : toute socket créée doit être fermée, y compris quand une branche d’erreur est prise.
-4. Relance verification.py. Tu ne modifies pas T6 : seul le code de tester_port peut changer ici.
+- Une socket reste une ressource ouverte tant qu’elle n’est pas fermée. with la ferme à la sortie du bloc, y compris si une exception survient.
+- finally sert aussi à effectuer un nettoyage après un succès ou une erreur.
 
 **Éditeur · Exemple Python à lire ou essayer**
 
@@ -773,6 +857,13 @@ print(diviser(6, 3))
 diviser(1, 0)
 ```
 
+**Actions dans l’ordre**
+
+1. Essaie l’exemple finally avec une division valide, puis une division par zéro. Observe le nettoyage dans les deux cas.
+2. Relis tous les chemins de tester_port : chaque socket créée doit être fermée.
+3. Complète le nettoyage si nécessaire, sans modifier T6.
+4. Relance verification.py et vérifie que la suite reste verte.
+
 **Terminal · Commande à lancer au moment indiqué**
 
 Terminal du parcours : reste à la racine du dépôt. Exécute ces lignes au moment demandé dans les actions, avec les modifications manuelles entre les blocs. Lance le programme et echo $? ensemble : le nombre affiché est le code du programme ; la console peut afficher code 0 pour echo lui-même.
@@ -787,16 +878,24 @@ python3 verification.py; echo $?
 
 #### Palier 6 — Relecture, commit et pipeline de MR (10 min)
 
-Relire ton diff, pousser la branche et vérifier que la CI de MR teste bien le dernier commit.
+Livrer la connexion et son test dans une MR au pipeline vert.
 
 **Où tu travailles :** Branche feat/connexion ; MR GitLab
 
+**Pour comprendre**
+
+- git diff montre les lignes modifiées ; git diff --staged montre celles choisies pour le prochain commit. Le diff de la MR compare toute ta branche à main.
+- La demande de fusion (MR dans GitLab, PR dans GitHub) permet de relire le travail avant de l’intégrer à main.
+
 **Actions dans l’ordre**
 
-1. Lis git status et git diff avant tout ajout : tu ne veux ni __pycache__, ni fichier inutile.
-2. Vérifie que le test n’emploie aucun port fixe, aucun serveur externe, aucun thread, aucun accept et aucune attente artificielle.
-3. Ajoute explicitement les fichiers nécessaires, fais un commit descriptif, pousse la branche et ouvre la MR vers la branche principale.
-4. Vérifie que le pipeline du dernier commit de la MR exécute toute la suite : T1 à T6. Ce pipeline ne dépend ni du labo ni d’un service déjà présent.
+1. Lance la suite complète avec la commande indiquée au début de la mission.
+2. Relis T6 : écoute éphémère locale, sans port fixe, serveur externe, thread, accept ou attente artificielle. Le pipeline doit exécuter T1 à T6 sans laboratoire.
+3. Relis git status et git diff : la livraison doit contenir portpilot.py et verification.py, avec les modifications nécessaires de cette mission.
+4. Ajoute les fichiers par leur nom, relis git diff --staged, puis commite ce qui ne l’est pas encore.
+5. Pousse feat/connexion et ouvre la demande de fusion vers main.
+6. Dans GitLab, ouvre le pipeline du dernier commit : vérifie qu’il a réellement exécuté les tests et qu’il est vert. Un test local réussi ne le remplace pas.
+7. Relis le diff dans GitLab. La fusion et le retour sur main se font au palier suivant.
 
 **Terminal · Relire l’état du dépôt**
 
@@ -836,11 +935,17 @@ Fusionner la MR 2 après un pipeline vert, puis repartir d’une branche princip
 
 **Où tu travailles :** MR GitLab ; branche principale
 
+**Pour comprendre**
+
+- Le pipeline vert est une condition de fusion de l’école ; ta branche principale locale doit ensuite récupérer cette fusion.
+- La prochaine mission repart de cette version commune.
+
 **Actions dans l’ordre**
 
-1. Relis le diff de la MR dans GitLab, vérifie que le pipeline du dernier commit est vert, puis fusionne.
-2. Une fusion autorisée n’est pas la même chose qu’un test local réussi : ce qui compte pour l’école est le pipeline du dernier commit et la règle de fusion.
-3. Reviens sur la branche principale et mets-la à jour. Ta branche de la MR 3 se crée à partir de cette version.
+1. Si tu n’as pas encore fusionné MR2, relis son diff et son dernier pipeline, puis fusionne lorsque la règle de l’école l’autorise.
+2. Reviens sur main et lance git pull --ff-only.
+3. Vérifie dans git log que la fusion est présente, puis relance T1 à T6.
+4. Ne crée la branche de MR3 qu’après ces vérifications.
 
 **Terminal · Après la fusion : actualiser la principale**
 
@@ -889,11 +994,19 @@ Partir de la branche principale à jour et savoir exactement ce que la MR 3 doit
 
 **Où tu travailles :** Dépôt
 
+**Pour comprendre**
+
+- La branche principale (main) contient le travail déjà fusionné. Ta branche feat/... reçoit les changements de cette mission.
+- Un dépôt « propre » n’a aucune modification en attente : git status te le confirme.
+
 **Actions dans l’ordre**
 
-1. Vérifie que la MR 2 est fusionnée, puis reviens sur la branche principale et mets-la à jour.
-2. Crée feat/scan-bilan. Relis la liste des livrables : portpilot.py, verification.py, README.md, .gitignore et .gitlab-ci.yml. Le ZIP ne contient que portpilot.py, verification.py et README.md.
-3. Lance verification.py : T1 à T6 doivent passer sur cette base avant tout ajout.
+1. Ouvre workspaces/portpilot dans VS Code, ou Coder dans Cyber Atelier avec cwd sur « . ».
+2. Vérifie que MR2 est fusionnée.
+3. Lis git status ; enregistre ton travail en cours avant de changer de branche.
+4. Reviens sur main avec git switch main, mets-la à jour avec git pull --ff-only, puis crée feat/scan-bilan. Remplace main par master si ton dépôt utilise ce nom.
+5. Lance T1 à T6. Relis les livrables : portpilot.py, verification.py, README.md, .gitignore et .gitlab-ci.yml ; le ZIP final ne contient que les trois premiers.
+6. Vérifie le nom de ta branche avec git status. Si elle existe déjà, reprends-la avec git switch sans -c.
 
 **Terminal · Relire l’état du dépôt**
 
@@ -939,21 +1052,10 @@ Comprendre pourquoi on valide l’ensemble avant d’agir, puis écrire T7 qui d
 
 **Où tu travailles :** verification.py
 
-**Cas de test à écrire**
+**Pour comprendre**
 
-L’entrée est ce que tu donnes au code ; l’attendu est ce que ton test doit vérifier.
-
-**T7 — Scan de deux écoutes dans l’ordre**
-- Entrée : Deux sockets éphémères ouvertes, fournies dans un ordre choisi
-- Résultat attendu : Deux paires port/OUVERT exactement dans l’ordre de l’entrée.
-
-**Actions dans l’ordre**
-
-1. Quand une action se fait pour plusieurs éléments, il vaut mieux vérifier toute la liste avant la première action. Ainsi une entrée invalide ne provoque aucune connexion partielle.
-2. Exemple sans rapport avec ton exercice : préparer un panier de courses. Le programme ci-dessous vérifie toute la liste avant d’ajouter le premier article. Lance-le avec la liste valide puis avec une liste contenant une valeur invalide.
-3. Dans verification.py, écris test_t7 : deux écoutes éphémères distinctes, toutes deux ouvertes pendant le scan, puis vérification que scanner_ports retourne exactement les deux paires [port, OUVERT] dans l’ordre donné.
-4. Ferme les deux sockets systématiquement, même si une assertion échoue.
-5. Lance verification.py : T7 doit échouer, car scanner_ports n’existe pas encore.
+- Valider toute la liste avant d’agir empêche des connexions partielles si un port plus loin dans la liste est invalide.
+- T7 ouvre lui-même ses deux écoutes locales et les garde disponibles pendant tout le scan.
 
 **Éditeur · Exemple Python à lire ou essayer**
 
@@ -969,6 +1071,22 @@ for article in articles:
 else:
     print("liste valide, on commence les achats")
 ```
+
+**Cas de test à écrire**
+
+L’entrée est ce que tu donnes au code ; l’attendu est ce que ton test doit vérifier.
+
+**T7 — Scan de deux écoutes dans l’ordre**
+- Entrée : Deux sockets éphémères ouvertes, fournies dans un ordre choisi
+- Résultat attendu : Deux paires port/OUVERT exactement dans l’ordre de l’entrée.
+
+**Actions dans l’ordre**
+
+1. Observe l’exemple du panier refusé avant le début des achats.
+2. Écris T7 : crée deux sockets d’écoute IPv4 avec le port 0, puis lis leurs deux ports distincts.
+3. Donne ces ports à scanner_ports dans un ordre choisi. Vérifie les deux paires [port, "OUVERT"] dans exactement cet ordre.
+4. Ferme les deux écoutes systématiquement après l’essai, même si une assertion échoue.
+5. Lance le test et constate le rouge lié à l’absence de scanner_ports.
 
 **Terminal · Commande à lancer au moment indiqué**
 
@@ -988,12 +1106,10 @@ python3 verification.py
 
 **Où tu travailles :** portpilot.py ; verification.py
 
-**Actions dans l’ordre**
+**Pour comprendre**
 
-1. scanner_ports(ports) valide toute la liste avec valider_ports avant la première connexion. Une liste invalide ne doit donc déclencher aucune tentative.
-2. Pour chaque port de la liste, dans l’ordre, fais une seule tentative avec tester_port et ajoute la paire [port, état] à la liste de résultats.
-3. Exemple sans rapport : une boucle for qui construit une liste de paires avec leur indice. Lance-le pour voir l’ordre conservé.
-4. Relance verification.py jusqu’à ce que T1 à T7 passent, puis fais un commit.
+- Une paire [port, état] relie la valeur testée à son résultat. Une liste de paires garde l’ordre de tes tentatives.
+- Réutiliser valider_ports puis tester_port conserve les règles déjà vérifiées.
 
 **Éditeur · Exemple Python à lire ou essayer**
 
@@ -1006,6 +1122,29 @@ for position, fruit in enumerate(fruits):
     resultats.append([position, fruit])
 print(resultats)
 ```
+
+**Exemple de résultat attendu**
+
+Ce que tu donnes :
+
+```text
+Deux ports locaux ouverts, fournis dans l’ordre 53002 puis 53001.
+```
+
+Ce que tu dois obtenir :
+
+```text
+[[53002, "OUVERT"], [53001, "OUVERT"]]
+```
+
+Ces nombres illustrent la forme ; T7 utilise les ports réellement attribués par le système.
+
+**Actions dans l’ordre**
+
+1. Crée scanner_ports(ports) : valide toute la liste avant le premier appel réseau.
+2. Parcours les ports dans leur ordre ; appelle tester_port une fois par port et conserve [port, état].
+3. Retourne la liste obtenue. Une liste refusée ne doit lancer aucune tentative.
+4. Relance T1 à T7, puis commite.
 
 **Terminal · Commande à lancer au moment indiqué**
 
@@ -1034,21 +1173,10 @@ Compter les états dans un dictionnaire à cinq compteurs, et écrire T8 pour v�
 
 **Où tu travailles :** portpilot.py ; verification.py
 
-**Cas de test à écrire**
+**Pour comprendre**
 
-L’entrée est ce que tu donnes au code ; l’attendu est ce que ton test doit vérifier.
-
-**T8 — Bilan mixte et vide**
-- Entrée : Deux OUVERT, un REFUSE, un TIMEOUT, un ERREUR ; puis liste vide
-- Résultat attendu : total 5, ouverts 2, refuses 1, timeouts 1, erreurs 1 ; cinq zéros pour la liste vide.
-
-**Actions dans l’ordre**
-
-1. resumer(resultats) retourne cinq compteurs entiers : total, ouverts, refuses, timeouts et erreurs. Les catégories doivent totaliser total. Une liste vide donne cinq zéros.
-2. Exemple sans rapport : compter des fruits dans un dictionnaire. Lance le code et vérifie que chaque clé reçoit un compteur.
-3. Dans verification.py, écris test_t8 : il construit deux OUVERT, un REFUSE, un TIMEOUT et un ERREUR, vérifie les cinq compteurs, puis vérifie les cinq zéros pour une liste vide.
-4. T8 vérifie le comptage d’états fabriqués, il ne provoque pas de vraies erreurs réseau.
-5. Écris resumer, relance verification.py, puis fais un commit.
+- Le bilan compte des états déjà connus ; il ne se connecte à rien. Tu peux donc le tester avec des états fabriqués.
+- Une catégorie vide a tout de même un compteur zéro.
 
 **Éditeur · Exemple Python à lire ou essayer**
 
@@ -1061,6 +1189,37 @@ for fruit in fruits:
     compte[fruit] = compte.get(fruit, 0) + 1
 print(compte)
 ```
+
+**Exemple de résultat attendu**
+
+Ce que tu donnes :
+
+```text
+Deux OUVERT, un REFUSE, un TIMEOUT, un ERREUR.
+```
+
+Ce que tu dois obtenir :
+
+```text
+{"total": 5, "ouverts": 2, "refuses": 1, "timeouts": 1, "erreurs": 1}
+```
+
+T8 vérifie ce comptage ; il ne provoque pas les trois erreurs réseau.
+
+**Cas de test à écrire**
+
+L’entrée est ce que tu donnes au code ; l’attendu est ce que ton test doit vérifier.
+
+**T8 — Bilan mixte et vide**
+- Entrée : Deux OUVERT, un REFUSE, un TIMEOUT, un ERREUR ; puis liste vide
+- Résultat attendu : total 5, ouverts 2, refuses 1, timeouts 1, erreurs 1 ; cinq zéros pour la liste vide.
+
+**Actions dans l’ordre**
+
+1. Écris T8 : deux OUVERT, un REFUSE, un TIMEOUT et un ERREUR. Compare les cinq compteurs.
+2. Ajoute le cas de la liste vide : les cinq compteurs valent zéro.
+3. Crée resumer(resultats), retourne un dictionnaire et vérifie que les quatre catégories totalisent total.
+4. Relance T1 à T8 et commite.
 
 **Terminal · Commande à lancer au moment indiqué**
 
@@ -1089,14 +1248,10 @@ Séparer le point d’entrée des fonctions, pour que l’import du module ne la
 
 **Où tu travailles :** portpilot.py
 
-**Actions dans l’ordre**
+**Pour comprendre**
 
-1. Le bloc if __name__ == "__main__": ne s’exécute que lorsque tu lances le fichier directement. Quand verification.py importe portpilot, ce bloc ne doit donc pas tourner.
-2. Exemple sans rapport : un module qui affiche quelque chose seulement s’il est lancé directement. Lance-le directement, puis importe-le depuis un autre fichier.
-3. Dans un exemple.py jetable, lance python3 exemple.py puis python3 -c "import exemple" : le premier affiche Bonjour, le second ne doit rien afficher. Supprime exemple.py après l’essai.
-4. main coordonne la liste configurée, le scan, un résultat par port et le bilan. Une liste invalide affiche un message clair au lieu d’une trace d’erreur brute.
-5. Relance verification.py : il doit toujours passer, et l’import ne doit pas afficher le scan.
-6. Fais un commit.
+- La garde __main__ empêche le lancement automatique du scan lors de l’import depuis verification.py.
+- main rassemble configuration, scan et affichage ; les calculs restent dans leurs fonctions.
 
 **Éditeur · Exemple Python à lire ou essayer**
 
@@ -1109,6 +1264,14 @@ def saluer():
 if __name__ == "__main__":
     saluer()
 ```
+
+**Actions dans l’ordre**
+
+1. Essaie l’exemple dans exemple.py : lancement direct → Bonjour ; import → aucune sortie. Supprime le fichier d’essai.
+2. Écris main pour utiliser la liste configurée, afficher un résultat par port puis le bilan.
+3. Traite une liste refusée avec un message clair plutôt qu’une trace brute.
+4. Place le lancement sous la garde __main__, vérifie un import silencieux et relance la suite.
+5. Commite les changements.
 
 **Terminal · Commande à lancer au moment indiqué**
 
@@ -1145,13 +1308,17 @@ Décrire le projet et ses limites avant que la CI de livraison ne construise l�
 
 **Où tu travailles :** README.md
 
+**Pour comprendre**
+
+- Le README explique comment configurer, lancer et interpréter ton programme. Il doit distinguer ce que le scan observe et ce que les tests prouvent.
+- Un port OUVERT indique une connexion possible, sans identifier une vulnérabilité ou la nature du service.
+
 **Actions dans l’ordre**
 
-1. Le README décrit l’objectif et ses limites, les prérequis, la configuration de la liste, le lancement, les quatre états, les tests et le téléchargement de l’artefact.
-2. Le scan ne vise que 127.0.0.1, de façon séquentielle, avec une tentative et 0,5 seconde par port. Un état OUVERT ne prouve ni vulnérabilité ni nature du service.
-3. Précise que T8 compte des états fabriqués : les états REFUSE, TIMEOUT et ERREUR ne sont pas déclenchés par la suite de tests.
-4. Pour la démonstration locale, prévois le port 8000 qui est celui du labo de Cyber Atelier : tu l’écriras dans la liste configurée au palier 8.
-5. Fais un commit du README.
+1. Documente objectif, limites, prérequis, liste configurée, lancement, quatre états, tests et téléchargement de l’artefact.
+2. Indique le périmètre : 127.0.0.1, scan séquentiel, une tentative et 0,5 seconde par port.
+3. Explique que T8 compte des états fabriqués et ne déclenche pas REFUSE, TIMEOUT ou ERREUR sur le réseau.
+4. Décris la démonstration du palier 8 avec le labo sur 8000, puis commite le README.
 
 **Terminal · Relire l’état du dépôt**
 
@@ -1178,13 +1345,10 @@ Ajouter une étape de livraison qui ne tourne qu’après les tests et produit u
 
 **Où tu travailles :** .gitlab-ci.yml ; portpilot.zip
 
-**Actions dans l’ordre**
+**Pour comprendre**
 
-1. Ton .gitlab-ci.yml a deux stages successifs : test, puis livraison. Le job de livraison ne s’exécute qu’après le succès du stage test.
-2. Le job de livraison crée portpilot.zip avec exactement portpilot.py, verification.py et README.md, et le conserve comme artefact téléchargeable pendant sept jours.
-3. Exemple sans rapport avec ton exercice : zipfile crée une archive avec des fichiers choisis. Lance-le et liste le contenu avec python3 -m zipfile -l.
-4. Vérifie localement ton ZIP sur les trois fichiers attendus avant de pousser. Le pipeline reste la référence : il doit produire le même contenu.
-5. Commite la CI, pousse, puis vérifie le pipeline du dernier commit : le stage test doit être vert avant la livraison.
+- Un stage regroupe des jobs. L’ordre test puis livraison empêche de livrer une version dont les tests échouent.
+- Un artefact est un fichier produit par le pipeline et conservé pour téléchargement.
 
 **Éditeur · Exemple Python à lire ou essayer**
 
@@ -1198,6 +1362,14 @@ with open("notes.txt", "w", encoding="utf-8") as f:
 with zipfile.ZipFile("exemple.zip", "w") as archive:
     archive.write("notes.txt")
 ```
+
+**Actions dans l’ordre**
+
+1. Essaie l’exemple zipfile, liste son contenu puis retire ses fichiers d’essai.
+2. Adapte la CI à deux stages : test, puis livraison après réussite des tests.
+3. Crée portpilot.zip avec exactement portpilot.py, verification.py et README.md, sans dossier supplémentaire ni cache.
+4. Vérifie localement la liste des fichiers du ZIP ; configure sa conservation comme artefact pendant sept jours.
+5. Commite la CI, pousse et ouvre la MR si nécessaire. Vérifie les deux stages du pipeline du dernier commit.
 
 **Terminal · Commande à lancer au moment indiqué**
 
@@ -1236,14 +1408,19 @@ Constater le comportement du scan sur le labo, vérifier l’artefact du dernier
 
 **Où tu travailles :** MR GitLab
 
+**Pour comprendre**
+
+- La démonstration observe le laboratoire réel. La suite de tests continue à créer ses propres écoutes : elle ne dépend pas de ce labo.
+- L’artefact à relire est celui du dernier pipeline vert ; il expire au bout de sept jours.
+
 **Actions dans l’ordre**
 
-1. Démonstration hors tests : dans le dossier de Cyber Atelier, lance python3 labs.py dans un premier terminal. Le labo répond sur 127.0.0.1:8000.
-2. Dans un second terminal, dans workspaces/portpilot, lance python3 portpilot.py avec 8000 dans la liste configurée. Attends OUVERT pour ce port.
-3. Arrête labs.py avec Ctrl+C, relance portpilot.py : tu dois voir REFUSE. Ne lance aucun autre serveur sur 8000, le labo suffit.
-4. Cette démonstration n’est pas un test : elle dépend du labo, et verification.py ne doit jamais dépendre de lui.
-5. Vérifie l’artefact portpilot.zip du dernier pipeline vert avant son expiration, et ouvre-le pour contrôler ses trois fichiers.
-6. Relis le diff de la MR, fusionne après pipeline vert du dernier commit, puis mets la branche principale à jour.
+1. Sur le Mac, lance python3 labs.py depuis cyberatelier dans un premier terminal. Dans Docker, utilise le bouton du labo à la place.
+2. Dans le même environnement, configure 8000 dans la liste de PortPilot et lance le programme : attends OUVERT.
+3. Arrête le labo avec Ctrl+C ou son bouton, relance : attends REFUSE. Ne démarre pas un autre serveur sur ce port.
+4. Si tu as modifié la liste livrée, commite et pousse cette configuration, puis attends son pipeline.
+5. Télécharge le ZIP du dernier pipeline vert et vérifie ses trois fichiers.
+6. Relis la MR, fusionne lorsque les règles le permettent, puis mets main à jour.
 
 **Terminal · Option Mac : démarrer le laboratoire dans un autre terminal**
 

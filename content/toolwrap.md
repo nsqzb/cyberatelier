@@ -63,11 +63,11 @@ Codes de sortie : 0 succès, 1 échec de l’outil, 2 arguments invalides ou cib
 <!-- BEGIN GENERATED EXERCISES -->
 ## Comment travailler un exercice
 
-Chaque mission construit une partie du projet. Commence par « Avant de commencer », puis avance palier par palier. Les durées sont des repères : prends le temps de comprendre chaque résultat.
+Ces exercices sont ton entraînement. Chaque palier explique les notions utiles, montre les données ou les règles attendues, puis te fait écrire et vérifier ton propre code. Les durées sont des repères : avance quand tu comprends le résultat.
 
-1. Lis l’objectif et les fichiers concernés. Un fichier indiqué comme « à créer » n’est pas fourni : c’est toi qui l’écris.
+1. Lis « Pour comprendre » et l’exemple lorsqu’il y en a un. Repère ce qui entre dans le programme, ce qui doit en sortir et les règles à respecter.
 2. Les cartes de tests donnent l’entrée et le résultat attendu. Écris les tests correspondants dans le fichier indiqué ; cocher un palier ne les exécute pas. Avec unittest, « Ran 0 tests » signifie qu’aucun test n’a été exécuté : ce n’est pas une validation. Un cas décrit peut contenir plusieurs valeurs ; le nombre de méthodes Python n’est donc pas forcément le nombre d’identifiants.
-3. Suis les actions numérotées. Les blocs Python se placent dans l’éditeur ; les commandes se lancent au moment demandé. Relis les blocs Git : des modifications et des actions dans GitHub/GitLab peuvent être nécessaires entre deux commandes.
+3. Suis les actions numérotées, une à la fois. Les exemples servent à apprendre une notion ; tu écris toi-même la solution de l’exercice. Les blocs Terminal donnent les commandes à lancer au moment indiqué.
 4. Vérifie le résultat indiqué avant de poursuivre. Un échec attendu (phase rouge, argument refusé ou conflit volontaire) est expliqué dans le palier.
 5. Si tu bloques, lis la dernière ligne de l’erreur, compare l’entrée et l’attendu, puis ouvre l’indice. Fais un petit changement et relance.
 
@@ -82,6 +82,16 @@ La console web repart à neuf à chaque exécution : un `cd`, une activation de 
 Un venv créé sur le Mac ne fonctionne pas dans le conteneur : utilise `python3` dans ce dernier. Remplace `main` par `master` si nécessaire. Si une branche existe déjà, reprends-la avec `git switch NOM` sans `-c`. Après chaque fusion, actualise la branche principale avant la mission suivante.
 
 ### Les mots utiles
+
+**Chaîne / champ.** Une chaîne (str) est du texte. Un champ est un morceau de donnée, comme l’utilisateur dans une ligne de journal.
+
+**Liste / position.** Une liste conserve plusieurs valeurs dans un ordre. Sa première position porte le numéro 0, la suivante 1, etc.
+
+**Dictionnaire / clé.** Un dictionnaire associe un nom à une valeur : {"fruit": "pomme"}. fruit est la clé ; pomme est sa valeur.
+
+**None.** Une valeur Python qui représente l’absence de résultat. Dans analyser_ligne, elle signifie que la ligne est refusée. Elle s’écrit sans guillemets.
+
+**split / strip.** split() sans argument découpe une chaîne sur ses espaces. split(".") découpe sur les points. strip() retire les espaces aux bords.
 
 **Contrat.** Les règles à respecter : arguments reçus, valeur retournée, erreurs et cas limites. Tu choisis le code qui respecte ces règles.
 
@@ -144,13 +154,16 @@ Travailler sur une branche dédiée à la MR1 et savoir où tu te trouves avant 
 
 **Pour comprendre**
 
-- Une branche est une ligne de travail séparée de main : main ne bouge pas tant que tu ne fusionnes pas.
+- La branche principale (main) contient le travail déjà fusionné. Ta branche feat/... reçoit les changements de cette mission.
+- Un dépôt « propre » n’a aucune modification en attente : git status te le confirme.
 
 **Actions dans l’ordre**
 
-1. Ouvre le dossier workspaces/toolwrap dans VS Code, puis un terminal (Terminal > New Terminal).
-2. Si git status répond « not a git repository », fais d’abord « Cloner le dépôt » dans l’onglet Environnement. Clone directement dans workspaces/toolwrap avec le point final ; n’imbrique pas un second workspaces/toolwrap dans ce dossier.
-3. Vérifie que python3 et git répondent, puis crée la branche de la MR1 depuis main à jour.
+1. Ouvre workspaces/toolwrap dans VS Code, ou Coder dans Cyber Atelier avec cwd sur « . ».
+2. Termine la préparation de l’onglet Environnement avant de commencer.
+3. Lis git status ; enregistre ton travail en cours avant de changer de branche.
+4. Reviens sur main avec git switch main, mets-la à jour avec git pull --ff-only, puis crée feat/subprocess. Remplace main par master si ton dépôt utilise ce nom.
+5. Vérifie le nom de ta branche avec git status. Si elle existe déjà, reprends-la avec git switch sans -c.
 
 **Terminal · Commande à lancer au moment indiqué**
 
@@ -190,12 +203,18 @@ Comprendre pourquoi on passe une liste d’arguments à subprocess.run, et ce qu
 
 **Où tu travailles :** Terminal : exemple subprocess
 
+**Pour comprendre**
+
+- subprocess.run lance un autre programme. Dans la liste d’arguments, le premier élément est le programme ; chaque élément suivant est un argument distinct.
+- Sans shell, le point-virgule reste du texte dans un argument. Un shell pourrait l’interpréter comme un séparateur de commandes.
+- capture_output récupère les sorties ; text les donne en chaînes ; returncode est le code de fin du programme.
+
 **Actions dans l’ordre**
 
-1. Une liste d’arguments : le premier élément est le programme, les suivants sont ses arguments. Python ne les interprète pas : un point-virgule ou un guillemet reste une simple lettre.
-2. Le shell, lui, interprète « ; » comme un séparateur de commandes. C’est ce que tu évites en ne passant jamais une chaîne à un shell avec une entrée utilisateur.
-3. Lis la documentation de subprocess.run : retiens seulement capture_output, text et returncode.
-4. Lance l’exemple ci-dessous. Il est sans rapport avec ton outil : il lance Python lui-même.
+1. Lis l’aide de subprocess.run en te concentrant sur capture_output, text et returncode.
+2. Lance le premier exemple : observe code 0, stdout avec "5\n" et stderr vide.
+3. Lance le second : le texte "Ana; echo piraté" est affiché en entier, sans seconde commande exécutée.
+4. Repère la différence entre la liste Python d’arguments et une commande de shell.
 
 **Terminal · Commande à lancer au moment indiqué**
 
@@ -221,12 +240,18 @@ Voir comment un outil signale le succès, l’échec simulé et l’erreur d’u
 
 **Où tu travailles :** Outil adsim dans Docker
 
+**Pour comprendre**
+
+- adsim simule un outil Active Directory ; il lit des données fictives et ne contacte aucun réseau.
+- stdout et stderr sont deux canaux séparés ; le code de sortie est un nombre indépendant du message.
+
 **Actions dans l’ordre**
 
-1. adsim est un simulateur fictif, sans réseau. Il tourne dans le conteneur : depuis ton Mac, tu le lances avec docker compose exec, depuis le dossier du projet Cyber Atelier (celui qui contient compose.yaml), et non depuis workspaces/toolwrap.
-2. Lance les trois commandes ci-dessous et note, pour chacune, le code de sortie et le canal du message (stdout ou stderr).
-3. Code 0 : succès. Code 3 : échec simulé par --fail. Code 2 : argument inconnu, refusé avant tout traitement.
-4. Garde stderr visible : le message d’argument inconnu fait partie de l’observation. Si tu es déjà dans la console du conteneur, lance python3 /app/tools/adsim.py directement, sans docker compose exec.
+1. Sur le Mac, place-toi dans cyberatelier pour les commandes docker compose. Dans la console du conteneur, utilise directement python3 /app/tools/adsim.py.
+2. Lance la commande normale et note le canal du résultat ainsi que le code 0.
+3. Lance avec --fail : observe l’erreur simulée et le code 3.
+4. Lance avec un argument inconnu : observe le message sur stderr et le code 2.
+5. Lis le code avec echo $? dans la même exécution et garde stderr visible.
 
 **Terminal · Commande à lancer au moment indiqué**
 
@@ -260,13 +285,8 @@ Remplacer un appel réel par un faux pendant un test, pour que le test ne dépen
 
 **Pour comprendre**
 
-- Un mock est un faux objet qui remplace une fonction pendant un test. unittest.mock.patch le pose le temps du bloc with.
-
-**Actions dans l’ordre**
-
-1. Règle essentielle : on patche le nom tel que le module qui appelle la fonction le voit, pas là où la fonction est définie.
-2. Crée l’exemple dans un dossier jetable hors du dépôt, lance-le, puis supprime-le.
-3. assert_called_once_with vérifie les arguments reçus par le faux.
+- Un mock remplace un appel par un faux pendant le test. Tu choisis sa réponse et tu peux vérifier comment il a été appelé.
+- patch remplace le nom utilisé par le module testé : si de.py a importé randint, le nom à remplacer est de.randint.
 
 **Éditeur · Code d’exemple à placer dans de.py**
 
@@ -300,6 +320,13 @@ if __name__ == '__main__':
     unittest.main()
 ```
 
+**Actions dans l’ordre**
+
+1. Dans un dossier jetable hors du dépôt, crée de.py et test_de.py avec les deux exemples.
+2. Lance le test : le faux doit rendre 6 et recevoir les arguments 1 et 6, une seule fois.
+3. Change seulement return_value en 2, relance et observe l’échec de la comparaison à 6.
+4. Rétablis 6, puis supprime le dossier d’exemple. Aucun de ces fichiers n’est un livrable de ToolWrap.
+
 **Terminal · Commande à lancer au moment indiqué**
 
 Terminal du parcours : reste à la racine du dépôt. Exécute ces lignes au moment demandé dans les actions, avec les modifications manuelles entre les blocs.
@@ -326,6 +353,35 @@ cd - && rm -r ~/exemple_mock
 
 **Où tu travailles :** toolwrap.py ; tests/test_toolwrap.py
 
+**Pour comprendre**
+
+- Le wrapper transforme le résultat du programme externe en une forme que le reste de ton code peut toujours lire.
+- CompletedProcess représente un programme terminé : returncode, stdout et stderr. Le mock permet d’en fournir un sans lancer le programme.
+
+**Exemple de résultat attendu**
+
+Ce que tu donnes :
+
+```text
+lancer_outil(["echo", "ok"], 2), avec le résultat simulé de W1.
+```
+
+Ce que tu dois obtenir :
+
+```text
+{"returncode": 0, "stdout": "ok", "stderr": "", "erreur": None}
+```
+
+Le texte "ok" est choisi par le faux du test, sans lancement réel du programme echo.
+
+**Règles à respecter**
+
+- Retour toujours aux quatre clés returncode, stdout, stderr et erreur.
+- Succès : code 0, sorties conservées, erreur None.
+- Les sorties sont des chaînes ; une sortie absente est vide.
+- Une liste vide ne lance rien et rend une erreur normalisée.
+- Les échecs prévus seront traités aux deux paliers suivants.
+
 **Cas de test à écrire**
 
 L’entrée est ce que tu donnes au code ; l’attendu est ce que ton test doit vérifier.
@@ -336,11 +392,11 @@ L’entrée est ce que tu donnes au code ; l’attendu est ce que ton test doit 
 
 **Actions dans l’ordre**
 
-1. Crée toolwrap.py (le wrapper) et tests/test_toolwrap.py (les tests). Les tests vivent dans tests/ et importent toolwrap.
-2. Écris le test W1 : patche subprocess.run à l’endroit où toolwrap.py l’utilise, puis fais renvoyer au faux un résultat subprocess.CompletedProcess avec returncode 0, stdout « ok » et stderr vide.
-3. Lance les tests : ils échouent, c’est la phase rouge. Le message te dit ce qui manque.
-4. Écris lancer_outil(args, timeout) : liste d’arguments, capture_output, text, timeout transmis, check à False. Retourne les quatre clés returncode, stdout, stderr et erreur.
-5. Fais passer W1 sans rien ajouter d’autre, puis commit.
+1. Crée toolwrap.py et tests/test_toolwrap.py.
+2. Écris W1 : patche subprocess.run là où toolwrap l’utilise et retourne un CompletedProcess simulé (0, "ok", stderr vide).
+3. Appelle lancer_outil(["echo", "ok"], 2) et compare le dictionnaire entier. Lance et comprends le rouge.
+4. Crée lancer_outil(args, timeout) avec liste d’arguments, capture_output=True, text=True, délai transmis et check=False.
+5. Fais passer W1, relance la suite et commite.
 
 **Terminal · Commande à lancer au moment indiqué**
 
@@ -374,6 +430,11 @@ Traiter deux exceptions de subprocess.run sans les laisser remonter à l’appel
 
 **Où tu travailles :** toolwrap.py ; tests/test_toolwrap.py
 
+**Pour comprendre**
+
+- side_effect permet au mock de lever une exception au lieu de retourner une valeur.
+- TimeoutExpired signale que le délai est dépassé ; FileNotFoundError que le programme à lancer est introuvable.
+
 **Cas de test à écrire**
 
 L’entrée est ce que tu donnes au code ; l’attendu est ce que ton test doit vérifier.
@@ -388,11 +449,11 @@ L’entrée est ce que tu donnes au code ; l’attendu est ce que ton test doit 
 
 **Actions dans l’ordre**
 
-1. Exemple sans rapport d’abord : une exception se rattrape avec try / except. TimeoutExpired est l’exception que subprocess.run lève quand le délai est dépassé.
-2. W3 : le faux lève TimeoutExpired. Vérifie que le délai de 2 secondes est bien transmis à subprocess.run, et que erreur mentionne le délai.
-3. W4 : le faux lève FileNotFoundError. Vérifie que returncode vaut None et que erreur dit que l’outil est introuvable.
-4. Dans lancer_outil, attrape les deux exceptions séparément. Aucune ne doit sortir de la fonction.
-5. Lance les tests, puis commit.
+1. Écris W3 : le faux lève TimeoutExpired ; vérifie aussi que timeout=2 est transmis à subprocess.run.
+2. Attends returncode None et une erreur mentionnant le délai.
+3. Écris W4 : le faux lève FileNotFoundError ; attends returncode None et un message court « outil introuvable ».
+4. Traite ces deux exceptions séparément dans lancer_outil, sans les laisser sortir.
+5. Relance W1, W3 et W4 puis commite.
 
 **Terminal · Commande à lancer au moment indiqué**
 
@@ -438,7 +499,8 @@ Distinguer un code de retour non nul d’une exception, et vérifier que la list
 
 **Pour comprendre**
 
-- Un code de retour non nul n’est pas une exception : subprocess.run renvoie quand même un résultat, avec returncode 3 par exemple. Tu conserves returncode et stderr, et tu remplis erreur.
+- Un code non nul signifie que le programme a terminé en échec ; il garde tout de même ses sorties utiles.
+- call_args permet de lire les arguments reçus par le mock et de vérifier l’absence de shell.
 
 **Cas de test à écrire**
 
@@ -454,9 +516,10 @@ L’entrée est ce que tu donnes au code ; l’attendu est ce que ton test doit 
 
 **Actions dans l’ordre**
 
-1. W2 : un code 0 n’est jamais une erreur ; un code 3 donne erreur non vide, et stderr reste renseigné.
-2. W5 : vérifie que le faux reçoit exactement la liste ['echo', 'Ana; echo piraté'], sans shell=True. Les arguments d’un appel se lisent dans call_args.
-3. Lance les tests : W1 à W5 doivent tous passer. Puis commit.
+1. Écris W2 : code 3 et stderr "erreur simulée" ; vérifie leur conservation et une erreur non vide. Code 0 doit garder erreur None.
+2. Écris W5 : liste ["echo", "Ana; echo piraté"] transmise intacte, en deux éléments.
+3. Vérifie shell absent ou False dans l’appel ; jamais shell=True.
+4. Complète le traitement du code non nul, relance W1 à W5 puis commite.
 
 **Terminal · Commande à lancer au moment indiqué**
 
@@ -500,11 +563,17 @@ Ne livrer que tes fichiers, et relire le diff avant chaque commit.
 
 **Où tu travailles :** .gitignore
 
+**Pour comprendre**
+
+- Python crée des caches dans __pycache__. Ils sont reconstruits automatiquement et ne font pas partie de ta source.
+- .gitignore empêche Git de proposer ces fichiers non suivis ; le diff reste à relire pour choisir la livraison.
+
 **Actions dans l’ordre**
 
-1. Crée un fichier .gitignore contenant une ligne __pycache__/ : Python y range ses caches, ils ne doivent pas être commités.
-2. Relance les tests, puis regarde git status : __pycache__ ne doit plus apparaître.
-3. Relis le diff avant chaque add. Le .gitignore fait l’objet de son propre commit.
+1. Crée .gitignore avec __pycache__/ sur une ligne.
+2. Relance les tests, puis vérifie que git status ne propose plus ces caches.
+3. Relis le diff et commite .gitignore séparément.
+4. Observe git log --oneline : chaque message décrit le changement enregistré.
 
 **Terminal · Commande à lancer au moment indiqué**
 
@@ -544,11 +613,20 @@ Relire ce que tu livres, le pousser et le fusionner après ta propre vérificati
 
 **Où tu travailles :** PR GitHub
 
+**Pour comprendre**
+
+- git diff montre les lignes modifiées ; git diff --staged montre celles choisies pour le prochain commit. Le diff de la MR compare toute ta branche à main.
+- La demande de fusion (MR dans GitLab, PR dans GitHub) permet de relire le travail avant de l’intégrer à main.
+
 **Actions dans l’ordre**
 
-1. Ici, aucun pipeline ne tourne : un test local réussi n’est pas une fusion autorisée. Tu relis le diff toi-même, puis tu fusionnes.
-2. Pousse la branche, ouvre la pull request, puis relis le diff dans GitHub comme si c’était le code de quelqu’un d’autre.
-3. Fusionne avec « Merge pull request » dans GitHub, puis reviens sur main à jour.
+1. Lance la suite complète avec la commande indiquée au début de la mission.
+2. Relis git status et git diff : la livraison doit contenir toolwrap.py, tests/test_toolwrap.py et .gitignore, avec les modifications nécessaires de cette mission.
+3. Ajoute les fichiers par leur nom, relis git diff --staged, puis commite ce qui ne l’est pas encore.
+4. Pousse feat/subprocess et ouvre la demande de fusion vers main.
+5. Relis le diff dans la demande de fusion. Cette mission n’a pas encore de pipeline : la relecture et les conditions de fusion restent nécessaires.
+6. Fusionne après relecture et, pour GitLab de l’école, après son autorisation.
+7. Après la fusion, reviens sur main et lance git pull --ff-only avant la mission suivante.
 
 **Terminal · Commande à lancer au moment indiqué**
 
@@ -607,10 +685,18 @@ Partir d’une main qui contient la MR1 fusionnée, sur une branche dédiée à 
 
 **Où tu travailles :** Dépôt
 
+**Pour comprendre**
+
+- La branche principale (main) contient le travail déjà fusionné. Ta branche feat/... reçoit les changements de cette mission.
+- Un dépôt « propre » n’a aucune modification en attente : git status te le confirme.
+
 **Actions dans l’ordre**
 
-1. Vérifie que toolwrap.py est présent sur main : c’est la preuve que la MR1 est fusionnée.
-2. Crée la branche de la MR2 depuis main à jour.
+1. Ouvre workspaces/toolwrap dans VS Code, ou Coder dans Cyber Atelier avec cwd sur « . ».
+2. Vérifie que MR1 est fusionnée : toolwrap.py est présent et W1 à W5 passent.
+3. Lis git status ; enregistre ton travail en cours avant de changer de branche.
+4. Reviens sur main avec git switch main, mets-la à jour avec git pull --ff-only, puis crée feat/cli-perimetre. Remplace main par master si ton dépôt utilise ce nom.
+5. Vérifie le nom de ta branche avec git status. Si elle existe déjà, reprends-la avec git switch sans -c.
 
 **Terminal · Commande à lancer au moment indiqué**
 
@@ -639,11 +725,10 @@ Comprendre comment argparse découpe une ligne de commande en sous-commandes, av
 
 **Où tu travailles :** calc.py (jetable)
 
-**Actions dans l’ordre**
+**Pour comprendre**
 
-1. argparse lit une liste d’arguments et produit un objet dont les champs sont les valeurs reçues. En test, tu lui passes la liste ; en ligne de commande, il lit sys.argv.
-2. Une sous-commande est un mot qui choisit une branche du programme. Chacune a ses propres arguments.
-3. Lance l’exemple sans rapport : une petite calculatrice. Lis ce que --help affiche.
+- argparse transforme une liste de textes en valeurs nommées. type=int convertit un argument numérique en entier.
+- Une sous-commande choisit une action, comme additionner dans l’exemple. --help décrit les arguments sans exécuter cette action.
 
 **Éditeur · Code d’exemple à placer dans calc.py**
 
@@ -665,6 +750,13 @@ if __name__ == '__main__':
     print(construire_parseur().parse_args())
 ```
 
+**Actions dans l’ordre**
+
+1. Crée calc.py avec l’exemple de calculatrice dans un dossier d’essai.
+2. Lance --help et repère la sous-commande additionner.
+3. Lance additionner avec deux nombres ; observe commande, a et b dans l’objet retourné.
+4. Repère add_subparsers, add_argument et parse_args, puis retire le fichier d’essai.
+
 **Terminal · Commande à lancer au moment indiqué**
 
 Terminal du parcours : reste à la racine du dépôt. Exécute ces lignes au moment demandé dans les actions, avec les modifications manuelles entre les blocs.
@@ -684,6 +776,11 @@ Construire les deux sous-commandes du programme et les tester sans lancer aucun 
 
 **Où tu travailles :** cli.py ; tests/test_cli.py
 
+**Pour comprendre**
+
+- construire_parseur prépare les règles des arguments ; parse_args les applique. En test, tu fournis une liste sans le nom du script.
+- L’aide termine avec SystemExit(0) : pour W7, cette exception est le comportement attendu.
+
 **Cas de test à écrire**
 
 L’entrée est ce que tu donnes au code ; l’attendu est ce que ton test doit vérifier.
@@ -698,11 +795,12 @@ L’entrée est ce que tu donnes au code ; l’attendu est ce que ton test doit 
 
 **Actions dans l’ordre**
 
-1. Crée cli.py. Mets la construction du parseur dans une fonction construire_parseur(), et écris main(argv) qui reçoit une liste d’arguments (pas sys.argv) : les tests passent une liste.
-2. Sous-commande reseau : une cible obligatoire et --port entier, 8000 par défaut.
-3. Sous-commande ad : un sujet parmi users, groups et computers, puis --format json ou text.
-4. W6 vérifie les valeurs obtenues. W7 vérifie que --help sort avec SystemExit de code 0 : utilise assertRaises(SystemExit).
-5. Lance python3 cli.py --help à la main, puis les tests, puis commit.
+1. Crée cli.py avec construire_parseur() et main(argv).
+2. Ajoute reseau : cible obligatoire, --port entier avec défaut 8000.
+3. Ajoute ad : sujet users/groups/computers, --format json/text.
+4. Écris W6 avec --port 8000 puis sans --port ; vérifie les champs et le type entier.
+5. Écris W7 avec ["--help"] : capture l’aide, attends SystemExit de code 0 et les noms reseau et ad.
+6. Essaie aussi python3 cli.py --help, relance les tests et commite.
 
 **Terminal · Commande à lancer au moment indiqué**
 
@@ -742,6 +840,11 @@ Refuser toute cible qui n’est pas une adresse IP autorisée, sans jamais réso
 
 **Où tu travailles :** cli.py ; tests/test_cli.py
 
+**Pour comprendre**
+
+- ipaddress lit une adresse sous forme de texte sans résoudre de nom DNS. localhost et une plage ne sont pas des adresses admises ici.
+- La liste blanche contient les cibles explicitement autorisées : appartenir au loopback ne suffit pas.
+
 **Cas de test à écrire**
 
 L’entrée est ce que tu donnes au code ; l’attendu est ce que ton test doit vérifier.
@@ -752,10 +855,10 @@ L’entrée est ce que tu donnes au code ; l’attendu est ce que ton test doit 
 
 **Actions dans l’ordre**
 
-1. ipaddress lit une chaîne comme une adresse IP. Si ce n’est pas une adresse, elle lève ValueError : c’est un moyen de refuser « localhost » sans consulter le DNS.
-2. Liste blanche : une constante unique dans cli.py, qui ne contient que l’adresse autorisée dans le labo. Une adresse loopback n’est pas autorisée par défaut : seule celle de la liste l’est.
-3. Écris W8 d’abord : 127.0.0.1 est accepté ; 127.0.0.2, 8.8.8.8, localhost et 127.0.0.1/32 sont refusés avec un message en français.
-4. Écris la validation, fais passer W8, puis commit.
+1. Écris les cinq cas de W8 : 127.0.0.1 accepté ; 127.0.0.2, 8.8.8.8, localhost et 127.0.0.1/32 refusés.
+2. Crée une constante unique de liste blanche dans cli.py, avec 127.0.0.1 seulement.
+3. Écris la validation avec ipaddress puis la liste blanche. Transforme les refus en ValueError avec message français.
+4. Vérifie qu’aucune résolution de nom n’est tentée, relance les tests et commite.
 
 **Terminal · Commande à lancer au moment indiqué**
 
@@ -801,6 +904,11 @@ Faire en sorte qu’une cible refusée ne lance jamais l’outil, et renvoyer le
 
 **Où tu travailles :** cli.py ; tests/test_cli.py
 
+**Pour comprendre**
+
+- Valider avant de lancer permet de refuser une cible sans exécuter d’outil.
+- redirect_stderr capture le message d’erreur ; assert_not_called vérifie que le faux n’a jamais été utilisé.
+
 **Cas de test à écrire**
 
 L’entrée est ce que tu donnes au code ; l’attendu est ce que ton test doit vérifier.
@@ -811,10 +919,10 @@ L’entrée est ce que tu donnes au code ; l’attendu est ce que ton test doit 
 
 **Actions dans l’ordre**
 
-1. Dans main, valide la cible avant tout appel à lancer_outil. Si elle est refusée : message sur stderr, code de retour 2.
-2. Dans W9, remplace lancer_outil par un faux dans le module cli (cli.lancer_outil), comme dans l’exemple de mock de la MR1. Il ne doit jamais être appelé.
-3. Pour lire stderr dans le test, capture-le avec contextlib.redirect_stderr.
-4. Écris W9, fais-le passer, puis commit.
+1. Écris W9 avec main(["reseau", "8.8.8.8"]) et le faux cli.lancer_outil.
+2. Capture stderr ; attends retour 2, message d’erreur et zéro appel du faux.
+3. Dans main, appelle la validation avant lancer_outil et traite le refus à ce niveau.
+4. Relance W1 à W9 et commite.
 
 **Terminal · Commande à lancer au moment indiqué**
 
@@ -858,6 +966,17 @@ Traduire le résultat de l’outil en code 0 ou 1, et tracer la commande lancée
 
 **Où tu travailles :** cli.py ; tests/test_cli.py
 
+**Pour comprendre**
+
+- logging écrit des traces de déroulement et d’erreur. Ici, elles vont sur stderr pour laisser le résultat sur stdout.
+- Une liste dans side_effect donne plusieurs réponses successives au mock.
+
+**Règles à respecter**
+
+- 0 : outil réussi.
+- 1 : outil en échec, code non nul ou erreur renseignée.
+- 2 : arguments invalides ou cible refusée.
+
 **Cas de test à écrire**
 
 L’entrée est ce que tu donnes au code ; l’attendu est ce que ton test doit vérifier.
@@ -868,10 +987,10 @@ L’entrée est ce que tu donnes au code ; l’attendu est ce que ton test doit 
 
 **Actions dans l’ordre**
 
-1. Code 0 : l’outil a réussi. Code 1 : échec (returncode non nul ou erreur renseignée). Code 2 : arguments invalides ou cible refusée, déjà fait.
-2. logging écrit des messages sur un canal choisi. Ici, le canal est stderr : le résultat reste sur stdout, les traces sur stderr.
-3. W10 : utilise mock.patch avec side_effect et une liste, pour que le faux renvoie d’abord un succès, puis un code 3. main doit renvoyer 0 puis 1, et le sujet users doit être transmis à l’outil.
-4. Écris main avec logging, fais passer W10, puis commit.
+1. Écris W10 : pour main(["ad", "users"]), le faux rend d’abord un succès puis un code 3 ou une erreur.
+2. Vérifie retour 0 puis 1, et le sujet users transmis à l’outil.
+3. Complète main et le logging sur stderr, puis relance W1 à W10.
+4. Commite quand la suite passe.
 
 **Terminal · Commande à lancer au moment indiqué**
 
@@ -913,12 +1032,19 @@ Provoquer puis résoudre un conflit de fusion, dans des branches qui ne seront j
 
 **Où tu travailles :** README.md dans les branches essai/
 
+**Pour comprendre**
+
+- Git signale un conflit quand deux branches changent la même zone du fichier. Les marqueurs contiennent les versions concurrentes.
+- L’exercice se fait sur deux branches locales d’essai, sans toucher feat/cli-perimetre.
+
 **Actions dans l’ordre**
 
-1. Les branches essai/conflit-a et essai/conflit-b partent de main. Elles servent uniquement à l’exercice : tu les supprimes à la fin.
-2. Chaque branche écrit une ligne différente dans README.md. Si README.md n’existe pas encore sur main, le conflit porte sur un fichier créé des deux côtés ; s’il existe déjà, c’est un conflit de contenu. Dans les deux cas, la méthode est la même.
-3. Git écrit les deux versions entre les marqueurs <<<<<<<, ======= et >>>>>>>. Tu choisis le texte final, tu retires les trois marqueurs, puis tu commites.
-4. Ne lance pas ces commandes sur feat/cli-perimetre.
+1. Commite d’abord le travail de ta vraie branche ; git status doit être propre.
+2. Depuis main, crée essai/conflit-a et essai/conflit-b. Écris une ligne différente dans README.md et commite dans chacune.
+3. Fusionne la seconde dans la première ; observe le conflit attendu, qu’il s’agisse d’un fichier nouveau ou déjà présent.
+4. Choisis le texte final, retire les trois marqueurs, git add puis commit.
+5. Vérifie README sans marqueurs et le graphe avant de quitter l’essai.
+6. Reviens sur main, supprime uniquement ces branches jetables puis reprends feat/cli-perimetre.
 
 **Terminal · Commande à lancer au moment indiqué**
 
@@ -982,12 +1108,18 @@ Poser des commits au-dessus d’une base mise à jour, et lire l’historique av
 
 **Où tu travailles :** Historique dans les branches essai/
 
+**Pour comprendre**
+
+- Un rebase rejoue tes commits sur une base plus récente. Cet essai utilise une copie de ta branche.
+- Sur une branche déjà poussée, le rebase change l’historique partagé : il faut prévenir avant un éventuel push forcé.
+
 **Actions dans l’ordre**
 
-1. Un rebase rejoue tes commits sur une nouvelle base. Pour que l’exercice ne touche pas main, la base évoluée est une branche jetable essai/base-evoluee, créée depuis main.
-2. La copie jetable essai/rebase reprend ta branche feat/cli-perimetre. Tu rebases cette copie, pas la vraie branche.
-3. Pendant le rebase, Git s’arrête à chaque conflit : lis son message, corrige le fichier, git add, puis git rebase --continue. git rebase --abort annule tout.
-4. Dans la vraie MR2, si main a avancé avant ta livraison, la même commande s’applique à feat/cli-perimetre. Si la branche est déjà poussée, ne rebase pas sans prévenir : un rebase réécrit l’historique et impose un push forcé, à mentionner dans la PR.
+1. Depuis main, crée essai/base-evoluee, ajoute le changement d’essai et commite-le.
+2. Crée essai/rebase depuis feat/cli-perimetre ; rebase cette copie sur essai/base-evoluee.
+3. En cas de conflit, lis le message, corrige, git add puis rebase --continue. rebase --abort annule l’essai.
+4. Observe le graphe, lance les tests de la copie, puis reviens sur feat/cli-perimetre et supprime les branches d’essai.
+5. Pour la vraie livraison, si main a avancé, applique ce principe avant le push ; ne réécris pas une branche déjà partagée sans prévenir.
 
 **Terminal · Relire l’état du dépôt**
 
@@ -1061,11 +1193,21 @@ Documenter les codes, la liste blanche et les tests, puis livrer la MR après ta
 
 **Où tu travailles :** README.md ; PR GitHub
 
+**Pour comprendre**
+
+- git diff montre les lignes modifiées ; git diff --staged montre celles choisies pour le prochain commit. Le diff de la MR compare toute ta branche à main.
+- La demande de fusion (MR dans GitLab, PR dans GitHub) permet de relire le travail avant de l’intégrer à main.
+
 **Actions dans l’ordre**
 
-1. Dans README.md, ajoute une section « CLI » : codes 0, 1 et 2, liste blanche (127.0.0.1 seulement), commande des tests.
-2. Relis le diff : seuls cli.py, tests/test_cli.py et README.md doivent apparaître. Aucune ligne d’essai ne doit subsister.
-3. Pousse la branche, ouvre la pull request, puis fusionne après relecture. Il n’y a toujours pas de pipeline : la fusion reste ta décision.
+1. Lance la suite complète avec la commande indiquée au début de la mission.
+2. Avant de livrer, ajoute au README une section CLI : codes 0/1/2, cible unique 127.0.0.1 et commande des tests. Vérifie qu’aucun texte d’essai Git ne subsiste.
+3. Relis git status et git diff : la livraison doit contenir cli.py, tests/test_cli.py et README.md, avec les modifications nécessaires de cette mission.
+4. Ajoute les fichiers par leur nom, relis git diff --staged, puis commite ce qui ne l’est pas encore.
+5. Pousse feat/cli-perimetre et ouvre la demande de fusion vers main.
+6. Relis le diff dans la demande de fusion. Cette mission n’a pas encore de pipeline : la relecture et les conditions de fusion restent nécessaires.
+7. Fusionne après relecture et, pour GitLab de l’école, après son autorisation.
+8. Après la fusion, reviens sur main et lance git pull --ff-only avant la mission suivante.
 
 **Terminal · Commande à lancer au moment indiqué**
 
@@ -1132,11 +1274,19 @@ Préparer la branche de la MR3 et copier les fixtures : les originaux restent en
 
 **Où tu travailles :** Dépôt ; fixtures/
 
+**Pour comprendre**
+
+- La branche principale (main) contient le travail déjà fusionné. Ta branche feat/... reçoit les changements de cette mission.
+- Un dépôt « propre » n’a aucune modification en attente : git status te le confirme.
+
 **Actions dans l’ordre**
 
-1. Crée la branche de la MR3 depuis main à jour.
-2. Copie les fixtures nmap et adsim depuis le dossier fixtures/ du projet Cyber Atelier dans ton dépôt.
-3. Ouvre fixtures/nmap/open_8000.xml, closed_8000.xml et mixed.xml : repère l’hôte, le port (portid), le protocole et l’état (state).
+1. Ouvre workspaces/toolwrap dans VS Code, ou Coder dans Cyber Atelier avec cwd sur « . ».
+2. Vérifie que MR2 est fusionnée et que W1 à W10 passent.
+3. Lis git status ; enregistre ton travail en cours avant de changer de branche.
+4. Reviens sur main avec git switch main, mets-la à jour avec git pull --ff-only, puis crée feat/parsing. Remplace main par master si ton dépôt utilise ce nom.
+5. Copie les fixtures nmap et adsim dans ton dépôt. Ouvre open_8000.xml, closed_8000.xml et mixed.xml : repère hôte, portid, protocole et état.
+6. Vérifie le nom de ta branche avec git status. Si elle existe déjà, reprends-la avec git switch sans -c.
 
 **Terminal · Commande à lancer au moment indiqué**
 
@@ -1176,12 +1326,15 @@ Lire un document XML : racine, enfants, attributs, et erreur de syntaxe.
 
 **Pour comprendre**
 
-- Un XML est un arbre d’éléments avec des attributs. xml.etree.ElementTree le charge et permet de parcourir cet arbre.
+- XML représente un arbre de balises. Un attribut, comme nom="pain", est une valeur attachée à une balise.
+- ElementTree.fromstring lit le texte ; findall cherche les éléments ; get lit un attribut. Un texte XML cassé lève ParseError.
 
 **Actions dans l’ordre**
 
-1. findall('article') ne cherche que les enfants directs de l’élément. get('nom') lit un attribut.
-2. Une chaîne mal formée lève ParseError : tu la rattraperas plus tard pour les fichiers cassés.
+1. Lance l’exemple du panier fourni : observe pain 2 puis lait 1.
+2. Repère la racine, les enfants article et leurs attributs. findall("article") cherche ici les enfants directs.
+3. Observe l’erreur pour le XML mal formé et le except ParseError.
+4. Ouvre à nouveau la fixture nmap et repère les mêmes éléments de structure.
 
 **Terminal · Commande à lancer au moment indiqué**
 
@@ -1214,6 +1367,33 @@ Transformer un port de nmap en élément commun, en écrivant le test sur fixtur
 
 **Où tu travailles :** parsing.py ; tests/test_parsing.py
 
+**Pour comprendre**
+
+- Parser signifie lire un format structuré pour en extraire des données. Le parseur ne lance pas nmap.
+- __file__ désigne le fichier de test ; un chemin construit depuis lui ne dépend pas du dossier où tu lances la commande.
+
+**Exemple de résultat attendu**
+
+Ce que tu donnes :
+
+```text
+Fixture open_8000.xml.
+```
+
+Ce que tu dois obtenir :
+
+```text
+items : un élément pour 8000/tcp, statut open ; erreur : None.
+```
+
+Ce sont des données lues depuis la fixture ; aucun scan réel n’est nécessaire.
+
+**Règles à respecter**
+
+- Chaque parseur retourne {"items": [...], "erreur": ...}.
+- Chaque élément possède source, type, nom, statut et details.
+- Pour nmap : source nmap, nom port/protocole et statut fourni par le XML.
+
 **Cas de test à écrire**
 
 L’entrée est ce que tu donnes au code ; l’attendu est ce que ton test doit vérifier.
@@ -1224,10 +1404,10 @@ L’entrée est ce que tu donnes au code ; l’attendu est ce que ton test doit 
 
 **Actions dans l’ordre**
 
-1. Crée parsing.py (les parseurs) et tests/test_parsing.py. Le test W11 lit fixtures/nmap/open_8000.xml.
-2. Construis le chemin de la fixture à partir de __file__ (le fichier de test), pas à partir du dossier courant : les tests passent ainsi depuis n’importe où.
-3. W11 : un élément, source nmap, nom « 8000/tcp », statut « open », erreur None. Lance les tests : rouge.
-4. Écris l’analyse nmap : un élément par port de l’hôte, avec les clés source, type, nom, statut et details. Vert, puis commit.
+1. Crée parsing.py et tests/test_parsing.py ; construis le chemin des fixtures à partir de __file__.
+2. Écris W11 avec open_8000.xml : un élément, source nmap, nom "8000/tcp", statut "open", erreur None.
+3. Lance, puis écris le parseur XML avec un élément normalisé par port de l’hôte.
+4. Compare aussi la forme du résultat au contrat, relance W11 et commite.
 
 **Terminal · Commande à lancer au moment indiqué**
 
@@ -1261,6 +1441,11 @@ Garder l’ordre du fichier, et ne jamais laisser une erreur d’analyse remonte
 
 **Où tu travailles :** parsing.py ; tests/test_parsing.py
 
+**Pour comprendre**
+
+- L’ordre des ports dans le XML reste l’ordre de la liste items. Trier cette liste changerait le contrat.
+- Une erreur de lecture est rendue dans erreur ; elle ne s’échappe pas sous forme d’exception.
+
 **Cas de test à écrire**
 
 L’entrée est ce que tu donnes au code ; l’attendu est ce que ton test doit vérifier.
@@ -1275,10 +1460,10 @@ L’entrée est ce que tu donnes au code ; l’attendu est ce que ton test doit 
 
 **Actions dans l’ordre**
 
-1. W12 : mixed.xml donne trois éléments dans l’ordre du fichier, de statuts open, closed puis filtered ; erreur None.
-2. W13 : broken.xml ne lève aucune exception : items est vide et erreur est une chaîne non vide.
-3. Chaque analyse renvoie toujours la même forme : un dictionnaire avec items et erreur.
-4. Écris les tests, fais-les passer, puis commit.
+1. Écris W12 : mixed.xml donne open, closed, filtered dans l’ordre du fichier et erreur None.
+2. Écris W13 : broken.xml donne items vide et erreur non vide, sans exception.
+3. Complète la boucle de ports et le traitement de ParseError, en gardant toujours les deux clés de retour.
+4. Relance W11 à W13 avec le reste de la suite, puis commite.
 
 **Terminal · Commande à lancer au moment indiqué**
 
@@ -1312,6 +1497,17 @@ Lire un JSON avec json.loads, et définir un format commun pour nmap et adsim.
 
 **Où tu travailles :** parsing.py ; tests/test_parsing.py
 
+**Pour comprendre**
+
+- json.loads transforme du texte JSON en dictionnaires et listes Python. Le champ items contient ici les utilisateurs ; count indique leur nombre.
+- Normaliser permet d’exposer les mêmes clés pour des outils aux formats différents.
+
+**Règles à respecter**
+
+- source : adsim.
+- statut : actif si enabled est vrai, inactif sinon.
+- Les groupes restent dans details, y compris une liste vide.
+
 **Cas de test à écrire**
 
 L’entrée est ce que tu donnes au code ; l’attendu est ce que ton test doit vérifier.
@@ -1322,10 +1518,11 @@ L’entrée est ce que tu donnes au code ; l’attendu est ce que ton test doit 
 
 **Actions dans l’ordre**
 
-1. json.loads transforme une chaîne JSON en dictionnaire Python. Les données de adsim sont dans fixtures/adsim/users.json.
-2. Ouvre users.json : les champs count et items. Chaque item a name, enabled et groups.
-3. Format commun : source, type, nom, statut, details. Pour adsim : statut « actif » ou « inactif » selon enabled, et details contient les groupes (liste vide si aucun).
-4. W14 : le nombre d’éléments est égal au champ count, les statuts et les groupes sont conservés. Écris le test, rouge, puis vert, commit.
+1. Ouvre users.json et repère count, items, name, enabled et groups.
+2. Écris W14 : nombre d’éléments égal à count, statut selon enabled et groupes conservés.
+3. Écris le parseur adsim en utilisant les mêmes cinq clés par élément que pour nmap.
+4. Place les groupes dans details, avec liste vide pour un utilisateur sans groupe.
+5. Relance la suite puis commite.
 
 **Terminal · Commande à lancer au moment indiqué**
 
@@ -1360,6 +1557,11 @@ Capturer une erreur de JSON et documenter les valeurs de statut.
 
 **Où tu travailles :** parsing.py ; tests/test_parsing.py
 
+**Pour comprendre**
+
+- JSONDecodeError signale un texte JSON invalide. Il faut la traiter dans le parseur pour garder le retour normalisé.
+- Les statuts viennent de deux domaines : états de ports nmap et activité de comptes adsim.
+
 **Cas de test à écrire**
 
 L’entrée est ce que tu donnes au code ; l’attendu est ce que ton test doit vérifier.
@@ -1370,9 +1572,10 @@ L’entrée est ce que tu donnes au code ; l’attendu est ce que ton test doit 
 
 **Actions dans l’ordre**
 
-1. json.loads lève JSONDecodeError sur une chaîne invalide. C’est une sous-classe de ValueError : rattrape-la au moment de l’analyse.
-2. W15 : broken.json donne items vide, erreur non vide, et aucune exception.
-3. Crée dans README.md une section « Statuts » qui liste open, closed, filtered, actif et inactif, avec leur sens.
+1. Écris W15 avec broken.json : items [], erreur non vide et aucune exception.
+2. Attrape JSONDecodeError dans le parseur JSON ; garde la même forme de retour que pour le XML cassé.
+3. Documente open, closed, filtered, actif et inactif dans une section Statuts du README.
+4. Relance W11 à W15 et commite.
 
 **Terminal · Commande à lancer au moment indiqué**
 
@@ -1416,6 +1619,11 @@ Afficher une ligne par élément, des totaux cohérents, et un message clair pou
 
 **Où tu travailles :** parsing.py ; tests/test_parsing.py
 
+**Pour comprendre**
+
+- Le rapport transforme les éléments normalisés en texte et compte leurs statuts ; il ne relance pas les outils.
+- Retourner une chaîne permet de la tester ; main s’occupe de l’afficher sur stdout.
+
 **Cas de test à écrire**
 
 L’entrée est ce que tu donnes au code ; l’attendu est ce que ton test doit vérifier.
@@ -1426,9 +1634,11 @@ L’entrée est ce que tu donnes au code ; l’attendu est ce que ton test doit 
 
 **Actions dans l’ordre**
 
-1. Exemple sans rapport ci-dessous : une boucle, un compteur, et sum avec une condition.
-2. W16 : trois éléments (deux open, un closed) donnent une ligne par élément dans l’ordre, puis un total de 3, 2 ouverts et 1 fermé. Une liste vide donne un message qui dit qu’aucun élément n’a été trouvé.
-3. Écris une fonction qui renvoie le texte (et ne l’affiche pas) : le test compare une chaîne. L’affichage sur stdout se fait ensuite, dans main.
+1. Observe l’exemple de boucle et de compteur fourni.
+2. Écris W16 avec trois éléments, deux open et un closed : ligne par élément dans l’ordre, puis total 3 / open 2 / closed 1.
+3. Ajoute le cas vide : message indiquant qu’aucun élément n’a été trouvé.
+4. Crée la fonction de rapport sans print, puis branche son affichage dans main.
+5. Relance W1 à W16 et commite.
 
 **Terminal · Commande à lancer au moment indiqué**
 
@@ -1465,34 +1675,44 @@ Passer les vraies sorties de nmap et d’adsim dans ton code, sans que ces démo
 
 **Où tu travailles :** Outils réels dans Docker
 
+**Pour comprendre**
+
+- Les démonstrations lancent les outils réels ; les tests restent fondés sur mocks et fixtures.
+- Pour vérifier un timeout réel, l’outil doit attendre plus longtemps que le délai autorisé : --delay le rend reproductible avec adsim.
+
 **Actions dans l’ordre**
 
-1. Les démonstrations ne font pas partie de unittest discover : elles montrent le comportement réel, sans remplacer les tests.
-2. D1 : démarre le labo HTTP avec son bouton dans l’interface Cyber Atelier (127.0.0.1:8000). Lance nmap réel avec lancer_outil, depuis le dossier du projet, puis passe la sortie XML à ton analyse.
-3. D2 : lance adsim réel avec lancer_outil et passe sa sortie JSON à ton analyse. Le nombre doit égaler count.
-4. D3 : lance adsim avec --fail (code 3), puis avec un délai de 0,01 seconde : le démarrage de docker dépasse ce délai, ce qui doit donner une erreur de timeout.
-5. Note dans le bilan ce que tu observes : port open quand le labo tourne, et résultat différent quand il est arrêté.
+1. Les commandes proposées se lancent sur le Mac depuis cyberatelier, qui contient compose.yaml et workspaces/toolwrap. Elles utilisent Docker pour l’outil réel et ton wrapper du Mac pour le pilotage.
+2. D1 : active le labo dans Docker. Lance nmap via lancer_outil sur 127.0.0.1:8000 seulement, puis parse sa sortie XML. Attends open ; compare avec le labo arrêté.
+3. D2 : lance adsim users en JSON via lancer_outil et parse sa sortie ; le nombre d’éléments égale count.
+4. D3 : lance adsim avec --fail et observe l’erreur normalisée pour le code 3.
+5. Pour le timeout de D3, utilise --delay 1 avec un délai de 0,01 seconde ; attends une erreur de délai, sans trace Python.
+6. Garde ces appels hors des tests et note les résultats dans le bilan.
 
-**Terminal · Commande à lancer au moment indiqué**
+**Terminal · D1 : nmap via ton wrapper**
 
-Terminal du parcours : reste à la racine du dépôt. Exécute ces lignes au moment demandé dans les actions, avec les modifications manuelles entre les blocs.
+Terminal du Mac, depuis cyberatelier (le dossier de compose.yaml). Le wrapper est importé depuis workspaces/toolwrap ; l’outil réel est exécuté dans Docker. Fais les observations demandées entre les commandes.
 
 ```bash
 python3 -c "import sys; sys.path.insert(0, 'workspaces/toolwrap'); from toolwrap import lancer_outil; print(lancer_outil(['docker', 'compose', 'exec', '-T', 'atelier', 'nmap', '-sT', '-p', '8000', '-oX', '-', '127.0.0.1'], 30))"
 ```
 
-**Terminal · Commande à lancer au moment indiqué**
+**Terminal · D2 : adsim en JSON via ton wrapper**
 
-Console ou shell du conteneur, à la racine du parcours. /app contient les fichiers fournis par Cyber Atelier ; ce chemin n’existe pas sur le Mac.
+```bash
+python3 -c "import sys; sys.path.insert(0, 'workspaces/toolwrap'); from toolwrap import lancer_outil; print(lancer_outil(['docker', 'compose', 'exec', '-T', 'atelier', 'python', '/app/tools/adsim.py', 'users', '--format', 'json'], 30))"
+```
+
+**Terminal · D3 : échec simulé avec --fail**
 
 ```bash
 python3 -c "import sys; sys.path.insert(0, 'workspaces/toolwrap'); from toolwrap import lancer_outil; print(lancer_outil(['docker', 'compose', 'exec', '-T', 'atelier', 'python', '/app/tools/adsim.py', 'users', '--fail'], 30))"
 ```
 
-**Terminal · Commande à lancer au moment indiqué**
+**Terminal · D3 : délai d’une seconde, timeout de 0,01 seconde**
 
 ```bash
-python3 -c "import sys; sys.path.insert(0, 'workspaces/toolwrap'); from toolwrap import lancer_outil; print(lancer_outil(['docker', 'compose', 'exec', '-T', 'atelier', 'python', '/app/tools/adsim.py', 'users'], 0.01))"
+python3 -c "import sys; sys.path.insert(0, 'workspaces/toolwrap'); from toolwrap import lancer_outil; print(lancer_outil(['docker', 'compose', 'exec', '-T', 'atelier', 'python', '/app/tools/adsim.py', 'users', '--delay', '1'], 0.01))"
 ```
 
 **Tu sais que c’est bon quand :** D1 donne le port 8000 en open quand le labo tourne. D2 donne un nombre d’éléments égal à count. D3 donne une erreur normalisée pour le code 3 et une erreur de timeout, sans trace Python.
@@ -1505,11 +1725,21 @@ Finir le README avec un bilan honnête, puis livrer la MR3 sans y mettre les fic
 
 **Où tu travailles :** README.md ; PR GitHub
 
+**Pour comprendre**
+
+- git diff montre les lignes modifiées ; git diff --staged montre celles choisies pour le prochain commit. Le diff de la MR compare toute ta branche à main.
+- La demande de fusion (MR dans GitLab, PR dans GitHub) permet de relire le travail avant de l’intégrer à main.
+
 **Actions dans l’ordre**
 
-1. Dans README.md, complète : périmètre, codes de sortie, commandes de tests, démonstrations séparées de la CI, puis un bilan en trois listes : ce que les tests prouvent, ce que les démonstrations montrent, ce qui reste à faire.
-2. Ajoute à l’index uniquement les fichiers de test et les fixtures d’origine. Les fichiers demo_*.xml et demo_*.json ne sont pas livrés.
-3. Pousse la branche, ouvre la pull request, relis le diff dans GitHub, puis fusionne. Un test local réussi reste distinct d’une fusion autorisée.
+1. Lance la suite complète avec la commande indiquée au début de la mission.
+2. Complète le README : périmètre, codes de sortie, tests, démonstrations séparées et bilan (ce que les tests prouvent, ce que les démos montrent, ce qui reste à faire). Ne livre pas demo_*.xml ou demo_*.json.
+3. Relis git status et git diff : la livraison doit contenir parsing.py, les tests, README.md et les fixtures d’origine nécessaires, avec les modifications nécessaires de cette mission.
+4. Ajoute les fichiers par leur nom, relis git diff --staged, puis commite ce qui ne l’est pas encore.
+5. Pousse feat/parsing et ouvre la demande de fusion vers main.
+6. Relis le diff dans la demande de fusion. Cette mission n’a pas encore de pipeline : la relecture et les conditions de fusion restent nécessaires.
+7. Fusionne après relecture et, pour GitLab de l’école, après son autorisation.
+8. Après la fusion, reviens sur main et lance git pull --ff-only avant la mission suivante.
 
 **Terminal · Commande à lancer au moment indiqué**
 

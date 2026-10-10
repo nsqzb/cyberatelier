@@ -53,11 +53,11 @@ Le dossier du parcours est vide au départ. Dans la console de Cyber Atelier, pr
 <!-- BEGIN GENERATED EXERCISES -->
 ## Comment travailler un exercice
 
-Chaque mission construit une partie du projet. Commence par « Avant de commencer », puis avance palier par palier. Les durées sont des repères : prends le temps de comprendre chaque résultat.
+Ces exercices sont ton entraînement. Chaque palier explique les notions utiles, montre les données ou les règles attendues, puis te fait écrire et vérifier ton propre code. Les durées sont des repères : avance quand tu comprends le résultat.
 
-1. Lis l’objectif et les fichiers concernés. Un fichier indiqué comme « à créer » n’est pas fourni : c’est toi qui l’écris.
+1. Lis « Pour comprendre » et l’exemple lorsqu’il y en a un. Repère ce qui entre dans le programme, ce qui doit en sortir et les règles à respecter.
 2. Les cartes de tests donnent l’entrée et le résultat attendu. Écris les tests correspondants dans le fichier indiqué ; cocher un palier ne les exécute pas. Avec unittest, « Ran 0 tests » signifie qu’aucun test n’a été exécuté : ce n’est pas une validation. Un cas décrit peut contenir plusieurs valeurs ; le nombre de méthodes Python n’est donc pas forcément le nombre d’identifiants.
-3. Suis les actions numérotées. Les blocs Python se placent dans l’éditeur ; les commandes se lancent au moment demandé. Relis les blocs Git : des modifications et des actions dans GitHub/GitLab peuvent être nécessaires entre deux commandes.
+3. Suis les actions numérotées, une à la fois. Les exemples servent à apprendre une notion ; tu écris toi-même la solution de l’exercice. Les blocs Terminal donnent les commandes à lancer au moment indiqué.
 4. Vérifie le résultat indiqué avant de poursuivre. Un échec attendu (phase rouge, argument refusé ou conflit volontaire) est expliqué dans le palier.
 5. Si tu bloques, lis la dernière ligne de l’erreur, compare l’entrée et l’attendu, puis ouvre l’indice. Fais un petit changement et relance.
 
@@ -72,6 +72,16 @@ La console web repart à neuf à chaque exécution : un `cd`, une activation de 
 Un venv créé sur le Mac ne fonctionne pas dans le conteneur : utilise `python3` dans ce dernier. Remplace `main` par `master` si nécessaire. Si une branche existe déjà, reprends-la avec `git switch NOM` sans `-c`. Après chaque fusion, actualise la branche principale avant la mission suivante.
 
 ### Les mots utiles
+
+**Chaîne / champ.** Une chaîne (str) est du texte. Un champ est un morceau de donnée, comme l’utilisateur dans une ligne de journal.
+
+**Liste / position.** Une liste conserve plusieurs valeurs dans un ordre. Sa première position porte le numéro 0, la suivante 1, etc.
+
+**Dictionnaire / clé.** Un dictionnaire associe un nom à une valeur : {"fruit": "pomme"}. fruit est la clé ; pomme est sa valeur.
+
+**None.** Une valeur Python qui représente l’absence de résultat. Dans analyser_ligne, elle signifie que la ligne est refusée. Elle s’écrit sans guillemets.
+
+**split / strip.** split() sans argument découpe une chaîne sur ses espaces. split(".") découpe sur les points. strip() retire les espaces aux bords.
 
 **Contrat.** Les règles à respecter : arguments reçus, valeur retournée, erreurs et cas limites. Tu choisis le code qui respecte ces règles.
 
@@ -134,15 +144,17 @@ Avoir un package reconwrap/ importable, et un .gitignore qui protège le venv av
 
 **Pour comprendre**
 
-- Un package est un dossier qui contient un fichier __init__.py : Python le voit alors comme un module importable. Le fichier __main__.py permet de le lancer avec python -m reconwrap.
-- Pourquoi le venv : il isole les outils de ton projet. Il ne se commite jamais.
+- La branche principale (main) contient le travail déjà fusionné. Ta branche feat/... reçoit les changements de cette mission.
+- Un dépôt « propre » n’a aucune modification en attente : git status te le confirme.
 
 **Actions dans l’ordre**
 
-1. Après la préparation de l’onglet Environnement, vérifie que le dépôt est propre, mets main à jour, puis crée feat/architecture. Si la branche existe déjà, reprends-la sans -c.
-2. Crée le dossier reconwrap, puis les fichiers vides __init__.py et __main__.py dedans, avant de les ajouter à Git.
-3. Crée le .gitignore AVANT ton premier git add. Il doit contenir trois motifs, un par ligne : .venv/, __pycache__/ et rapports/.
-4. En MR1, __main__.py peut seulement afficher un message : la CLI arrive en MR2, mais la commande ne doit jamais planter.
+1. Ouvre workspaces/reconwrap dans VS Code, ou Coder dans Cyber Atelier avec cwd sur « . ».
+2. Termine la préparation, notamment le venv de cet environnement.
+3. Lis git status ; enregistre ton travail en cours avant de changer de branche.
+4. Reviens sur main avec git switch main, mets-la à jour avec git pull --ff-only, puis crée feat/architecture. Remplace main par master si ton dépôt utilise ce nom.
+5. Avant git add, crée .gitignore avec .venv/, __pycache__/ et rapports/. Crée reconwrap/__init__.py et reconwrap/__main__.py ; ce dernier peut afficher un simple message en MR1. Vérifie python -m reconwrap sans traceback.
+6. Vérifie le nom de ta branche avec git status. Si elle existe déjà, reprends-la avec git switch sans -c.
 
 **Terminal · Relire l’état du dépôt**
 
@@ -197,7 +209,40 @@ Construire un dict à cinq clés exactes depuis une fonction, avec annotations d
 
 **Pour comprendre**
 
-- Dans un fichier jetable contenant cet exemple, ajoute la ligne help(doubler) à la fin, puis relance-le avec python3 : la docstring s’affiche.
+- Une fabrique est une fonction qui construit le résultat commun aux modules. Chaque module rend cette même structure.
+- Les annotations décrivent les types attendus sans les imposer automatiquement. Une docstring est le texte d’aide placé au début d’une fonction.
+
+**Éditeur · Exemple travaillé, sans rapport avec ReconWrap **
+
+Éditeur : copie cet exemple dans exemple.py (jetable), enregistre-le, puis lance python3 exemple.py. Si plusieurs exemples sont proposés, essaie-les un par un en remplaçant le contenu du fichier. Retire ensuite les fichiers générés et le fichier d’exemple.
+
+```python
+def doubler(n: int) -> int:
+    """Retourne le double de n."""
+    return n * 2
+```
+
+**Exemple de résultat attendu**
+
+Ce que tu donnes :
+
+```text
+Fabrique avec module="faux", statut="OK", donnees={}, alertes=[], duree_s=0.0.
+```
+
+Ce que tu dois obtenir :
+
+```text
+{"module": "faux", "statut": "OK", "donnees": {}, "alertes": [], "duree_s": 0.0}
+```
+
+Tu choisis le nom de la fabrique et gardes les cinq clés pour tous les modules.
+
+**Règles à respecter**
+
+- Cinq clés exactes : module, statut, donnees, alertes, duree_s.
+- Statuts finaux admis : OK, ERREUR, IGNORE.
+- alertes est une liste et duree_s un nombre positif ou nul.
 
 **Cas de test à écrire**
 
@@ -209,21 +254,10 @@ L’entrée est ce que tu donnes au code ; l’attendu est ce que ton test doit 
 
 **Actions dans l’ordre**
 
-1. Crée tests/__init__.py (vide) : il permet à python -m unittest de trouver tes tests depuis la racine.
-2. Écris R1 dans tests/test_core.py : la fabrique reçoit module « faux », statut « OK », donnees vide, alertes vide, duree_s 0.0. Vérifie les cinq clés exactes, que alertes est une liste et que duree_s est positif ou nul.
-3. Lance les tests : ils échouent (rouge). Écris dans reconwrap/core.py la fonction minimale qui construit le dict. Pas de contrôle de statut ici : il arrive au palier suivant.
-4. Pourquoi les annotations : elles disent quel type on attend (str, list, float). Python ne les vérifie pas à l’exécution, mais elles se lisent comme une documentation.
-5. Pourquoi la docstring : c’est la première chaîne de la fonction. help(fonction) l’affiche.
-
-**Éditeur · Exemple travaillé, sans rapport avec ReconWrap **
-
-Éditeur : copie cet exemple dans exemple.py (jetable), enregistre-le, puis lance python3 exemple.py. Si plusieurs exemples sont proposés, essaie-les un par un en remplaçant le contenu du fichier. Retire ensuite les fichiers générés et le fichier d’exemple.
-
-```python
-def doubler(n: int) -> int:
-    """Retourne le double de n."""
-    return n * 2
-```
+1. Crée tests/__init__.py vide et tests/test_core.py.
+2. Écris R1 : module "faux", statut "OK", donnees vide, alertes [] et duree_s 0.0. Vérifie les cinq clés exactes, la liste d’alertes et la durée positive ou nulle.
+3. Lance : la fabrique manque. Crée-la dans reconwrap/core.py avec des annotations et une docstring.
+4. Fais passer R1 sans encore contrôler les statuts : ce sera le palier suivant.
 
 **Terminal · Commande à lancer au moment indiqué**
 
@@ -243,20 +277,10 @@ Refuser tout statut hors de OK, ERREUR et IGNORE, avec une erreur qui explique c
 
 **Où tu travailles :** reconwrap/core.py ; tests/test_core.py
 
-**Cas de test à écrire**
+**Pour comprendre**
 
-L’entrée est ce que tu donnes au code ; l’attendu est ce que ton test doit vérifier.
-
-**R2 — Statut refusé**
-- Entrée : Statut « FAUX », puis statut « ok » en minuscules.
-- Résultat attendu : ValueError avec un message en français qui cite le statut refusé. Aucun dict n’est retourné : les minuscules sont refusées aussi.
-
-**Actions dans l’ordre**
-
-1. Écris R2 dans tests/test_core.py : un statut « FAUX », puis « ok » en minuscules. Les deux doivent lever ValueError, avec un message en français qui cite le statut refusé.
-2. Lance les tests (rouge), puis ajoute le contrôle dans la fabrique. Aucun dict ne doit être retourné dans ces deux cas.
-3. Pourquoi lever une erreur tôt : un statut faux, s’il circule, fausse le rapport final sans que personne ne le remarque.
-4. Fais un commit du contrat (fabrique et tests R1 et R2).
+- Le statut est une valeur de contrat, avec une casse exacte. "ok" n’est pas "OK".
+- Refuser un statut inconnu tôt évite de produire un rapport impossible à interpréter.
 
 **Éditeur · Exemple travaillé, sans rapport avec ReconWrap **
 
@@ -269,6 +293,21 @@ def commander(plat):
         raise ValueError(f"plat inconnu : {plat}")
     return f"Commande : {plat}"
 ```
+
+**Cas de test à écrire**
+
+L’entrée est ce que tu donnes au code ; l’attendu est ce que ton test doit vérifier.
+
+**R2 — Statut refusé**
+- Entrée : Statut « FAUX », puis statut « ok » en minuscules.
+- Résultat attendu : ValueError avec un message en français qui cite le statut refusé. Aucun dict n’est retourné : les minuscules sont refusées aussi.
+
+**Actions dans l’ordre**
+
+1. Écris R2 séparément pour "FAUX" et "ok".
+2. Vérifie ValueError et un message français citant le statut refusé. Aucun dictionnaire ne doit être retourné.
+3. Ajoute le contrôle des trois statuts admis dans la fabrique.
+4. Relance R1 et R2 puis commite contrat et tests.
 
 **Terminal · Commande à lancer au moment indiqué**
 
@@ -297,22 +336,8 @@ Refuser toute cible qui n’est pas 127.0.0.1 avant qu’un module soit appelé.
 
 **Pour comprendre**
 
-- Pourquoi une règle si stricte : la cible est la seule porte entre le framework et le réseau. Ce qui n’est pas explicitement permis est refusé.
-- Documentation utile à lire, sans l’utiliser forcément : ipaddress (https://docs.python.org/3/library/ipaddress.html)
-
-**Cas de test à écrire**
-
-L’entrée est ce que tu donnes au code ; l’attendu est ce que ton test doit vérifier.
-
-**R5 — Cible loopback seulement**
-- Entrée : 127.0.0.1, puis 192.0.2.10, example.com, une chaîne vide, 10.0.0.0/24 et « 127.0.0.1; ls ».
-- Résultat attendu : 127.0.0.1 est accepté. Toutes les autres valeurs lèvent ValueError et aucun module n’est appelé.
-
-**Actions dans l’ordre**
-
-1. Commence R5 dans tests/test_core.py par les valeurs de cible acceptées et refusées. La preuve « aucun module appelé » sera complétée au palier 6, lorsque le dispatch existera : un test ne peut pas appeler une fonction que tu n’as pas encore prévue.
-2. Les cas : 127.0.0.1 accepté ; 192.0.2.10, example.com, une chaîne vide, 10.0.0.0/24 et « 127.0.0.1; ls » doivent lever ValueError.
-3. Écris la validation dans reconwrap/core.py. Un contrôle de type d’abord, puis une comparaison exacte : une règle lisible vaut mieux qu’une règle astucieuse.
+- La validation de la cible est un contrôle avant toute action. Ici, seule la chaîne exacte 127.0.0.1 est admise.
+- R5 sera complété quand le dispatch existera, pour prouver aussi qu’un refus ne lance aucun module.
 
 **Éditeur · Exemple travaillé, sans rapport avec ReconWrap **
 
@@ -324,6 +349,21 @@ try:
 except ValueError as erreur:
     print("pas un nombre :", erreur)
 ```
+
+**Cas de test à écrire**
+
+L’entrée est ce que tu donnes au code ; l’attendu est ce que ton test doit vérifier.
+
+**R5 — Cible loopback seulement**
+- Entrée : 127.0.0.1, puis 192.0.2.10, example.com, une chaîne vide, 10.0.0.0/24 et « 127.0.0.1; ls ».
+- Résultat attendu : 127.0.0.1 est accepté. Toutes les autres valeurs lèvent ValueError et aucun module n’est appelé.
+
+**Actions dans l’ordre**
+
+1. Commence R5 avec 127.0.0.1 admis, puis les cinq valeurs refusées du cas de test.
+2. Écris la validation dans core.py : contrôle du type puis comparaison exacte ; refus par ValueError.
+3. Relance les tests de validation.
+4. Note que la preuve « aucun module appelé » sera ajoutée au palier 6 ; elle n’est pas encore validée ici.
 
 **Terminal · Commande à lancer au moment indiqué**
 
@@ -340,7 +380,7 @@ git add reconwrap/core.py tests/test_core.py
 git commit -m "Valide la cible : seule 127.0.0.1 est acceptée"
 ```
 
-**Tu sais que c’est bon quand :** R5 passe : 127.0.0.1 est accepté, les six autres valeurs lèvent ValueError, et le faux module n’est jamais appelé.
+**Tu sais que c’est bon quand :** La validation accepte 127.0.0.1 et refuse 192.0.2.10, example.com, le texte vide, 10.0.0.0/24 et « 127.0.0.1; ls ». La partie dispatch de R5 reste à compléter au palier 6.
 
 *Indice si tu bloques :* Vérifie d’abord le type, puis compare la chaîne exacte. Une chaîne qui contient autre chose (espace, point-virgule) doit être refusée, pas réparée.
 
@@ -350,19 +390,10 @@ Associer un nom de module à sa fonction, et signaler clairement un nom inconnu.
 
 **Où tu travailles :** reconwrap/core.py ; tests/test_core.py
 
-**Cas de test à écrire**
+**Pour comprendre**
 
-L’entrée est ce que tu donnes au code ; l’attendu est ce que ton test doit vérifier.
-
-**R3 — Nom de module inconnu**
-- Entrée : Registre contenant trois faux modules nommés network, web et ad ; demande du module « scanner ».
-- Résultat attendu : ValueError qui liste les modules connus. Aucun des trois faux modules n’est appelé.
-
-**Actions dans l’ordre**
-
-1. Écris R3 dans tests/test_core.py : un registre avec trois faux modules nommés network, web et ad, puis une demande du module « scanner ». Le test attend ValueError qui liste les modules connus, et vérifie qu’aucun faux module n’a été appelé.
-2. Lance les tests (rouge), puis écris le registre dans reconwrap/core.py. C’est un dictionnaire ordinaire : nom vers fonction.
-3. Pourquoi un registre : ajouter un module devient une ligne dans un seul endroit, sans toucher au reste.
+- Le registre est un dictionnaire : une clé comme network désigne une fonction. Il indique les modules disponibles.
+- Un nom inconnu doit être refusé avant d’appeler une fonction du registre.
 
 **Éditeur · Exemple travaillé, sans rapport avec ReconWrap **
 
@@ -376,6 +407,21 @@ ACTIONS = {"bonjour": dire_bonjour}
 print(ACTIONS["bonjour"]())
 print(sorted(ACTIONS))
 ```
+
+**Cas de test à écrire**
+
+L’entrée est ce que tu donnes au code ; l’attendu est ce que ton test doit vérifier.
+
+**R3 — Nom de module inconnu**
+- Entrée : Registre contenant trois faux modules nommés network, web et ad ; demande du module « scanner ».
+- Résultat attendu : ValueError qui liste les modules connus. Aucun des trois faux modules n’est appelé.
+
+**Actions dans l’ordre**
+
+1. Écris R3 avec trois faux modules network, web et ad qui enregistrent leurs appels.
+2. Demande scanner : attends ValueError listant les modules connus et aucun appel des faux.
+3. Écris le registre et la recherche de module dans core.py.
+4. Fais passer R3 sans lancer de module réel.
 
 **Terminal · Commande à lancer au moment indiqué**
 
@@ -402,22 +448,10 @@ Appeler un module par son nom, et transformer une exception en résultat ERREUR 
 
 **Où tu travailles :** reconwrap/core.py ; tests/test_core.py
 
-**Cas de test à écrire**
+**Pour comprendre**
 
-L’entrée est ce que tu donnes au code ; l’attendu est ce que ton test doit vérifier.
-
-**R4 — Exception isolée**
-- Entrée : Faux module qui lève RuntimeError avec le message « boom ».
-- Résultat attendu : Le dispatch ne propage pas l’exception ; il retourne statut ERREUR, alertes vide, et donnees contient le message d’erreur.
-
-**Actions dans l’ordre**
-
-1. Écris R4 dans tests/test_core.py : un faux module lève RuntimeError avec le message « boom ». Le dispatch ne doit rien propager ; il retourne statut ERREUR, alertes vide, et donnees contient le message.
-2. Dans le dispatch : cherche la fonction dans le registre (R3), valide la cible (R5), appelle le module dans un bloc protégé, puis construis le résultat avec la fabrique.
-3. Complète maintenant R5 : injecte un faux module qui note ses appels et vérifie que le dispatch refuse chaque cible interdite sans appeler ce faux.
-4. Attrape Exception, pas BaseException : Ctrl+C doit toujours interrompre le programme.
-5. Pourquoi isoler : un module qui plante ne doit pas faire tomber le rapport ni les autres modules (c’est la suite de MR2).
-6. Commit : le dispatch et son isolation.
+- Le dispatch choisit une fonction dans le registre et l’appelle. Il transforme une panne du module en résultat commun.
+- Exception couvre les pannes ordinaires ; BaseException inclurait aussi Ctrl+C, qui doit continuer à interrompre le programme.
 
 **Éditeur · Exemple travaillé, sans rapport avec ReconWrap **
 
@@ -433,6 +467,22 @@ def lire_note(texte):
 print(lire_note("12"))
 print(lire_note("douze"))
 ```
+
+**Cas de test à écrire**
+
+L’entrée est ce que tu donnes au code ; l’attendu est ce que ton test doit vérifier.
+
+**R4 — Exception isolée**
+- Entrée : Faux module qui lève RuntimeError avec le message « boom ».
+- Résultat attendu : Le dispatch ne propage pas l’exception ; il retourne statut ERREUR, alertes vide, et donnees contient le message d’erreur.
+
+**Actions dans l’ordre**
+
+1. Écris R4 : un faux module lève RuntimeError("boom") ; attends ERREUR, alertes [] et message dans donnees, sans exception propagée.
+2. Dans le dispatch, refuse le module inconnu et la cible invalide avant l’appel ; protège ensuite seulement l’exécution du module.
+3. Construis le résultat d’erreur avec la fabrique ; attrape Exception, pas BaseException.
+4. Complète R5 : pour chaque cible refusée, vérifie que le faux module n’a jamais été appelé.
+5. Relance R1 à R5 puis commite le dispatch et ses tests.
 
 **Terminal · Commande à lancer au moment indiqué**
 
@@ -461,14 +511,8 @@ Ajouter du logging au dispatch sans que les tests dépendent du texte affiché.
 
 **Pour comprendre**
 
-- Pourquoi : le journal aide à comprendre une exécution ; c’est le résultat qui est la donnée fiable.
-
-**Actions dans l’ordre**
-
-1. Le logging écrit des messages avec un niveau : DEBUG pour le détail, INFO pour le déroulé, ERROR pour les pannes. Utilise journal.error(...) pour le niveau ERROR ; ERREUR reste le statut en français de ton résultat.
-2. Branche un logger par module (par exemple avec le nom du module comme nom de logger) et enregistre : appel du module (INFO), panne (ERREUR), détail (DEBUG).
-3. Les tests R1 à R5 vérifient les résultats, pas les lignes affichées. N’écris pas de test sur le texte du journal.
-4. Commit séparé pour le logging.
+- Un logger porte un nom pour identifier l’origine des messages. Les niveaux sont DEBUG, INFO et ERROR.
+- ERROR est le niveau Python du journal ; ERREUR est le statut français du dictionnaire de résultat.
 
 **Éditeur · Exemple travaillé, sans rapport avec ReconWrap **
 
@@ -481,6 +525,13 @@ journal = logging.getLogger("cuisine")
 journal.info("four préchauffé")
 journal.debug("température lue : 180")
 ```
+
+**Actions dans l’ordre**
+
+1. Prépare un logger par module, nommé selon ce module.
+2. Journalise l’appel en INFO, les détails en DEBUG et les pannes avec journal.error(...).
+3. Observe une panne simulée : la ligne doit identifier le module et le niveau ERROR.
+4. Ne teste pas le texte exact du journal ; relance R1 à R5 puis commite le logging séparément.
 
 **Terminal · Commande à lancer au moment indiqué**
 
@@ -497,7 +548,7 @@ git add reconwrap/core.py
 git commit -m "Ajoute le logging du dispatch"
 ```
 
-**Tu sais que c’est bon quand :** Un module en panne produit une ligne ERREUR visible, et R1 à R5 passent toujours.
+**Tu sais que c’est bon quand :** Une panne simulée produit une ligne de niveau ERROR identifiant le module. Le résultat garde le statut ERREUR ; R1 à R5 passent.
 
 *Indice si tu bloques :* Avec level=INFO, la ligne DEBUG n’apparaît pas : c’est normal. Regarde ce que le format affiche avant de choisir le nom du logger.
 
@@ -509,13 +560,15 @@ Vérifier l’acceptance clé : un nouveau module ne demande que de l’ajouter 
 
 **Pour comprendre**
 
-- Pourquoi : si ajouter un module oblige à retoucher le dispatch, chaque module nouveau devient un risque de casse.
+- Le dispatch dépend du contrat et du registre, pas d’une liste de conditions propres à network/web/ad.
+- Un nouveau module doit s’intégrer en étant enregistré, sans modifier le dispatch.
 
 **Actions dans l’ordre**
 
-1. Ajoute un quatrième faux module dans tests/test_core.py (par exemple « cloud ») et enregistre-le seulement dans le registre.
-2. Lance le dispatch sur ce nouveau nom : il doit fonctionner sans rien changer dans la fonction de dispatch.
-3. Relis git diff reconwrap/core.py : la fonction de dispatch ne doit pas avoir bougé depuis le palier précédent.
+1. Ajoute dans tests/test_core.py un quatrième faux module, par exemple cloud, conforme au contrat.
+2. Ajoute seulement sa fonction au registre de l’essai, puis appelle le dispatch sur cloud.
+3. Vérifie que le résultat arrive sans changer la fonction de dispatch.
+4. Relis son diff par rapport au palier précédent et conserve ce test pour la livraison.
 
 **Terminal · Relire l’état du dépôt**
 
@@ -541,13 +594,18 @@ Contrôler chaque commit avant de le faire : état, diff en zone de préparation
 
 **Où tu travailles :** Dépôt ; historique Git
 
+**Pour comprendre**
+
+- git add choisit le contenu du prochain commit ; git diff --staged permet de le relire avant enregistrement.
+- Un commit atomique décrit une modification cohérente, par exemple contrat ou logging.
+
 **Actions dans l’ordre**
 
-1. Avant chaque commit : git status, git diff, puis python -m unittest. Tu n’ajoutes que les fichiers que tu nommes.
-2. Pourquoi la zone de préparation : git add choisit ce qui entre dans le commit. git diff --staged montre exactement ce qui sera committé.
-3. Relis l’historique : chaque commit doit décrire une seule chose (structure, contrat, cible, registre, dispatch, logging).
-4. Lance le module une dernière fois : .venv/bin/python -m reconwrap.
-5. Enregistre aussi le test du quatrième faux module ajouté au palier 8 avant de pousser : il fait partie du travail à livrer.
+1. Lance git status, git diff et les tests avant le dernier commit de MR1.
+2. Ajoute explicitement le test cloud ainsi que les fichiers nécessaires encore modifiés ; relis le contenu staged.
+3. Commite avec un message qui décrit le changement.
+4. Relis l’historique : structure, contrat, cible, registre, dispatch et logging doivent être compréhensibles.
+5. Lance python -m reconwrap avec le Python de cet environnement et vérifie status propre.
 
 **Terminal · Exemple travaillé dans un dépôt jetable, hors de ReconWrap **
 
@@ -610,12 +668,21 @@ Pousser la branche, ouvrir la merge request sur le dépôt de l’école, et dis
 
 **Où tu travailles :** MR GitLab
 
+**Pour comprendre**
+
+- git diff montre les lignes modifiées ; git diff --staged montre celles choisies pour le prochain commit. Le diff de la MR compare toute ta branche à main.
+- La demande de fusion (MR dans GitLab, PR dans GitHub) permet de relire le travail avant de l’intégrer à main.
+
 **Actions dans l’ordre**
 
-1. Relis le diff complet de la MR : git diff main --stat, puis git diff main. Tu relis comme si c’était le code de quelqu’un d’autre.
-2. Pousse la branche, puis ouvre la merge request dans l’interface GitLab de l’école. Il n’y a pas encore de pipeline en MR1 : le fichier .gitlab-ci.yml arrive en MR3.
-3. Quatre résultats à ne pas confondre : tes tests locaux, le pipeline réellement exécuté, l’autorisation de fusion donnée par l’école, et la case cochée dans Cyber Atelier (déclarative, elle ne vérifie rien).
-4. Fusionne seulement si l’école l’autorise. Après fusion, remets main à jour avant de créer la branche suivante.
+1. Lance la suite complète avec la commande indiquée au début de la mission.
+2. Le fichier de CI arrivera en MR3. Note l’état réel des tests et de la relecture ; la case de progression ne vérifie pas ces conditions.
+3. Relis git status et git diff : la livraison doit contenir le package reconwrap/, tests/ et .gitignore, avec les modifications nécessaires de cette mission.
+4. Ajoute les fichiers par leur nom, relis git diff --staged, puis commite ce qui ne l’est pas encore.
+5. Pousse feat/architecture et ouvre la demande de fusion vers main.
+6. Relis le diff dans la demande de fusion. Cette mission n’a pas encore de pipeline : la relecture et les conditions de fusion restent nécessaires.
+7. Fusionne après relecture et, pour GitLab de l’école, après son autorisation.
+8. Après la fusion, reviens sur main et lance git pull --ff-only avant la mission suivante.
 
 **Terminal · Relire l’état du dépôt**
 
@@ -672,12 +739,19 @@ Rendre les fixtures nmap et adsim suivies par Git, pour que la CI les lise à la
 
 **Où tu travailles :** Dépôt ; fixtures/
 
+**Pour comprendre**
+
+- La branche principale (main) contient le travail déjà fusionné. Ta branche feat/... reçoit les changements de cette mission.
+- Un dépôt « propre » n’a aucune modification en attente : git status te le confirme.
+
 **Actions dans l’ordre**
 
-1. Après fusion de MR1, vérifie que le dépôt est propre, mets main à jour et crée feat/orchestration-rapport avant de copier les fixtures.
-2. Fais cette copie sur le Mac, depuis workspaces/reconwrap : ../../ remonte jusqu’au projet Cyber Atelier, où se trouvent les dossiers fixtures/nmap et fixtures/adsim. Les originaux sont en lecture seule, le chmod rend tes copies modifiables.
-3. Pourquoi chmod : une copie de fichier en lecture seule ne peut pas être modifiée ; chmod u+w rend tes copies modifiables, sans toucher aux originaux.
-4. Vérifie que Git suit les copies, et qu’aucun .venv ni rapport n’est ajouté.
+1. Ouvre workspaces/reconwrap dans VS Code, ou Coder dans Cyber Atelier avec cwd sur « . ».
+2. Vérifie que MR1 est fusionnée et que R1 à R5 passent.
+3. Lis git status ; enregistre ton travail en cours avant de changer de branche.
+4. Reviens sur main avec git switch main, mets-la à jour avec git pull --ff-only, puis crée feat/orchestration-rapport. Remplace main par master si ton dépôt utilise ce nom.
+5. Copie fixtures/nmap et fixtures/adsim depuis ../../fixtures sur le Mac, ou /app/fixtures dans Docker. Rends les copies modifiables, ajoute-les explicitement et commite ; aucun venv ni rapport ne doit être ajouté.
+6. Vérifie le nom de ta branche avec git status. Si elle existe déjà, reprends-la avec git switch sans -c.
 
 **Terminal · Relire l’état du dépôt**
 
@@ -732,13 +806,8 @@ Lire un fichier XML et retrouver ses balises et attributs avec la bibliothèque 
 
 **Pour comprendre**
 
-- Un XML est une arborescence de balises. ElementTree le transforme en objets : chaque élément a un nom (tag), des attributs (attrib) et des méthodes de recherche.
-- Pourquoi : nmap te donne un XML. Le découper à la main avec du texte casse au premier changement de mise en forme.
-
-**Actions dans l’ordre**
-
-1. Ouvre fixtures/nmap/open_8000.xml dans VS Code, repère la balise qui porte l’état d’un port. Tu n’écris pas encore le module : c’est une lecture.
-2. Une lecture qui échoue lève ParseError : c’est ce que le module devra transformer en ERREUR au palier suivant.
+- ElementTree lit l’arbre XML. tag est le nom d’une balise ; get lit un attribut de cette balise.
+- Un XML mal formé lève ParseError, que le module devra traduire en ERREUR.
 
 **Éditeur · Exemple travaillé, sans rapport avec ReconWrap **
 
@@ -755,6 +824,13 @@ try:
 except ET.ParseError as erreur:
     print("XML cassé :", erreur)
 ```
+
+**Actions dans l’ordre**
+
+1. Ouvre open_8000.xml et repère la racine ainsi que la balise state du port.
+2. Lance la lecture proposée et observe le tag de la racine.
+3. Repère portid, protocol et l’attribut state : ils fournissent les données à conserver.
+4. Ne code pas encore le module : cette étape prépare la lecture du contrat R12.
 
 **Terminal · Commande à lancer au moment indiqué**
 
@@ -774,6 +850,11 @@ Transformer un XML nmap en résultat du contrat : open, closed, filtered, ou ERR
 
 **Où tu travailles :** reconwrap/network.py ; tests/test_network.py
 
+**Pour comprendre**
+
+- Le module réseau retourne la structure commune de MR1. La voie « fichier fourni » remplace la sortie d’un scan réel dans les tests.
+- Une fixture rend l’essai stable et indépendant de nmap.
+
 **Cas de test à écrire**
 
 L’entrée est ce que tu donnes au code ; l’attendu est ce que ton test doit vérifier.
@@ -784,11 +865,11 @@ L’entrée est ce que tu donnes au code ; l’attendu est ce que ton test doit 
 
 **Actions dans l’ordre**
 
-1. Reprends la logique de PortPilot : la validation de la cible et du port reste la même. Relis ton code avant de le brancher ; ne le copie pas à l’aveugle.
-2. Écris R12 dans tests/test_network.py : open_8000.xml, closed_8000.xml, mixed.xml et broken.xml. Les tests lisent ces fichiers ; ils n’appellent jamais nmap.
-3. Écris la fonction du module : elle reçoit un chemin de XML (option « fichier fourni », utilisée par la CI) et retourne le contrat de MR1. Un XML cassé donne ERREUR, sans exception qui sort.
-4. Pourquoi un fichier fourni : le test devient déterministe. La voie nmap réelle se branchera au même endroit, mais la CI ne la lance jamais.
-5. Commit du module réseau.
+1. Relis la validation de cible/port de ton PortPilot avant de l’adapter.
+2. Écris R12 dans tests/test_network.py avec les quatre fixtures XML : open, closed, mixed et broken. Aucun appel à nmap.
+3. Crée network.py avec une entrée permettant de lire le fichier XML fourni et un retour conforme à la fabrique.
+4. Conserve les états open/closed/filtered ; transforme ParseError en ERREUR sans exception sortante.
+5. Relance les tests puis commite le module réseau.
 
 **Terminal · Commande à lancer au moment indiqué**
 
@@ -815,21 +896,10 @@ Classer une réponse HTTP (code et en-têtes) sans ouvrir de connexion, et disti
 
 **Où tu travailles :** reconwrap/web.py ; tests/test_web.py
 
-**Cas de test à écrire**
+**Pour comprendre**
 
-L’entrée est ce que tu donnes au code ; l’attendu est ce que ton test doit vérifier.
-
-**R14 — Classement web sans réseau**
-- Entrée : Statut 404 avec en-têtes quelconques, puis statut 200 avec les trois en-têtes conformes.
-- Résultat attendu : 404 : statut ERREUR, code 404 conservé, alertes vide. 200 conforme : zéro alerte. Aucune connexion n’est ouverte.
-
-**Actions dans l’ordre**
-
-1. Reprends le classement de HeaderScope : trois en-têtes à vérifier et leur conformité. Relis ton code avant de le brancher.
-2. Sépare deux choses : la lecture de la réponse (réseau, plus tard) et le classement (pur). Le classement reçoit un code et un dictionnaire d’en-têtes, et retourne le contrat : il se teste hors ligne.
-3. Accepte seulement les quatre chemins du labo : /fragile, /durci, /absent, /erreur.
-4. Dans donnees, distingue un code HTTP (404, 500), une panne de connexion et un timeout. Ces deux derniers cas ne sont pas testés ici : tu les verras en démonstration D6.
-5. Écris R14 dans tests/test_web.py, puis le classement. Les en-têtes HTTP ne sont pas sensibles à la casse.
+- Le classement web reçoit un code et des en-têtes : c’est une fonction pure testable sans connexion.
+- La voie réelle lit la réponse avant ce classement ; code HTTP, panne et timeout restent trois informations différentes.
 
 **Éditeur · Exemple travaillé, sans rapport avec ReconWrap **
 
@@ -840,6 +910,22 @@ stock = {"Pommes": 3, "Poires": 0}
 stock_min = {nom.lower(): n for nom, n in stock.items()}
 print(stock_min["pommes"])
 ```
+
+**Cas de test à écrire**
+
+L’entrée est ce que tu donnes au code ; l’attendu est ce que ton test doit vérifier.
+
+**R14 — Classement web sans réseau**
+- Entrée : Statut 404 avec en-têtes quelconques, puis statut 200 avec les trois en-têtes conformes.
+- Résultat attendu : 404 : statut ERREUR, code 404 conservé, alertes vide. 200 conforme : zéro alerte. Aucune connexion n’est ouverte.
+
+**Actions dans l’ordre**
+
+1. Relis les trois contrôles et la normalisation des noms dans ton HeaderScope.
+2. Écris R14 dans tests/test_web.py : 404 garde son code avec ERREUR et alertes [] ; 200 conforme donne zéro alerte.
+3. Adapte le classement au contrat ReconWrap sans appel réseau dans ce test.
+4. Garde les quatre chemins du labo seulement et prévois dans donnees un code HTTP ou une panne/timeout distincte.
+5. Relance la suite ; ces pannes réelles seront observées en D6.
 
 **Terminal · Commande à lancer au moment indiqué**
 
@@ -866,20 +952,10 @@ Lire une sortie JSON d’adsim capturée et la transformer en résultat du contr
 
 **Où tu travailles :** reconwrap/ad.py ; tests/test_ad.py
 
-**Cas de test à écrire**
+**Pour comprendre**
 
-L’entrée est ce que tu donnes au code ; l’attendu est ce que ton test doit vérifier.
-
-**R13 — Lecture AD depuis fixtures**
-- Entrée : Fixtures adsim : users.json, puis broken.json. Le module lit la sortie capturée, il n’appelle pas adsim.
-- Résultat attendu : users.json : le nombre de comptes égale count et actifs et inactifs sont distingués. broken.json donne ERREUR avec un message.
-
-**Actions dans l’ordre**
-
-1. adsim est un simulateur fictif du domaine LAB.LOCAL. Dans le test, tu lis users.json et broken.json comme des sorties capturées : tu n’appelles pas adsim.
-2. Pourquoi json.load : il lit un fichier JSON et le transforme en dictionnaires et listes. Un JSON cassé lève json.JSONDecodeError : c’est ce qui doit donner ERREUR.
-3. Écris R13 dans tests/test_ad.py : pour users.json, le nombre de comptes égale count, et les comptes actifs et inactifs sont distingués. Pour broken.json, ERREUR avec un message.
-4. Écris la partie lecture du module AD. Le lancement d’adsim viendra au palier suivant.
+- json.load lit un fichier JSON en dictionnaires et listes. JSONDecodeError indique un fichier mal formé.
+- adsim reste le simulateur fictif LAB.LOCAL : le test lit une sortie capturée et ne lance pas cet outil.
 
 **Éditeur · Exemple travaillé, sans rapport avec ReconWrap **
 
@@ -895,6 +971,21 @@ try:
 except json.JSONDecodeError as erreur:
     print("JSON invalide :", erreur)
 ```
+
+**Cas de test à écrire**
+
+L’entrée est ce que tu donnes au code ; l’attendu est ce que ton test doit vérifier.
+
+**R13 — Lecture AD depuis fixtures**
+- Entrée : Fixtures adsim : users.json, puis broken.json. Le module lit la sortie capturée, il n’appelle pas adsim.
+- Résultat attendu : users.json : le nombre de comptes égale count et actifs et inactifs sont distingués. broken.json donne ERREUR avec un message.
+
+**Actions dans l’ordre**
+
+1. Écris R13 dans tests/test_ad.py avec users.json puis broken.json.
+2. Vérifie le nombre de comptes égal à count et la distinction actifs/inactifs selon enabled.
+3. Crée la lecture dans ad.py et retourne le contrat commun ; pour broken.json, ERREUR avec message.
+4. Relance R13 et la suite. Le lancement réel sera ajouté au palier suivant.
 
 **Terminal · Commande à lancer au moment indiqué**
 
@@ -923,14 +1014,8 @@ Appeler adsim depuis Python de façon sûre : liste d’arguments, délai maxima
 
 **Pour comprendre**
 
-- Pourquoi une liste : chaque élément est passé tel quel. Avec shell=True, un caractère spécial comme le point-virgule serait interprété.
-- Un code de retour non nul, ou une sortie qui n’est pas du JSON valide, donne ERREUR. Un succès passe à la même lecture que R13.
-
-**Actions dans l’ordre**
-
-1. Le module AD lance adsim avec subprocess.run, en passant les arguments dans une liste. Jamais shell=True : une valeur reçue ne doit jamais devenir une commande de shell.
-2. timeout= limite la durée. Un dépassement lève subprocess.TimeoutExpired : transforme-le en ERREUR.
-3. Ce palier n’a pas de test automatique : la CI ne lance pas adsim. Tu vérifies à la démonstration D5, dans le conteneur.
+- La liste d’arguments de subprocess.run garde chaque valeur séparée, sans interprétation par un shell.
+- Le timeout borne l’attente et lève TimeoutExpired lorsqu’il est dépassé.
 
 **Éditeur · Exemple travaillé, sans rapport avec ReconWrap **
 
@@ -941,6 +1026,13 @@ import subprocess
 resultat = subprocess.run(["echo", "a; b"], capture_output=True, text=True, timeout=5)
 print(resultat.returncode, resultat.stdout.strip())
 ```
+
+**Actions dans l’ordre**
+
+1. Branche le lancement d’adsim dans la voie réelle du module AD avec une liste d’arguments et sans shell=True.
+2. Transforme un dépassement du délai en résultat ERREUR.
+3. Relis la séparation : les tests continuent à lire leurs fixtures, sans passer par ce lancement.
+4. Vérifie l’absence de shell=True et relance tous les cas écrits jusqu’ici. D5 vérifiera cette voie réelle dans Docker.
 
 **Terminal · Commande à lancer au moment indiqué**
 
@@ -975,7 +1067,34 @@ Exécuter plusieurs modules dans l’ordre demandé, en isolant chaque échec.
 
 **Pour comprendre**
 
-- Pourquoi : un module qui plante est une information à rapporter, pas une raison d’arrêter le programme.
+- L’orchestrateur parcourt les modules demandés et conserve leurs résultats dans le même ordre.
+- Le dispatch de MR1 isole chaque panne : l’orchestrateur peut continuer après un échec.
+
+**Éditeur · Exemple travaillé, sans rapport avec ReconWrap **
+
+Éditeur : copie cet exemple dans exemple.py (jetable), enregistre-le, puis lance python3 exemple.py. Si plusieurs exemples sont proposés, essaie-les un par un en remplaçant le contenu du fichier. Retire ensuite les fichiers générés et le fichier d’exemple.
+
+```python
+nombres = [1, 2, 3]
+carres = [n * n for n in nombres]
+print(carres)
+```
+
+**Exemple de résultat attendu**
+
+Ce que tu donnes :
+
+```text
+Modules demandés : A, B, C ; B plante.
+```
+
+Ce que tu dois obtenir :
+
+```text
+Résultats : A OK, B ERREUR, C OK.
+```
+
+L’échec de B reste dans le rapport et n’empêche pas C de travailler.
 
 **Cas de test à écrire**
 
@@ -987,19 +1106,10 @@ L’entrée est ce que tu donnes au code ; l’attendu est ce que ton test doit 
 
 **Actions dans l’ordre**
 
-1. Écris R6 dans tests/test_orchestration.py : trois faux modules dans l’ordre A (OK), B (lève une exception), C (OK).
-2. L’orchestrateur reçoit une liste de noms, appelle chaque module par le dispatch de MR1, et collecte les résultats dans cet ordre.
-3. Commit de l’orchestrateur.
-
-**Éditeur · Exemple travaillé, sans rapport avec ReconWrap **
-
-Éditeur : copie cet exemple dans exemple.py (jetable), enregistre-le, puis lance python3 exemple.py. Si plusieurs exemples sont proposés, essaie-les un par un en remplaçant le contenu du fichier. Retire ensuite les fichiers générés et le fichier d’exemple.
-
-```python
-nombres = [1, 2, 3]
-carres = [n * n for n in nombres]
-print(carres)
-```
+1. Écris R6 dans tests/test_orchestration.py avec A qui rend OK, B qui lève une exception, C qui rend OK.
+2. Vérifie trois résultats dans l’ordre A OK, B ERREUR, C OK, et l’appel effectif de C.
+3. Crée la boucle d’orchestration en utilisant le dispatch, sans dupliquer son traitement d’erreur.
+4. Relance la suite et commite l’orchestrateur.
 
 **Terminal · Commande à lancer au moment indiqué**
 
@@ -1028,21 +1138,8 @@ Lire les options de la ligne de commande et refuser un module inconnu avec le co
 
 **Pour comprendre**
 
-- Pourquoi une fonction main qui reçoit une liste : le test n’a pas besoin de lancer un sous-processus, il reste rapide et déterministe.
-
-**Cas de test à écrire**
-
-L’entrée est ce que tu donnes au code ; l’attendu est ce que ton test doit vérifier.
-
-**R7 — Module inconnu en CLI**
-- Entrée : --modules network,scanner, dans un dossier temporaire.
-- Résultat attendu : Code de sortie 2, message d’erreur sur stderr, aucun rapport écrit.
-
-**Actions dans l’ordre**
-
-1. Écris R7 dans tests/test_cli.py : appelle la fonction principale de la CLI avec une liste d’arguments, dans un dossier temporaire. Vérifie le code de retour, le message sur stderr, et l’absence de rapport.
-2. Crée cli.py : --modules (choix dans le registre), --cible (127.0.0.1 par défaut), --chemin, --format (json ou md), --sortie. Ajoute __main__.py qui appelle la CLI.
-3. argparse écrit lui-même les erreurs d’usage sur stderr et sort avec le code 2.
+- La CLI valide l’ensemble des options avant de lancer les modules ou d’écrire un rapport.
+- argparse écrit les erreurs d’usage sur stderr et termine avec 2 ; --help termine avec 0.
 
 **Éditeur · Exemple travaillé, sans rapport avec ReconWrap **
 
@@ -1055,6 +1152,22 @@ parser.add_argument("--plat", choices=["soupe", "salade"], default="soupe")
 print(parser.parse_args(["--plat", "salade"]).plat)
 parser.parse_args(["--plat", "pizza"])   # erreur : code 2 et SystemExit
 ```
+
+**Cas de test à écrire**
+
+L’entrée est ce que tu donnes au code ; l’attendu est ce que ton test doit vérifier.
+
+**R7 — Module inconnu en CLI**
+- Entrée : --modules network,scanner, dans un dossier temporaire.
+- Résultat attendu : Code de sortie 2, message d’erreur sur stderr, aucun rapport écrit.
+
+**Actions dans l’ordre**
+
+1. Crée reconwrap/cli.py avec --modules, --cible (défaut 127.0.0.1), --chemin, --format json/md et --sortie.
+2. Relie reconwrap/__main__.py à la CLI pour python -m reconwrap.
+3. Écris R7 dans tests/test_cli.py avec --modules network,scanner dans un dossier temporaire.
+4. Capture le code 2 et le message sur stderr, puis vérifie qu’aucun rapport n’a été écrit.
+5. Valide tous les noms avant l’orchestration, relance la suite.
 
 **Terminal · Commande à lancer au moment indiqué**
 
@@ -1091,6 +1204,11 @@ Refuser une cible autre que 127.0.0.1 dans la CLI avant tout appel, et pratiquer
 
 **Où tu travailles :** reconwrap/cli.py ; tests/test_cli.py
 
+**Pour comprendre**
+
+- La CLI doit réutiliser la validation de MR1. Refuser la cible signifie ne lancer aucun module et ne produire aucun fichier.
+- stash met un changement de côté ; pop le restaure. restore efface un changement non commité : essaie-le seulement sur un fichier jetable.
+
 **Cas de test à écrire**
 
 L’entrée est ce que tu donnes au code ; l’attendu est ce que ton test doit vérifier.
@@ -1101,10 +1219,11 @@ L’entrée est ce que tu donnes au code ; l’attendu est ce que ton test doit 
 
 **Actions dans l’ordre**
 
-1. Écris R8 dans tests/test_cli.py : --cible 192.0.2.10 dans un dossier temporaire. Le test vérifie le code 2, qu’aucun module n’est appelé, et qu’aucun fichier n’est écrit.
-2. Ne réécris pas la règle de cible : réutilise la validation de MR1 depuis la CLI.
-3. Pratique une fois git stash : modifie une ligne sans importance de cli.py, lance git stash, vérifie que git status est propre, puis git stash pop.
-4. git restore annule une modification non commitée, et elle est définitive. Pratique-le seulement sur un fichier de test jetable, comme ~/essai-git de MR1.
+1. Écris R8 : --cible 192.0.2.10 dans un dossier temporaire ; code 2, aucun module appelé, aucun fichier écrit.
+2. Branche la validation de core.py dans la CLI et relance R8.
+3. Commite le travail utile avant l’essai Git. Ajoute un commentaire temporaire dans cli.py, fais stash puis observe status propre et stash list.
+4. Fais stash pop et observe le commentaire revenu ; retire uniquement ce commentaire.
+5. Pour observer restore, crée et commite un fichier dans un dépôt d’essai hors du projet, modifie-le puis restaure ce seul fichier. Vérifie stash list vide dans le vrai dépôt.
 
 **Terminal · Exemple jetable **
 
@@ -1154,30 +1273,9 @@ git commit -m "Refuse une cible autre que 127.0.0.1 dans la CLI"
 
 **Pour comprendre**
 
-- Pourquoi : un rapport qui change à chaque lancement sans raison est illisible dans un diff et impossible à comparer.
-
-**Cas de test à écrire**
-
-L’entrée est ce que tu donnes au code ; l’attendu est ce que ton test doit vérifier.
-
-**R9 — Rapport JSON déterministe**
-- Entrée : Mêmes résultats écrits deux fois, avec la date injectée 2026-01-05T08:00:00, dans deux dossiers temporaires.
-- Résultat attendu : Les deux fichiers JSON sont identiques octet pour octet. Ils contiennent la date injectée et, pour chaque module, les clés module, statut et alertes.
-
-**R10 — Nom de fichier sûr**
-- Entrée : Nom de rapport « ../../evil » puis « rapport final/v1 », dans un dossier temporaire.
-- Résultat attendu : Le nom est refusé ou nettoyé. Aucun fichier n’est créé en dehors du dossier demandé, et aucun nom ne contient de séparateur de chemin.
-
-**R11 — Rapport Markdown**
-- Entrée : Un résultat OK sans alerte, puis un résultat ERREUR avec deux alertes.
-- Résultat attendu : Un titre, une ligne par module avec son statut, les alertes listées sous leur module, dans l’ordre des résultats.
-
-**Actions dans l’ordre**
-
-1. R9 : la date est un paramètre de la fonction d’écriture. Le test injecte 2026-01-05T08:00:00. Deux écritures identiques doivent donner deux fichiers JSON identiques octet pour octet.
-2. R10 : un nom « ../../evil » ou « rapport final/v1 » est refusé ou nettoyé. Aucun fichier n’est créé hors du dossier demandé, et le nom ne contient aucun séparateur. Choisis refuser ou nettoyer, et écris ton choix dans la docstring.
-3. R11 : Markdown avec un titre, une ligne par module avec son statut, et les alertes sous leur module, dans l’ordre des résultats.
-4. Documente le code de sortie choisi : tu le reprendras dans le README de MR3.
+- Un rapport déterministe garde les mêmes octets quand les résultats et la date sont identiques. La date doit donc pouvoir être fournie par le test.
+- Le dossier de sortie et le nom de fichier sont deux valeurs distinctes : le nom ne doit pas créer de sous-chemin.
+- Markdown est un texte structuré avec titres et listes, lisible sans outil spécial.
 
 **Éditeur · Exemple travaillé, sans rapport avec ReconWrap **
 
@@ -1200,6 +1298,37 @@ with tempfile.TemporaryDirectory() as dossier:
     chemin.write_text("lait\npain\n", encoding="utf-8")
     print(chemin.read_text(encoding="utf-8").split())
 ```
+
+**Règles à respecter**
+
+- Le JSON conserve la date injectée et, pour chaque module, module, statut et alertes.
+- Deux écritures des mêmes entrées donnent des JSON identiques octet pour octet.
+- Les noms de fichiers restent dans le dossier demandé.
+- Markdown conserve ordre des modules et rattachement de leurs alertes.
+
+**Cas de test à écrire**
+
+L’entrée est ce que tu donnes au code ; l’attendu est ce que ton test doit vérifier.
+
+**R9 — Rapport JSON déterministe**
+- Entrée : Mêmes résultats écrits deux fois, avec la date injectée 2026-01-05T08:00:00, dans deux dossiers temporaires.
+- Résultat attendu : Les deux fichiers JSON sont identiques octet pour octet. Ils contiennent la date injectée et, pour chaque module, les clés module, statut et alertes.
+
+**R10 — Nom de fichier sûr**
+- Entrée : Nom de rapport « ../../evil » puis « rapport final/v1 », dans un dossier temporaire.
+- Résultat attendu : Le nom est refusé ou nettoyé. Aucun fichier n’est créé en dehors du dossier demandé, et aucun nom ne contient de séparateur de chemin.
+
+**R11 — Rapport Markdown**
+- Entrée : Un résultat OK sans alerte, puis un résultat ERREUR avec deux alertes.
+- Résultat attendu : Un titre, une ligne par module avec son statut, les alertes listées sous leur module, dans l’ordre des résultats.
+
+**Actions dans l’ordre**
+
+1. Écris R9 : injecte 2026-01-05T08:00:00, écris les mêmes résultats dans deux dossiers temporaires et compare les octets JSON.
+2. Écris R10 pour ../../evil et rapport final/v1 : refuse ou nettoie le nom, sans fichier hors du dossier ni séparateur restant. Documente ton choix dans la docstring.
+3. Écris R11 : titre, ligne par module avec statut, puis alertes sous leur module, dans l’ordre des résultats.
+4. Crée les fonctions d’écriture de rapport JSON et Markdown en respectant ces cas.
+5. Documente le code de sortie choisi pour la commande, relance R9 à R11 et la suite, puis commite.
 
 **Terminal · Commande à lancer au moment indiqué**
 
@@ -1236,13 +1365,19 @@ Prouver, à un moment donné et labo démarré, que D1 à D6 se comportent comme
 
 **Où tu travailles :** Outils réels dans Docker ; MR GitLab
 
+**Pour comprendre**
+
+- Les six démos lancent les voies réelles. Le pipeline futur continuera à lire des fixtures et des données injectées.
+- Dans Docker, utilise python3 ; un venv créé sur le Mac n’est pas réutilisable dans le conteneur.
+
 **Actions dans l’ordre**
 
-1. Démarre le labo avec son bouton dans Cyber Atelier. Les démonstrations ne figurent pas dans la CI : elles disent seulement que le labo réagissait ainsi au moment de l’essai.
-2. Lance les démonstrations dans le conteneur (docker compose exec atelier bash, puis cd /workspaces/reconwrap) avec python3 : le venv créé sur le Mac n’y fonctionne pas, et le module n’a pas besoin de dépendance.
-3. D5 utilise adsim, qui n’existe que dans le conteneur. D6 se lance après avoir arrêté le labo avec son bouton, puis te demande de le relancer pour la suite.
-4. Note les résultats dans les notes du parcours, pas dans le dépôt.
-5. Après les démonstrations, relance la suite locale, relis le diff contre main, pousse feat/orchestration-rapport et ouvre la MR2 dans GitLab. Après relecture et autorisation de l’école, fusionne-la ; le pipeline sera ajouté en MR3. Reviens ensuite sur main à jour.
+1. Démarre le labo intégré. Ouvre le conteneur et place-toi dans /workspaces/reconwrap.
+2. D1 : réseau, port 8000 open. D2 : web /fragile, trois alertes. D3 : web /durci, zéro alerte.
+3. D4 : /absent puis /erreur, ERREUR avec les codes 404 puis 500 conservés.
+4. D5 : adsim, comptes fictifs LAB.LOCAL. D6 : arrête le labo, observe une panne web sans code HTTP et un rapport tout de même écrit ; relance ensuite le labo.
+5. Note les résultats dans les notes du parcours, puis relance les tests et relis le diff contre main.
+6. Commite le travail nécessaire, pousse feat/orchestration-rapport et ouvre MR2 dans GitLab. Fusionne après relecture et autorisation de l’école ; la CI arrive en MR3. Mets main à jour.
 
 **Terminal · Commande à lancer au moment indiqué**
 
@@ -1371,13 +1506,27 @@ Relire ton diff comme si c’était celui d’un autre, puis ajouter docstrings 
 
 **Pour comprendre**
 
-- Pourquoi : une annotation fausse trompe plus qu’une absence d’annotation.
+- La branche principale (main) contient le travail déjà fusionné. Ta branche feat/... reçoit les changements de cette mission.
+- Un dépôt « propre » n’a aucune modification en attente : git status te le confirme.
+
+**Éditeur · Exemple travaillé, sans rapport avec ReconWrap **
+
+Éditeur : copie cet exemple dans exemple.py (jetable), enregistre-le, puis lance python3 exemple.py. Si plusieurs exemples sont proposés, essaie-les un par un en remplaçant le contenu du fichier. Retire ensuite les fichiers générés et le fichier d’exemple.
+
+```python
+def compter_mots(texte: str) -> int:
+    """Retourne le nombre de mots d’un texte."""
+    return len(texte.split())
+```
 
 **Actions dans l’ordre**
 
-1. Commence par la branche de MR3 : après la fusion de MR2, mets main à jour et crée feat/doc-qualite.
-2. Relis le diff complet par rapport à main avec une checklist écrite par toi : noms, erreurs, effets de bord, chemins, tests. Garde la checklist hors du dépôt.
-3. Pour chaque fonction publique : une docstring (une phrase, puis paramètres et retour) et des annotations de type. Vérifie que la docstring décrit ce que la fonction fait réellement.
+1. Ouvre workspaces/reconwrap dans VS Code, ou Coder dans Cyber Atelier avec cwd sur « . ».
+2. Vérifie que MR2 est fusionnée.
+3. Lis git status ; enregistre ton travail en cours avant de changer de branche.
+4. Reviens sur main avec git switch main, mets-la à jour avec git pull --ff-only, puis crée feat/doc-qualite. Remplace main par master si ton dépôt utilise ce nom.
+5. Écris une checklist hors du dépôt : noms, erreurs, effets de bord, chemins, tests. Relis le code avec elle ; ajoute aux fonctions publiques des annotations et une docstring décrivant action, paramètres et retour. Relance les tests.
+6. Vérifie le nom de ta branche avec git status. Si elle existe déjà, reprends-la avec git switch sans -c.
 
 **Terminal · Commande à lancer au moment indiqué**
 
@@ -1394,19 +1543,7 @@ git diff main --stat
 git diff main
 ```
 
-**Éditeur · Exemple travaillé, sans rapport avec ReconWrap **
-
-Éditeur : copie cet exemple dans exemple.py (jetable), enregistre-le, puis lance python3 exemple.py. Si plusieurs exemples sont proposés, essaie-les un par un en remplaçant le contenu du fichier. Retire ensuite les fichiers générés et le fichier d’exemple.
-
-```python
-def compter_mots(texte: str) -> int:
-    """Retourne le nombre de mots d’un texte."""
-    return len(texte.split())
-```
-
 **Terminal · Commande à lancer au moment indiqué**
-
-Terminal du parcours : reste à la racine du dépôt. Exécute ces lignes au moment demandé dans les actions, avec les modifications manuelles entre les blocs.
 
 ```bash
 .venv/bin/python -m unittest -v
@@ -1431,13 +1568,8 @@ git commit -m "Ajoute docstrings et annotations de type"
 
 **Pour comprendre**
 
-- Pourquoi : un outil que personne ne sait lancer n’est pas un livrable.
-
-**Actions dans l’ordre**
-
-1. Plan du README : installation (venv avec python3 -m venv .venv, puis .venv/bin/python), lancement, options de la CLI (--modules, --cible, --chemin, --format, --sortie), architecture (un module par domaine), comment ajouter un module, périmètre loopback, limites éthiques et légales.
-2. Pour l’ajout d’un module, décris les trois gestes : écrire la fonction selon le contrat, la brancher dans le registre, écrire ses tests. Ne retouche pas le dispatch.
-3. Teste ton README : suis-le à la lettre dans un dossier propre (un clone dans un dossier temporaire) et note chaque endroit où tu bloques.
+- Un README utilisable donne les commandes exactes et les dossiers où les exécuter.
+- Ajouter un module suit le contrat : fonction, inscription dans le registre, tests ; le dispatch reste identique.
 
 **Éditeur · Exemple travaillé, sans rapport avec ReconWrap **
 
@@ -1450,6 +1582,14 @@ git commit -m "Ajoute docstrings et annotations de type"
 python3 -m venv .venv
 ```
 ````
+
+**Actions dans l’ordre**
+
+1. Rédige installation avec venv, lancement, cinq options CLI et commande des tests.
+2. Décris l’architecture par domaine et les trois gestes d’ajout d’un module.
+3. Précise le périmètre loopback et les limites éthiques/légales.
+4. Suis le README dans un clone temporaire propre : crée son venv, lance tests et aide.
+5. Corrige chaque instruction qui demandait de deviner un chemin ou une option, puis commite.
 
 **Terminal · Enregistrer le travail vérifié**
 
@@ -1472,7 +1612,21 @@ Vérifier que les trois modules respectent le contrat hors ligne, et que l’aid
 
 **Pour comprendre**
 
-- Pourquoi : si un module change de forme, ce test casse ici, et pas dans ton rapport final.
+- Le contrat commun permet de vérifier les trois domaines avec les mêmes critères. subTest nomme chaque sous-cas sans arrêter les suivants.
+- Tester l’aide confirme que l’entrée publique fonctionne sans démarrer de module.
+
+**Éditeur · Exemple travaillé, sans rapport avec ReconWrap **
+
+Éditeur : place ce code dans un fichier d’exemple jetable, puis lance ce fichier avec python3. Un extrait avec self se place dans une méthode de test.
+
+```python
+import unittest
+class TestCarres(unittest.TestCase):
+    def test_carres(self):
+        for n, attendu in [(2, 4), (3, 9)]:
+            with self.subTest(n=n):
+                self.assertEqual(n * n, attendu)
+```
 
 **Cas de test à écrire**
 
@@ -1488,22 +1642,10 @@ L’entrée est ce que tu donnes au code ; l’attendu est ce que ton test doit 
 
 **Actions dans l’ordre**
 
-1. Écris R15 dans tests/test_contrat.py : relis les résultats de network (fixture XML), de ad (fixture JSON) et de web (classement injecté) avec la fabrique de MR1. Vérifie les cinq clés, un statut OK, ERREUR ou IGNORE, et une liste d’alertes.
-2. Écris R17 : python -m reconwrap --help doit sortir avec le code 0 et afficher --modules, --cible, --chemin, --format et --sortie.
-3. Pour tester plusieurs cas du même type sans écrire dix fois la même ligne, unittest a subTest.
-
-**Éditeur · Exemple travaillé, sans rapport avec ReconWrap **
-
-Éditeur : place ce code dans un fichier d’exemple jetable, puis lance ce fichier avec python3. Un extrait avec self se place dans une méthode de test.
-
-```python
-import unittest
-class TestCarres(unittest.TestCase):
-    def test_carres(self):
-        for n, attendu in [(2, 4), (3, 9)]:
-            with self.subTest(n=n):
-                self.assertEqual(n * n, attendu)
-```
+1. Écris R15 dans tests/test_contrat.py : network depuis XML, ad depuis JSON, web depuis code/en-têtes injectés.
+2. Pour chaque résultat, vérifie les cinq clés, un statut OK/ERREUR/IGNORE et la liste d’alertes avec la fabrique de MR1.
+3. Écris R17 : python -m reconwrap --help rend 0 et affiche --modules, --cible, --chemin, --format, --sortie.
+4. Utilise subTest si utile pour identifier les trois domaines, relance puis commite les tests.
 
 **Terminal · Commande à lancer au moment indiqué**
 
@@ -1540,21 +1682,10 @@ git commit -m "Ajoute les tests de contrat et d’aide CLI"
 
 **Où tu travailles :** .gitlab-ci.yml
 
-**Cas de test à écrire**
+**Pour comprendre**
 
-L’entrée est ce que tu donnes au code ; l’attendu est ce que ton test doit vérifier.
-
-**R16 — Suite complète sans labo**
-- Entrée : python -m unittest lancé depuis la racine, labo arrêté et nmap absent du système.
-- Résultat attendu : Code de sortie 0. Les tests R1 à R15 sont découverts, et aucun test ne se connecte à 127.0.0.1:8000 ni n’appelle nmap ou adsim.
-
-**Actions dans l’ordre**
-
-1. GitLab CI lit un fichier .gitlab-ci.yml à la racine du dépôt. Un job est une étape avec une image (Python) et une liste de commandes. Lis la documentation des règles pour limiter le job aux merge requests.
-2. Pourquoi l’indentation compte en YAML : les niveaux se lisent par les espaces. Exemple sans rapport :
-3. Écris le fichier toi-même : une image Python, une étape qui lance python -m unittest depuis la racine, déclenchée sur les merge requests. Cyber Atelier ne fournit pas ce fichier.
-4. R16 : labo arrêté, nmap non utilisé. Depuis la racine, la commande doit sortir avec le code 0, les tests R1 à R15 doivent être découverts, et aucun test ne se connecte à 127.0.0.1:8000 ni n’appelle nmap ou adsim.
-5. Pousse la branche et ouvre la merge request. Attends le pipeline. Si l’école n’a pas de runner, note-le au lieu de déclarer la CI validée.
+- GitLab exécute le fichier .gitlab-ci.yml depuis la racine du dépôt sur son runner. Le job doit utiliser un environnement Python.
+- La suite est indépendante de nmap, adsim et du labo ; les démonstrations ne doivent pas entrer dans ce job.
 
 **Éditeur · Exemple YAML sans rapport avec ReconWrap **
 
@@ -1565,6 +1696,22 @@ courses:
   - lait
   - pain
 ```
+
+**Cas de test à écrire**
+
+L’entrée est ce que tu donnes au code ; l’attendu est ce que ton test doit vérifier.
+
+**R16 — Suite complète sans labo**
+- Entrée : python -m unittest lancé depuis la racine, labo arrêté et nmap absent du système.
+- Résultat attendu : Code de sortie 0. Les tests R1 à R15 sont découverts, et aucun test ne se connecte à 127.0.0.1:8000 ni n’appelle nmap ou adsim.
+
+**Actions dans l’ordre**
+
+1. Lis l’exemple YAML pour repérer les niveaux d’indentation, puis rédige la CI toi-même.
+2. Prévois une image Python et un job limité aux MR, qui lance python -m unittest depuis la racine.
+3. R16 : arrête le labo, vérifie que R1 à R15 sont découverts et que la suite sort avec 0 sans appel réseau, nmap ou adsim.
+4. Relis les tests pour confirmer l’usage des fixtures, données injectées et faux.
+5. Commite, pousse et ouvre MR3 ; attends son pipeline. S’il manque un runner, note cet état au lieu d’annoncer la CI validée.
 
 **Terminal · Commande à lancer au moment indiqué**
 
@@ -1601,12 +1748,8 @@ git push -u origin feat/doc-qualite
 
 **Pour comprendre**
 
-- Pourquoi : quelqu’un qui découvre l’outil doit savoir ce qu’il sait faire et ce qu’il ne fait pas.
-
-**Actions dans l’ordre**
-
-1. Crée CHANGELOG.md avec une section 0.1.0 : ajouts, puis limites connues.
-2. Une entrée par changement visible pour l’utilisateur, en phrases courtes. Les limites connues comptent autant que les ajouts.
+- Le CHANGELOG décrit les changements visibles d’une version. Il permet de comprendre ce qui est livré et ses limites.
+- Un ajout annoncé doit déjà exister ; une idée future va dans les pistes, pas dans les fonctionnalités livrées.
 
 **Éditeur · Exemple travaillé, sans rapport avec ReconWrap **
 
@@ -1619,6 +1762,13 @@ git push -u origin feat/doc-qualite
 ### Limites connues
 - Pas de version sans gluten.
 ```
+
+**Actions dans l’ordre**
+
+1. Crée CHANGELOG.md avec une section 0.1.0.
+2. Liste les ajouts en phrases courtes du point de vue de l’utilisateur.
+3. Ajoute les limites connues, notamment outils fictifs et périmètre local.
+4. Vérifie chaque affirmation contre le code puis commite.
 
 **Terminal · Enregistrer le travail vérifié**
 
@@ -1639,11 +1789,17 @@ Rédiger un bilan honnête : ce qui est fait, ce qui reste à apprendre, et les 
 
 **Où tu travailles :** docs/PROJET_FINAL.md
 
+**Pour comprendre**
+
+- Le bilan distingue compétences pratiquées, idées de futur projet et compétences encore à apprendre.
+- Le module AD réel reste une idée de projet : adsim n’est pas un annuaire réel.
+
 **Actions dans l’ordre**
 
-1. Crée docs/PROJET_FINAL.md avec trois parties : ce que tu ferais (un module AD réel contre un domaine dont tu as l’autorisation écrite, une interface graphique optionnelle), ce que tu ne ferais pas, et un bilan avec la liste de ce qui reste à apprendre.
-2. Précise l’autorisation écrite nécessaire pour tout test sur un vrai domaine : un accord écrit, daté, du propriétaire du domaine.
-3. Pour chaque idée, demande-toi : est-ce que je l’ai faite, ou est-ce que je la ferais ? Un bilan qui dit « je ne sais pas encore » est une réponse valide.
+1. Crée docs/PROJET_FINAL.md avec ce que tu ferais, ce que tu ne ferais pas et ce qui reste à apprendre.
+2. Dans les idées, décris un module AD réel sur un domaine autorisé et une interface graphique optionnelle.
+3. Précise l’accord écrit, daté, du propriétaire nécessaire pour travailler sur un vrai domaine.
+4. Distingue clairement réalisé et envisagé, puis commite le document.
 
 **Terminal · Enregistrer le travail vérifié**
 
@@ -1664,14 +1820,19 @@ Résoudre un conflit en lisant les marqueurs, et annuler un commit avec git reve
 
 **Où tu travailles :** README.md dans les branches jetables
 
+**Pour comprendre**
+
+- Un conflit demande de choisir le contenu final. Un revert enregistre un commit inverse sans effacer l’historique.
+- Les trois branches sont locales et jetables ; aucune n’est poussée.
+
 **Actions dans l’ordre**
 
-1. Vérifie que tout ton travail sur feat/doc-qualite est commité. Les trois branches suivantes sont locales et jetables : aucune n’est poussée.
-2. Depuis main à jour, crée jetable-conflit-a. Dans README.md, remplace la première ligne par « # Variante A », puis ajoute et commite ce fichier.
-3. Repars de main et crée jetable-conflit-b. Remplace la même première ligne par « # Variante B », ajoute et commite, puis fusionne jetable-conflit-a dans cette branche. Le conflit est attendu.
-4. Ouvre README.md : lis les versions entre <<<<<<<, ======= et >>>>>>>. Garde une version, retire les marqueurs, ajoute le fichier et commite la résolution. Vérifie les marqueurs et l’historique avant de quitter cette branche.
-5. Repars de main et crée jetable-revert. Ajoute une ligne d’essai à README.md et commite-la ; git revert HEAD --no-edit crée un commit inverse qui retire cette ligne en conservant l’historique.
-6. Reviens sur feat/doc-qualite, puis supprime uniquement les trois branches de cet exercice. -D accepte de supprimer leur historique local non fusionné : utilise-le ici après tes observations. Relance les tests de ta vraie branche.
+1. Commite tout le travail utile de feat/doc-qualite ; git status doit être propre.
+2. Depuis main, crée jetable-conflit-a puis jetable-conflit-b ; remplace la première ligne README par Variante A ou B et commite dans chacune.
+3. Fusionne A dans B. Résous le conflit, enlève les marqueurs, ajoute et commite ; observe le fichier et le graphe avant nettoyage.
+4. Depuis main, crée jetable-revert : ajoute une ligne d’essai, commite puis lance git revert HEAD --no-edit. Observe erreur et inverse dans l’historique.
+5. Reviens sur feat/doc-qualite et supprime uniquement ces trois branches. -D abandonne leur historique local non fusionné.
+6. Relance la suite sur la vraie branche.
 
 **Terminal · Relire l’état du dépôt**
 
@@ -1754,12 +1915,18 @@ Faire relire la MR3, la fusionner si l’école l’autorise, puis poser le tag 
 
 **Où tu travailles :** MR GitLab ; tag v0.1.0
 
+**Pour comprendre**
+
+- Le tag annoté fige la version livrée avec message et auteur. Il doit désigner le main mis à jour après fusion.
+- Un pipeline vert, l’autorisation de fusion et la présence du tag sont des vérifications différentes.
+
 **Actions dans l’ordre**
 
-1. Relis le diff de la MR3 avec ta checklist du premier palier. Ouvre la merge request dans GitLab.
-2. Attends le pipeline. La fusion n’a lieu que si le pipeline est vert et que l’école l’autorise. Sinon, note l’état réel.
-3. Après fusion, mets main à jour, puis pose le tag annoté v0.1.0. Un tag annoté a un message et un auteur. Pousse-le séparément de la branche.
-4. Pourquoi un tag : il fige la version. Une version déplacée après coup trompe tous ceux qui s’y fient.
+1. Relis le diff de MR3 avec la checklist du palier 1. Commite et pousse les derniers changements.
+2. Ouvre ou actualise MR3, puis attends le pipeline du dernier commit.
+3. Fusionne seulement si le pipeline et l’école le permettent ; sinon conserve l’état réel comme non validé.
+4. Après fusion, mets main à jour et crée le tag annoté v0.1.0 avec un message.
+5. Compare git show v0.1.0 au commit de main, puis pousse le tag séparément.
 
 **Terminal · Relire l’état du dépôt**
 
