@@ -43,10 +43,18 @@ def generated(data, course):
     out=[START,'## Comment travailler un exercice','',guide['body'],'']
     out += [f'{i}. {item}' for i,item in enumerate(guide['items'],1)]
     out += ['', '### Le bon endroit pour chaque action','',
-      f'Sur ton Mac, ouvre `workspaces/{course["id"]}` dans VS Code. Dans Cyber Atelier, utilise l’éditeur et la console de **Coder**, avec `cwd` sur `.` (la racine du dépôt). Fais la préparation de **Environnement** avant MR1 ; la mission crée ensuite sa branche.', '',
-      'Le code Python se place dans l’éditeur. Les commandes `docker compose ...` se lancent sur ton Mac depuis `cyberatelier` ; `/app/...` existe dans le conteneur. Le laboratoire interrogé doit tourner dans le même environnement que ton programme.', '',
-      'La console web repart à neuf à chaque exécution : un `cd`, une activation de venv ou `echo $?` ne se transmet pas à la commande suivante. Lance le programme et `echo $?` ensemble quand le palier le demande. Le nombre affiché par echo est celui du programme ; la console peut afficher code 0 pour echo lui-même.', '',
-      'Un venv créé sur le Mac ne fonctionne pas dans le conteneur : utilise `python3` dans ce dernier. Remplace `main` par `master` si nécessaire. Si une branche existe déjà, reprends-la avec `git switch NOM` sans `-c`. Après chaque fusion, actualise la branche principale avant la mission suivante.', '',
+      f'Ouvre `workspaces/{course["id"]}` dans VS Code et un terminal du Mac dans ce même dossier. Tu écris et testes le code ici, dans le dépôt Git de l’exercice. Ouvre un second terminal dans `cyberatelier` pour lire les consignes avec `python3 atelier.py voir` et piloter Docker. Le site reste disponible pour la lecture ; l’onglet Coder est facultatif.', '',
+      f'Depuis `cyberatelier`, `mkdir -p workspaces/{course["id"]}` puis `cd workspaces/{course["id"]}` permet de rejoindre le dossier du parcours. S’il contient déjà ton exercice, garde ses fichiers, sa branche et son dépôt : ne le reclone pas. La préparation ci-dessous se fait une fois ; la mission crée ensuite sa branche.', '',
+      'Le code Python se place dans VS Code et doit être enregistré avant les tests. Les commandes `docker compose ...` et `python3 atelier.py ...` se lancent depuis `cyberatelier`. Leurs appels Docker entrent dans le conteneur ; `/app/fixtures`, `/app/tools` et `/workspaces` sont des chemins internes à celui-ci. Depuis le dépôt d’exercice sur le Mac, les fixtures fournies sont dans `../../fixtures`.', '',
+      'Le terminal du Mac conserve son `cd` et son activation de venv. Active `.venv` dans chaque nouveau terminal d’exercice ; `python3` utilise alors ce venv, ou appelle `.venv/bin/python` explicitement. Lis `echo $?` immédiatement après le programme dont tu veux le code, avant toute autre commande. Ajoute `.venv/` à `.gitignore` avant `git add`.', '',
+      'PortPilot et HeaderScope exécutés sur le Mac : lance `python3 labs.py` depuis `cyberatelier` dans un autre terminal et garde-le ouvert ; Ctrl+C arrête ce labo Mac. Les outils ToolWrap et les démos ReconWrap tournent dans Docker : `python3 atelier.py labo demarrer`, `labo arreter` et `labo statut` depuis `cyberatelier` pilotent uniquement le labo Docker. Le même numéro 8000 ne relie pas automatiquement les deux environnements.', '',
+      'Un venv créé sur le Mac ne fonctionne pas dans Docker : les démos dans le conteneur utilisent son `python3`. Le dossier hôte `workspaces` doit être monté dans Docker pour que les démos ReconWrap lisent ton code ; conserve le `compose.override.yaml` du mode VS Code. Remplace `main` par `master` si nécessaire. Si une branche existe, reprends-la avec `git switch NOM` sans `-c`. Après chaque fusion, actualise la principale dans le dépôt du parcours avant la mission suivante.', '',
+      '### Préparation sur le Mac','']
+    for item in course['setup']:
+        out += [f'**{item["label"]}**','',item.get('context',f'Terminal du Mac, dans workspaces/{course["id"]}.'),'']
+        if item.get('command'): out += [fence(item['command'],'bash'),'']
+        out += [item.get('note',''),'']
+    out += [
       '### Les mots utiles','']
     for term in guide['glossary']:
         out += [f'**{term["title"]}.** {term["body"]}','']
@@ -74,9 +82,18 @@ def generated(data, course):
                 out += ['**Cas de test à écrire**','','L’entrée est ce que tu donnes au code ; l’attendu est ce que ton test doit vérifier.','']+cases(wanted)
             out += ['**Actions dans l’ordre**','']+[f'{i}. {item}' for i,item in enumerate(p['do'],1)]+['']
             out += blocks(p['blocks'],'after_actions')
-            out += [f'**Tu sais que c’est bon quand :** {p["check"]}','',f'*Indice si tu bloques :* {p["hint"]}','']
+            out += [f'**Tu sais que c’est bon quand :** {p["check"]}','']
+            if p.get('hints'):
+                out += ['**Indices progressifs**','','Depuis le terminal dans `cyberatelier`, `python3 atelier.py indice` révèle un niveau à la fois. Ouvre seulement le niveau nécessaire.','']
+                for level,hint in enumerate(p['hints'],1):
+                    out += ['<details>',f'<summary>Indice {level}</summary>','',hint,'','</details>','']
+            else:
+                out += [f'*Indice si tu bloques :* {p["hint"]}','']
         if step.get('demos'):
-            out += ['**Démonstrations manuelles (hors CI)**','','Ces essais utilisent le laboratoire ou les outils réels. Ils sont séparés des tests obligatoires.','']+cases(step['demos'])
+            out += ['**Démonstrations manuelles (hors CI)**','','Ces essais lisent des fichiers locaux ou utilisent le labo et les outils réels, selon le parcours. Ils sont séparés des tests obligatoires.','']
+            if course['id'] in ('toolwrap','reconwrap'):
+                out += ['Les cartes ci-dessous conservent le contrat de démonstration initial. Depuis le terminal Mac dans `cyberatelier`, les mentions du « bouton du labo » se réalisent avec `python3 atelier.py labo demarrer` ou `python3 atelier.py labo arreter`. Utilise les commandes Docker du palier de démonstration pour exécuter les outils dans le bon environnement.','']
+            out += cases(step['demos'])
         out += ['**Avant de livrer**','']+[f'- {item}' for item in step['acceptance']]+['']
     return '\n'.join(out+[END,''])
 

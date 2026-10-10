@@ -93,6 +93,14 @@ class ServerApiTests(unittest.TestCase):
         status, old = self.json_request("POST", "/api/state", base)
         self.assertEqual((status, old["paliers"]), (200, []), "une ancienne progression sans paliers reste valide")
 
+    def test_health_reports_the_installed_version(self):
+        installed = {"commit": "a" * 40, "label": "aaaaaaa", "source": "image"}
+        with mock.patch("server.version_info", return_value=installed):
+            status, result = self.json_request("GET", "/api/health")
+        self.assertEqual(status, 200)
+        self.assertEqual(result["status"], "ok")
+        self.assertEqual(result["version"], installed)
+
     def test_path_and_symlink_traversal_are_rejected(self):
         for bad in ("../secret", "/etc/passwd", "a%2F..%2Fsecret", "a\\b"):
             status, result = self.json_request("POST", "/api/file", {

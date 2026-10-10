@@ -14,9 +14,9 @@ Le programme final tient en trois fichiers Python et un README :
 - `journal.py` : lecture de fichier, erreurs, JSON et rapport de données (MR2) ;
 - `analyseur.py` : affichage du rapport et point d’entrée en ligne de commande (MR3).
 
-Chaque fichier a son fichier de tests : `test_outils.py`, `test_journal.py`, `test_analyseur.py`. Tous utilisent unittest, lancé avec `python -m unittest` depuis le dossier du projet. Aucun `pip install`, aucun pytest.
+Chaque fichier a son fichier de tests : `test_outils.py`, `test_journal.py`, `test_analyseur.py`. Tous utilisent unittest, lancé avec `python3 -m unittest` depuis le dossier du projet. Aucun `pip install`, aucun pytest.
 
-Le journal fictif est `fixtures/socle/auth.log`. Tu le copies dans la console avec la commande de préparation ; les originaux sont en lecture seule, la copie est modifiable. Il n’est jamais versionné : ton `.gitignore` l’exclut.
+Le journal fictif est `fixtures/socle/auth.log`. Tu le copies depuis le terminal du Mac dans workspaces/socle avec la commande de préparation ; les originaux sont en lecture seule, la copie est modifiable. Il n’est jamais versionné : ton `.gitignore` l’exclut.
 
 Le format d’une ligne de journal est :
 
@@ -33,17 +33,94 @@ Ces exercices sont ton entraînement. Chaque palier explique les notions utiles,
 2. Les cartes de tests donnent l’entrée et le résultat attendu. Écris les tests correspondants dans le fichier indiqué ; cocher un palier ne les exécute pas. Avec unittest, « Ran 0 tests » signifie qu’aucun test n’a été exécuté : ce n’est pas une validation. Un cas décrit peut contenir plusieurs valeurs ; le nombre de méthodes Python n’est donc pas forcément le nombre d’identifiants.
 3. Suis les actions numérotées, une à la fois. Les exemples servent à apprendre une notion ; tu écris toi-même la solution de l’exercice. Les blocs Terminal donnent les commandes à lancer au moment indiqué.
 4. Vérifie le résultat indiqué avant de poursuivre. Un échec attendu (phase rouge, argument refusé ou conflit volontaire) est expliqué dans le palier.
-5. Si tu bloques, lis la dernière ligne de l’erreur, compare l’entrée et l’attendu, puis ouvre l’indice. Fais un petit changement et relance.
+5. Si tu bloques, lis la dernière ligne de l’erreur, compare entrée et attendu, puis demande un seul indice à la fois avec python3 atelier.py indice depuis cyberatelier. Les trois niveaux vont du rappel à un petit exemple ; ils ne donnent pas une fonction corrigée.
 
 ### Le bon endroit pour chaque action
 
-Sur ton Mac, ouvre `workspaces/socle` dans VS Code. Dans Cyber Atelier, utilise l’éditeur et la console de **Coder**, avec `cwd` sur `.` (la racine du dépôt). Fais la préparation de **Environnement** avant MR1 ; la mission crée ensuite sa branche.
+Ouvre `workspaces/socle` dans VS Code et un terminal du Mac dans ce même dossier. Tu écris et testes le code ici, dans le dépôt Git de l’exercice. Ouvre un second terminal dans `cyberatelier` pour lire les consignes avec `python3 atelier.py voir` et piloter Docker. Le site reste disponible pour la lecture ; l’onglet Coder est facultatif.
 
-Le code Python se place dans l’éditeur. Les commandes `docker compose ...` se lancent sur ton Mac depuis `cyberatelier` ; `/app/...` existe dans le conteneur. Le laboratoire interrogé doit tourner dans le même environnement que ton programme.
+Depuis `cyberatelier`, `mkdir -p workspaces/socle` puis `cd workspaces/socle` permet de rejoindre le dossier du parcours. S’il contient déjà ton exercice, garde ses fichiers, sa branche et son dépôt : ne le reclone pas. La préparation ci-dessous se fait une fois ; la mission crée ensuite sa branche.
 
-La console web repart à neuf à chaque exécution : un `cd`, une activation de venv ou `echo $?` ne se transmet pas à la commande suivante. Lance le programme et `echo $?` ensemble quand le palier le demande. Le nombre affiché par echo est celui du programme ; la console peut afficher code 0 pour echo lui-même.
+Le code Python se place dans VS Code et doit être enregistré avant les tests. Les commandes `docker compose ...` et `python3 atelier.py ...` se lancent depuis `cyberatelier`. Leurs appels Docker entrent dans le conteneur ; `/app/fixtures`, `/app/tools` et `/workspaces` sont des chemins internes à celui-ci. Depuis le dépôt d’exercice sur le Mac, les fixtures fournies sont dans `../../fixtures`.
 
-Un venv créé sur le Mac ne fonctionne pas dans le conteneur : utilise `python3` dans ce dernier. Remplace `main` par `master` si nécessaire. Si une branche existe déjà, reprends-la avec `git switch NOM` sans `-c`. Après chaque fusion, actualise la branche principale avant la mission suivante.
+Le terminal du Mac conserve son `cd` et son activation de venv. Active `.venv` dans chaque nouveau terminal d’exercice ; `python3` utilise alors ce venv, ou appelle `.venv/bin/python` explicitement. Lis `echo $?` immédiatement après le programme dont tu veux le code, avant toute autre commande. Ajoute `.venv/` à `.gitignore` avant `git add`.
+
+PortPilot et HeaderScope exécutés sur le Mac : lance `python3 labs.py` depuis `cyberatelier` dans un autre terminal et garde-le ouvert ; Ctrl+C arrête ce labo Mac. Les outils ToolWrap et les démos ReconWrap tournent dans Docker : `python3 atelier.py labo demarrer`, `labo arreter` et `labo statut` depuis `cyberatelier` pilotent uniquement le labo Docker. Le même numéro 8000 ne relie pas automatiquement les deux environnements.
+
+Un venv créé sur le Mac ne fonctionne pas dans Docker : les démos dans le conteneur utilisent son `python3`. Le dossier hôte `workspaces` doit être monté dans Docker pour que les démos ReconWrap lisent ton code ; conserve le `compose.override.yaml` du mode VS Code. Remplace `main` par `master` si nécessaire. Si une branche existe, reprends-la avec `git switch NOM` sans `-c`. Après chaque fusion, actualise la principale dans le dépôt du parcours avant la mission suivante.
+
+### Préparation sur le Mac
+
+**Vérifier Python**
+
+Terminal du Mac, dans cyberatelier/workspaces/socle.
+
+```bash
+python3 --version
+```
+
+Python 3 doit être installé sur ton Mac. Ce parcours utilise seulement sa bibliothèque standard ; aucun pip install n’est demandé.
+
+**Vérifier Git**
+
+Terminal du Mac, dans cyberatelier/workspaces/socle.
+
+```bash
+git --version
+```
+
+Vérifie Git sur ton Mac. Les commandes du parcours agissent sur ce dépôt d’exercice, distinct du dépôt cyberatelier.
+
+**Configurer ton identité Git (une seule fois)**
+
+Terminal du Mac, dans cyberatelier/workspaces/socle.
+
+```bash
+git config --global user.name "Prénom Nom" && git config --global user.email "adresse@ecole.example"
+```
+
+Remplace les deux valeurs d’exemple par ton nom et l’adresse de ton compte scolaire. Cette configuration globale est enregistrée sur ton Mac ; sans identité, git commit refuse le commit.
+
+**Cloner le dépôt**
+
+Terminal du Mac, dans cyberatelier/workspaces/socle.
+
+```bash
+git clone <URL_DU_DEPOT> .
+```
+
+Depuis le terminal du Mac dans workspaces/socle, clone seulement si le dossier est vide et n’a pas encore de dépôt. Remplace <URL_DU_DEPOT> par l’URL autorisée réelle avant exécution ; le point signifie « ici ». Si ton exercice existe déjà, garde-le et passe directement à git status. HTTPS ou SSH peut demander une saisie dans ce terminal.
+
+**Créer le venv**
+
+Terminal du Mac, dans cyberatelier/workspaces/socle.
+
+```bash
+python3 -m venv .venv
+source .venv/bin/activate
+```
+
+Après le clone, crée ce venv sur le Mac une seule fois ; s’il existe, active-le simplement. L’activation reste valable dans ce terminal. Dans un nouveau terminal, réactive-le ou appelle .venv/bin/python. Ajoute .venv/ à .gitignore avant git add. Aucun paquet pip n’est nécessaire.
+
+**Vérifier le dépôt cloné**
+
+Terminal du Mac, dans cyberatelier/workspaces/socle.
+
+```bash
+git status
+```
+
+Vérifie que tu es sur la branche principale (main ou master) et que le dépôt est propre.
+
+**Copier les fixtures du parcours**
+
+Terminal du Mac, dans cyberatelier/workspaces/socle.
+
+```bash
+mkdir -p fixtures/socle && cp -r ../../fixtures/socle/. fixtures/socle/ && chmod -R u+w fixtures/socle
+```
+
+Copie le journal fictif auth.log dans ton dossier de travail. Les originaux sont en lecture seule ; la copie est modifiable. Ne l’ajoute pas à Git : le .gitignore de MR1 l’exclut. La source est dans le dépôt cyberatelier sur ton Mac ; /app/fixtures est réservée au conteneur.
 
 ### Les mots utiles
 
@@ -114,7 +191,7 @@ Tu vas écrire quatre fonctions pures de validation, d’analyse de ligne et de 
 
 Avoir un dossier propre, relié à GitHub, sur la branche de la mission.
 
-**Où tu travailles :** Dépôt et .gitignore
+**Où tu travailles :** Mac · workspaces/socle · Dépôt et .gitignore
 
 **Pour comprendre**
 
@@ -123,16 +200,16 @@ Avoir un dossier propre, relié à GitHub, sur la branche de la mission.
 
 **Actions dans l’ordre**
 
-1. Ouvre workspaces/socle dans VS Code, ou Coder dans Cyber Atelier avec cwd sur « . ».
-2. Termine la préparation de l’onglet Environnement : le dépôt doit déjà être cloné.
+1. Ouvre workspaces/socle dans VS Code. Dans le terminal du Mac, place-toi dans ce même dossier et active son venv avec source .venv/bin/activate.
+2. Termine la préparation décrite au début du guide : le dépôt doit déjà être cloné.
 3. Lis git status ; enregistre ton travail en cours avant de changer de branche.
 4. Reviens sur main avec git switch main, mets-la à jour avec git pull --ff-only, puis crée feat/bases. Remplace main par master si ton dépôt utilise ce nom.
-5. Crée .gitignore avec __pycache__/ et fixtures/, un motif par ligne. Commite ce fichier ; git status doit ensuite être propre.
+5. Crée .gitignore avec __pycache__/, .venv/ et fixtures/, un motif par ligne. Commite ce fichier ; git status doit ensuite être propre.
 6. Vérifie le nom de ta branche avec git status. Si elle existe déjà, reprends-la avec git switch sans -c.
 
 **Terminal · Relire l’état du dépôt**
 
-Terminal du parcours : reste à la racine du dépôt. Exécute ces lignes au moment demandé dans les actions, avec les modifications manuelles entre les blocs.
+Terminal du Mac, dans cyberatelier/workspaces/socle, venv Mac activé. Exécute chaque ligne au moment indiqué, avec les modifications manuelles entre les blocs.
 
 ```bash
 git status
@@ -159,13 +236,36 @@ git status
 
 **Tu sais que c’est bon quand :** git status affiche « On branch feat/bases » et « nothing to commit, working tree clean ».
 
-*Indice si tu bloques :* Si Git répond « not a git repository », tu n’es pas dans le bon dossier. Si la branche existe déjà, utilise git switch feat/bases (sans -c).
+**Indices progressifs**
+
+Depuis le terminal dans `cyberatelier`, `python3 atelier.py indice` révèle un niveau à la fois. Ouvre seulement le niveau nécessaire.
+
+<details>
+<summary>Indice 1</summary>
+
+Une branche Git conserve une version du dépôt ; le dossier courant décide quel dépôt reçoit tes commandes.
+
+</details>
+
+<details>
+<summary>Indice 2</summary>
+
+Compare le chemin donné par pwd au dossier workspaces/socle, puis lis la branche dans git status avant de la créer.
+
+</details>
+
+<details>
+<summary>Indice 3</summary>
+
+Dans un dépôt d’essai, git switch -c feat/carnet crée la branche ; git switch feat/carnet reprend une branche déjà créée.
+
+</details>
 
 #### Palier 2 — Écris ton tout premier test (10 min)
 
 Comprendre à quoi sert un test avant d’en écrire pour de vrai.
 
-**Où tu travailles :** exemple.py (jetable)
+**Où tu travailles :** Mac · workspaces/socle · exemple.py (jetable)
 
 **Pour comprendre**
 
@@ -174,7 +274,7 @@ Comprendre à quoi sert un test avant d’en écrire pour de vrai.
 
 **Éditeur · Exemple Python à lire ou essayer**
 
-Éditeur : place ce code dans un fichier d’exemple jetable, puis lance ce fichier avec python3. Un extrait avec self se place dans une méthode de test.
+VS Code sur le Mac : place ce code dans un fichier d’exemple jetable, puis lance ce fichier avec python3. Un extrait avec self se place dans une méthode de test.
 
 ```python
 import unittest
@@ -199,7 +299,7 @@ if __name__ == "__main__":
 
 **Terminal · Commande à lancer au moment indiqué**
 
-Terminal du parcours : reste à la racine du dépôt. Exécute ces lignes au moment demandé dans les actions, avec les modifications manuelles entre les blocs.
+Terminal du Mac, dans cyberatelier/workspaces/socle, venv Mac activé. Exécute chaque ligne au moment indiqué, avec les modifications manuelles entre les blocs.
 
 ```bash
 python3 exemple.py -v
@@ -207,13 +307,36 @@ python3 exemple.py -v
 
 **Tu sais que c’est bon quand :** Tu as vu « OK » avec 8, puis « FAIL » avec 9, et tu sais lire la ligne « AssertionError: 8 != 9 ».
 
-*Indice si tu bloques :* Si python3 n’est pas trouvé, tape python3 --version dans le terminal de VS Code. Les messages d’échec se lisent de bas en haut : la dernière ligne dit ce qui ne va pas.
+**Indices progressifs**
+
+Depuis le terminal dans `cyberatelier`, `python3 atelier.py indice` révèle un niveau à la fois. Ouvre seulement le niveau nécessaire.
+
+<details>
+<summary>Indice 1</summary>
+
+Un test compare un résultat obtenu à un résultat attendu ; unittest découvre les méthodes dont le nom commence par test_.
+
+</details>
+
+<details>
+<summary>Indice 2</summary>
+
+Observe l’exemple doubler : repère l’appel, la valeur attendue et la classe TestCase avant de créer ton propre fichier d’essai.
+
+</details>
+
+<details>
+<summary>Indice 3</summary>
+
+Si tripler(3) retourne 9, assertEqual(tripler(3), 9) passe ; attendre 8 produit un échec qui montre les deux valeurs.
+
+</details>
 
 #### Palier 3 — Un test d’abord, puis la fonction : les noms valides (15 min)
 
 Écrire un test AVANT le code (il échoue), puis le minimum de code pour le faire passer.
 
-**Où tu travailles :** outils.py ; test_outils.py
+**Où tu travailles :** Mac · workspaces/socle · outils.py ; test_outils.py
 
 **Pour comprendre**
 
@@ -262,7 +385,7 @@ L’entrée est ce que tu donnes au code ; l’attendu est ce que ton test doit 
 
 **Terminal · Commande à lancer au moment indiqué**
 
-Terminal du parcours : reste à la racine du dépôt. Exécute ces lignes au moment demandé dans les actions, avec les modifications manuelles entre les blocs.
+Terminal du Mac, dans cyberatelier/workspaces/socle, venv Mac activé. Exécute chaque ligne au moment indiqué, avec les modifications manuelles entre les blocs.
 
 ```bash
 python3 -m unittest -v
@@ -277,13 +400,36 @@ git commit -m "Ajoute valider_nom_utilisateur pour les noms valides"
 
 **Tu sais que c’est bon quand :** python3 -m unittest -v affiche 1 test OK, et git log --oneline montre ton nouveau commit.
 
-*Indice si tu bloques :* La fonction n’a pas besoin d’être maligne maintenant : S1 ne vérifie que des noms valides. Écris le test suivant avant de compliquer la fonction.
+**Indices progressifs**
+
+Depuis le terminal dans `cyberatelier`, `python3 atelier.py indice` révèle un niveau à la fois. Ouvre seulement le niveau nécessaire.
+
+<details>
+<summary>Indice 1</summary>
+
+La phase rouge prouve que le test observe une fonction absente ou incorrecte ; le vert vient après son écriture.
+
+</details>
+
+<details>
+<summary>Indice 2</summary>
+
+Commence seulement par les noms valides de S1, puis vérifie que les noms ressortent inchangés.
+
+</details>
+
+<details>
+<summary>Indice 3</summary>
+
+Pour un validateur de couleur, une entrée « bleu » acceptée ressort « bleu » ; ne la remplace pas par une valeur constante pour satisfaire un seul exemple.
+
+</details>
 
 #### Palier 4 — Les limites : longueur et caractères (15 min)
 
 Faire échouer un test, puis compléter la fonction règle par règle.
 
-**Où tu travailles :** outils.py ; test_outils.py
+**Où tu travailles :** Mac · workspaces/socle · outils.py ; test_outils.py
 
 **Pour comprendre**
 
@@ -311,7 +457,7 @@ L’entrée est ce que tu donnes au code ; l’attendu est ce que ton test doit 
 
 **Terminal · Commande à lancer au moment indiqué**
 
-Terminal du parcours : reste à la racine du dépôt. Exécute ces lignes au moment demandé dans les actions, avec les modifications manuelles entre les blocs.
+Terminal du Mac, dans cyberatelier/workspaces/socle, venv Mac activé. Exécute chaque ligne au moment indiqué, avec les modifications manuelles entre les blocs.
 
 ```bash
 python3 -m unittest -v
@@ -326,13 +472,36 @@ git commit -m "Contrôle la longueur et les caractères des noms"
 
 **Tu sais que c’est bon quand :** S1, S2 et S3 passent.
 
-*Indice si tu bloques :* Piège : str.isalpha() et str.isalnum() acceptent aussi les lettres accentuées comme « é ». Pour rester en ASCII, compare chaque caractère à la chaîne string.ascii_letters (module string), ou teste avec str.isascii().
+**Indices progressifs**
+
+Depuis le terminal dans `cyberatelier`, `python3 atelier.py indice` révèle un niveau à la fois. Ouvre seulement le niveau nécessaire.
+
+<details>
+<summary>Indice 1</summary>
+
+ASCII est un ensemble de caractères précis ; les méthodes isalpha et isalnum acceptent aussi des lettres accentuées.
+
+</details>
+
+<details>
+<summary>Indice 2</summary>
+
+Examine séparément la longueur, le premier caractère et les autres caractères ; teste chaque limite sans convertir l’entrée.
+
+</details>
+
+<details>
+<summary>Indice 3</summary>
+
+« é » est une lettre pour isalpha(), mais « é ».isascii() vaut False ; un test de longueur peut comparer deux textes de tailles voisines.
+
+</details>
 
 #### Palier 5 — Espaces et mauvais types (12 min)
 
 Gérer deux cas limites, dont une erreur levée volontairement.
 
-**Où tu travailles :** outils.py ; test_outils.py
+**Où tu travailles :** Mac · workspaces/socle · outils.py ; test_outils.py
 
 **Pour comprendre**
 
@@ -341,7 +510,7 @@ Gérer deux cas limites, dont une erreur levée volontairement.
 
 **Éditeur · Exemple Python à lire ou essayer**
 
-Éditeur : place ce code dans un fichier d’exemple jetable, puis lance ce fichier avec python3. Un extrait avec self se place dans une méthode de test.
+VS Code sur le Mac : place ce code dans un fichier d’exemple jetable, puis lance ce fichier avec python3. Un extrait avec self se place dans une méthode de test.
 
 ```python
 with self.assertRaises(ValueError):
@@ -370,7 +539,7 @@ L’entrée est ce que tu donnes au code ; l’attendu est ce que ton test doit 
 
 **Terminal · Commande à lancer au moment indiqué**
 
-Terminal du parcours : reste à la racine du dépôt. Exécute ces lignes au moment demandé dans les actions, avec les modifications manuelles entre les blocs.
+Terminal du Mac, dans cyberatelier/workspaces/socle, venv Mac activé. Exécute chaque ligne au moment indiqué, avec les modifications manuelles entre les blocs.
 
 ```bash
 python3 -m unittest -v
@@ -385,13 +554,36 @@ git commit -m "Gère les espaces et les types invalides"
 
 **Tu sais que c’est bon quand :** S1 à S5 passent.
 
-*Indice si tu bloques :* isinstance(nom, str) vérifie le type. Fais ce contrôle en premier, avant d’appeler une méthode de chaîne comme strip().
+**Indices progressifs**
+
+Depuis le terminal dans `cyberatelier`, `python3 atelier.py indice` révèle un niveau à la fois. Ouvre seulement le niveau nécessaire.
+
+<details>
+<summary>Indice 1</summary>
+
+Le type de l’entrée doit être vérifié avant une méthode de chaîne ; strip enlève seulement les espaces aux bords.
+
+</details>
+
+<details>
+<summary>Indice 2</summary>
+
+Compare un nom entouré d’espaces à un nom avec un espace au milieu, puis vérifie qu’un entier produit ValueError.
+
+</details>
+
+<details>
+<summary>Indice 3</summary>
+
+«  livre  ».strip() donne « livre », tandis que « li vre ».strip() garde l’espace intérieur ; 42 n’a pas de méthode strip().
+
+</details>
 
 #### Palier 6 — Lire une ligne de journal (15 min)
 
 Passer d’une ligne de journal fictif à cinq informations nommées, et refuser les lignes incorrectes.
 
-**Où tu travailles :** outils.py ; test_outils.py
+**Où tu travailles :** Mac · workspaces/socle · outils.py ; test_outils.py
 
 **Pour comprendre**
 
@@ -473,7 +665,7 @@ L’entrée est ce que tu donnes au code ; l’attendu est ce que ton test doit 
 
 **Terminal · Commande à lancer au moment indiqué**
 
-Terminal du parcours : reste à la racine du dépôt. Exécute ces lignes au moment demandé dans les actions, avec les modifications manuelles entre les blocs.
+Terminal du Mac, dans cyberatelier/workspaces/socle, venv Mac activé. Exécute chaque ligne au moment indiqué, avec les modifications manuelles entre les blocs.
 
 ```bash
 python3 -m unittest -v
@@ -488,13 +680,36 @@ git commit -m "Ajoute analyser_ligne"
 
 **Tu sais que c’est bon quand :** S1 à S8 passent.
 
-*Indice si tu bloques :* Essaie d’abord split() sur une phrase courte : observe la liste et ses positions. Pour l’IP, découpe sur les points, vérifie le nombre de morceaux, puis chaque nombre. Termine les contrôles avant de construire le dictionnaire.
+**Indices progressifs**
+
+Depuis le terminal dans `cyberatelier`, `python3 atelier.py indice` révèle un niveau à la fois. Ouvre seulement le niveau nécessaire.
+
+<details>
+<summary>Indice 1</summary>
+
+split() donne une liste de champs ; un dictionnaire associe chaque donnée à une clé ; None indique ici une ligne refusée.
+
+</details>
+
+<details>
+<summary>Indice 2</summary>
+
+Vérifie d’abord les cinq champs, puis l’événement et les quatre morceaux d’IP ; construis le dictionnaire après ces contrôles.
+
+</details>
+
+<details>
+<summary>Indice 3</summary>
+
+« pain 2 EUR ».split() donne ['pain', '2', 'EUR'] : la position 1 reste du texte, et int('2') permet ensuite une comparaison numérique.
+
+</details>
 
 #### Palier 7 — Compter les événements (13 min)
 
 Parcourir une liste avec une boucle et construire des dictionnaires.
 
-**Où tu travailles :** outils.py ; test_outils.py
+**Où tu travailles :** Mac · workspaces/socle · outils.py ; test_outils.py
 
 **Pour comprendre**
 
@@ -544,7 +759,7 @@ L’entrée est ce que tu donnes au code ; l’attendu est ce que ton test doit 
 
 **Terminal · Commande à lancer au moment indiqué**
 
-Terminal du parcours : reste à la racine du dépôt. Exécute ces lignes au moment demandé dans les actions, avec les modifications manuelles entre les blocs.
+Terminal du Mac, dans cyberatelier/workspaces/socle, venv Mac activé. Exécute chaque ligne au moment indiqué, avec les modifications manuelles entre les blocs.
 
 ```bash
 python3 -m unittest -v
@@ -559,13 +774,36 @@ git commit -m "Ajoute le comptage des événements et des échecs"
 
 **Tu sais que c’est bon quand :** Les 10 tests S1 à S10 passent.
 
-*Indice si tu bloques :* Pars d’un dictionnaire qui contient déjà les deux clés à 0, puis parcours la liste avec une boucle for. dict.get(clé, 0) renvoie 0 quand la clé n’existe pas encore.
+**Indices progressifs**
+
+Depuis le terminal dans `cyberatelier`, `python3 atelier.py indice` révèle un niveau à la fois. Ouvre seulement le niveau nécessaire.
+
+<details>
+<summary>Indice 1</summary>
+
+Un compteur augmente pour chaque occurrence ; un dictionnaire permet de garder plusieurs compteurs nommés.
+
+</details>
+
+<details>
+<summary>Indice 2</summary>
+
+Traite d’abord la liste vide, puis une liste mélangée ; distingue le total par événement du comptage des échecs par utilisateur.
+
+</details>
+
+<details>
+<summary>Indice 3</summary>
+
+Pour les fruits ['pomme', 'poire', 'pomme'], un comptage par nom donne {'pomme': 2, 'poire': 1} ; les valeurs comptent les occurrences.
+
+</details>
 
 #### Palier 8 — Livre ta pull request (10 min)
 
 Relire ton travail, le pousser sur GitHub et le fusionner proprement.
 
-**Où tu travailles :** Branche feat/bases et PR GitHub
+**Où tu travailles :** Mac · workspaces/socle · Branche feat/bases et PR GitHub
 
 **Pour comprendre**
 
@@ -585,7 +823,7 @@ Relire ton travail, le pousser sur GitHub et le fusionner proprement.
 
 **Terminal · Relire l’état du dépôt**
 
-Terminal du parcours : reste à la racine du dépôt. Exécute ces lignes au moment demandé dans les actions, avec les modifications manuelles entre les blocs.
+Terminal du Mac, dans cyberatelier/workspaces/socle, venv Mac activé. Exécute chaque ligne au moment indiqué, avec les modifications manuelles entre les blocs.
 
 ```bash
 git status
@@ -613,7 +851,30 @@ git pull --ff-only
 
 **Tu sais que c’est bon quand :** La pull request contient outils.py, test_outils.py et le .gitignore de préparation, et ton main local contient la fusion (git log --oneline).
 
-*Indice si tu bloques :* Si gh pr create se plaint d’une branche non poussée, lance d’abord git push -u origin feat/bases. Fusionne uniquement quand git status est propre et les 10 tests passent.
+**Indices progressifs**
+
+Depuis le terminal dans `cyberatelier`, `python3 atelier.py indice` révèle un niveau à la fois. Ouvre seulement le niveau nécessaire.
+
+<details>
+<summary>Indice 1</summary>
+
+Une PR présente les commits de ta branche pour relecture ; un test local ne fusionne rien.
+
+</details>
+
+<details>
+<summary>Indice 2</summary>
+
+Vérifie les fichiers choisis avec git diff --staged et les changements contre main ; pousse feat/bases avant d’ouvrir la PR.
+
+</details>
+
+<details>
+<summary>Indice 3</summary>
+
+Une PR de carnet peut afficher README.md et carnet.py ; un dossier de cache affiché dans son diff révèle qu’il a été ajouté à Git.
+
+</details>
 
 **Avant de livrer**
 
@@ -636,7 +897,7 @@ Tu vas construire journal.py et test_journal.py : lire les lignes, compter les l
 
 Partir de main à jour, sur une branche neuve, avant d’écrire la moindre ligne.
 
-**Où tu travailles :** Dépôt ; journal.py ; test_journal.py
+**Où tu travailles :** Mac · workspaces/socle · Dépôt ; journal.py ; test_journal.py
 
 **Pour comprendre**
 
@@ -645,7 +906,7 @@ Partir de main à jour, sur une branche neuve, avant d’écrire la moindre lign
 
 **Actions dans l’ordre**
 
-1. Ouvre workspaces/socle dans VS Code, ou Coder dans Cyber Atelier avec cwd sur « . ».
+1. Ouvre workspaces/socle dans VS Code. Dans le terminal du Mac, place-toi dans ce même dossier et active son venv avec source .venv/bin/activate.
 2. Vérifie que MR1 est fusionnée et que outils.py est présent sur main.
 3. Lis git status ; enregistre ton travail en cours avant de changer de branche.
 4. Reviens sur main avec git switch main, mets-la à jour avec git pull --ff-only, puis crée feat/fichiers-erreurs. Remplace main par master si ton dépôt utilise ce nom.
@@ -654,7 +915,7 @@ Partir de main à jour, sur une branche neuve, avant d’écrire la moindre lign
 
 **Terminal · Après la fusion : actualiser la principale**
 
-Terminal du parcours : reste à la racine du dépôt. Exécute ces lignes au moment demandé dans les actions, avec les modifications manuelles entre les blocs.
+Terminal du Mac, dans cyberatelier/workspaces/socle, venv Mac activé. Exécute chaque ligne au moment indiqué, avec les modifications manuelles entre les blocs.
 
 ```bash
 git switch main
@@ -692,13 +953,36 @@ git status
 
 **Tu sais que c’est bon quand :** git status affiche « On branch feat/fichiers-erreurs » et deux fichiers non suivis : journal.py et test_journal.py.
 
-*Indice si tu bloques :* Si git pull --ff-only refuse, main a divergé : ne force rien, demande de l’aide. Si la branche existe déjà, utilise git switch feat/fichiers-erreurs (sans -c).
+**Indices progressifs**
+
+Depuis le terminal dans `cyberatelier`, `python3 atelier.py indice` révèle un niveau à la fois. Ouvre seulement le niveau nécessaire.
+
+<details>
+<summary>Indice 1</summary>
+
+Chaque mission part de la précédente fusionnée ; git pull --ff-only accepte une simple avance sans créer de fusion locale.
+
+</details>
+
+<details>
+<summary>Indice 2</summary>
+
+Vérifie outils.py sur main et une suite verte avant de créer feat/fichiers-erreurs ; reprends la branche si elle existe déjà.
+
+</details>
+
+<details>
+<summary>Indice 3</summary>
+
+Si origin/main contient un commit de plus, pull --ff-only avance main ; si les deux historiques divergent, la commande refuse et le graphe aide à comprendre.
+
+</details>
 
 #### Palier 2 — Refuser un chemin vide, sans toucher au disque (10 min)
 
 Écrire un test pour une fonction qui valide une entrée, puis la faire passer.
 
-**Où tu travailles :** journal.py ; test_journal.py
+**Où tu travailles :** Mac · workspaces/socle · journal.py ; test_journal.py
 
 **Pour comprendre**
 
@@ -707,7 +991,7 @@ git status
 
 **Éditeur · Exemple Python à lire ou essayer**
 
-Éditeur : copie cet exemple dans exemple.py (jetable), enregistre-le, puis lance python3 exemple.py. Si plusieurs exemples sont proposés, essaie-les un par un en remplaçant le contenu du fichier. Retire ensuite les fichiers générés et le fichier d’exemple.
+VS Code sur le Mac : copie cet exemple dans exemple.py (jetable), enregistre-le, puis lance python3 exemple.py. Si plusieurs exemples sont proposés, essaie-les un par un en remplaçant le contenu du fichier. Retire ensuite les fichiers générés et le fichier d’exemple.
 
 ```python
 def diviser(a, b):
@@ -733,7 +1017,7 @@ L’entrée est ce que tu donnes au code ; l’attendu est ce que ton test doit 
 
 **Terminal · Commande à lancer au moment indiqué**
 
-Terminal du parcours : reste à la racine du dépôt. Exécute ces lignes au moment demandé dans les actions, avec les modifications manuelles entre les blocs.
+Terminal du Mac, dans cyberatelier/workspaces/socle, venv Mac activé. Exécute chaque ligne au moment indiqué, avec les modifications manuelles entre les blocs.
 
 ```bash
 python3 -m unittest -v
@@ -748,13 +1032,36 @@ git commit -m "Ajoute verifier_chemin et refuse les chemins vides"
 
 **Tu sais que c’est bon quand :** S13 passe, et git log --oneline montre ton nouveau commit. Le test passe sans fichier présent : aucun accès au disque.
 
-*Indice si tu bloques :* Retire les espaces avec str.strip() avant de comparer à la chaîne vide. Vérifie la condition en premier : tu n’as pas encore besoin de pathlib.
+**Indices progressifs**
+
+Depuis le terminal dans `cyberatelier`, `python3 atelier.py indice` révèle un niveau à la fois. Ouvre seulement le niveau nécessaire.
+
+<details>
+<summary>Indice 1</summary>
+
+Valider un chemin vide est une règle pure : elle se teste sans créer de fichier.
+
+</details>
+
+<details>
+<summary>Indice 2</summary>
+
+Écris S11 avec une chaîne vide et une chaîne d’espaces ; demande ValueError avant toute ouverture de fichier.
+
+</details>
+
+<details>
+<summary>Indice 3</summary>
+
+Un champ de dossier «   » devient vide après strip() ; tester ce refus n’a pas besoin d’un disque ni d’un fichier fictif.
+
+</details>
 
 #### Palier 3 — Lire un fichier UTF-8 et nettoyer ses lignes (14 min)
 
 Lire un fichier avec pathlib, puis écarter les lignes vides et les espaces de bord.
 
-**Où tu travailles :** journal.py ; test_journal.py
+**Où tu travailles :** Mac · workspaces/socle · journal.py ; test_journal.py
 
 **Pour comprendre**
 
@@ -763,7 +1070,7 @@ Lire un fichier avec pathlib, puis écarter les lignes vides et les espaces de b
 
 **Éditeur · Exemple Python à lire ou essayer**
 
-Éditeur : copie cet exemple dans exemple.py (jetable), enregistre-le, puis lance python3 exemple.py. Si plusieurs exemples sont proposés, essaie-les un par un en remplaçant le contenu du fichier. Retire ensuite les fichiers générés et le fichier d’exemple.
+VS Code sur le Mac : copie cet exemple dans exemple.py (jetable), enregistre-le, puis lance python3 exemple.py. Si plusieurs exemples sont proposés, essaie-les un par un en remplaçant le contenu du fichier. Retire ensuite les fichiers générés et le fichier d’exemple.
 
 ```python
 import pathlib
@@ -808,7 +1115,7 @@ L’entrée est ce que tu donnes au code ; l’attendu est ce que ton test doit 
 
 **Terminal · Commande à lancer au moment indiqué**
 
-Terminal du parcours : reste à la racine du dépôt. Exécute ces lignes au moment demandé dans les actions, avec les modifications manuelles entre les blocs.
+Terminal du Mac, dans cyberatelier/workspaces/socle, venv Mac activé. Exécute chaque ligne au moment indiqué, avec les modifications manuelles entre les blocs.
 
 ```bash
 python3 -m unittest -v
@@ -823,13 +1130,36 @@ git commit -m "Ajoute lire_journal avec nettoyage des lignes"
 
 **Tu sais que c’est bon quand :** S11 et S13 passent. Le fichier temporaire disparaît tout seul : git status ne montre aucun fichier de test.
 
-*Indice si tu bloques :* read_text(encoding="utf-8") lit tout le fichier ; splitlines() le découpe en lignes. Pour écarter les lignes vides après retrait des espaces, une boucle for et un test sur la chaîne nettoyée suffisent.
+**Indices progressifs**
+
+Depuis le terminal dans `cyberatelier`, `python3 atelier.py indice` révèle un niveau à la fois. Ouvre seulement le niveau nécessaire.
+
+<details>
+<summary>Indice 1</summary>
+
+UTF-8 décrit comment convertir les octets en texte ; une ligne peut finir par un saut de ligne.
+
+</details>
+
+<details>
+<summary>Indice 2</summary>
+
+Utilise un fichier temporaire contenant des lignes normales, vides et entourées d’espaces ; compare précisément la liste renvoyée.
+
+</details>
+
+<details>
+<summary>Indice 3</summary>
+
+Un fichier de courses contenant «  pain  » puis une ligne blanche permet de voir la différence entre nettoyer une ligne et conserver une ligne vide.
+
+</details>
 
 #### Palier 4 — Laisser remonter l’erreur de fichier absent (8 min)
 
 Comprendre qu’une erreur qui n’est pas attrapée remonte jusqu’à l’appelant.
 
-**Où tu travailles :** journal.py ; test_journal.py
+**Où tu travailles :** Mac · workspaces/socle · journal.py ; test_journal.py
 
 **Pour comprendre**
 
@@ -838,7 +1168,7 @@ Comprendre qu’une erreur qui n’est pas attrapée remonte jusqu’à l’appe
 
 **Éditeur · Exemple Python à lire ou essayer**
 
-Éditeur : copie cet exemple dans exemple.py (jetable), enregistre-le, puis lance python3 exemple.py. Si plusieurs exemples sont proposés, essaie-les un par un en remplaçant le contenu du fichier. Retire ensuite les fichiers générés et le fichier d’exemple.
+VS Code sur le Mac : copie cet exemple dans exemple.py (jetable), enregistre-le, puis lance python3 exemple.py. Si plusieurs exemples sont proposés, essaie-les un par un en remplaçant le contenu du fichier. Retire ensuite les fichiers générés et le fichier d’exemple.
 
 ```python
 try:
@@ -864,7 +1194,7 @@ L’entrée est ce que tu donnes au code ; l’attendu est ce que ton test doit 
 
 **Terminal · Commande à lancer au moment indiqué**
 
-Terminal du parcours : reste à la racine du dépôt. Exécute ces lignes au moment demandé dans les actions, avec les modifications manuelles entre les blocs.
+Terminal du Mac, dans cyberatelier/workspaces/socle, venv Mac activé. Exécute chaque ligne au moment indiqué, avec les modifications manuelles entre les blocs.
 
 ```bash
 python3 -m unittest -v
@@ -879,13 +1209,36 @@ git commit -m "Teste le fichier absent (FileNotFoundError)"
 
 **Tu sais que c’est bon quand :** S12 passe, et journal.py ne contient aucun except autour de la lecture du fichier.
 
-*Indice si tu bloques :* Relis lire_journal : il ne doit y avoir aucun try autour de l’ouverture du fichier.
+**Indices progressifs**
+
+Depuis le terminal dans `cyberatelier`, `python3 atelier.py indice` révèle un niveau à la fois. Ouvre seulement le niveau nécessaire.
+
+<details>
+<summary>Indice 1</summary>
+
+Une exception peut remonter sans être remplacée ; FileNotFoundError indique un chemin absent.
+
+</details>
+
+<details>
+<summary>Indice 2</summary>
+
+Choisis un chemin inexistant dans un dossier temporaire et vérifie le type exact de l’exception, sans créer ce fichier.
+
+</details>
+
+<details>
+<summary>Indice 3</summary>
+
+Ouvrir absent.txt dans un dossier neuf lève FileNotFoundError ; remplacer cela par [] ferait croire qu’un fichier vide a été lu.
+
+</details>
 
 #### Palier 5 — Séparer les lignes valides des malformées (14 min)
 
 Parcourir des lignes avec une boucle, compter les refusées, et renvoyer un couple.
 
-**Où tu travailles :** journal.py ; test_journal.py
+**Où tu travailles :** Mac · workspaces/socle · journal.py ; test_journal.py
 
 **Pour comprendre**
 
@@ -894,7 +1247,7 @@ Parcourir des lignes avec une boucle, compter les refusées, et renvoyer un coup
 
 **Éditeur · Exemple Python à lire ou essayer**
 
-Éditeur : copie cet exemple dans exemple.py (jetable), enregistre-le, puis lance python3 exemple.py. Si plusieurs exemples sont proposés, essaie-les un par un en remplaçant le contenu du fichier. Retire ensuite les fichiers générés et le fichier d’exemple.
+VS Code sur le Mac : copie cet exemple dans exemple.py (jetable), enregistre-le, puis lance python3 exemple.py. Si plusieurs exemples sont proposés, essaie-les un par un en remplaçant le contenu du fichier. Retire ensuite les fichiers générés et le fichier d’exemple.
 
 ```python
 def separer_pairs(nombres):
@@ -943,7 +1296,7 @@ L’entrée est ce que tu donnes au code ; l’attendu est ce que ton test doit 
 
 **Terminal · Commande à lancer au moment indiqué**
 
-Terminal du parcours : reste à la racine du dépôt. Exécute ces lignes au moment demandé dans les actions, avec les modifications manuelles entre les blocs.
+Terminal du Mac, dans cyberatelier/workspaces/socle, venv Mac activé. Exécute chaque ligne au moment indiqué, avec les modifications manuelles entre les blocs.
 
 ```bash
 python3 -m unittest -v
@@ -958,13 +1311,36 @@ git commit -m "Ajoute charger_evenements et compte les lignes malformees"
 
 **Tu sais que c’est bon quand :** S11 à S14 passent. Une liste vide donne ([], 0).
 
-*Indice si tu bloques :* analyser_ligne renvoie None quand la ligne est refusée : c’est à toi de décider si elle compte comme malformée. Vérifie d’abord le cas de la liste vide.
+**Indices progressifs**
+
+Depuis le terminal dans `cyberatelier`, `python3 atelier.py indice` révèle un niveau à la fois. Ouvre seulement le niveau nécessaire.
+
+<details>
+<summary>Indice 1</summary>
+
+Une ligne vide et une ligne malformée sont deux situations différentes ; analyser_ligne fournit le verdict sur une ligne non vide.
+
+</details>
+
+<details>
+<summary>Indice 2</summary>
+
+Sépare les lignes ignorées des lignes comptées ; garde les dictionnaires des lignes valides et le nombre de lignes non vides refusées.
+
+</details>
+
+<details>
+<summary>Indice 3</summary>
+
+Sur trois lignes de tickets, une ligne blanche ignorée, une ligne lisible et une ligne cassée donnent une donnée valide et une malformée, pas trois erreurs.
+
+</details>
 
 #### Palier 6 — Construire le rapport (14 min)
 
 Assembler un dictionnaire de résultats à partir de fonctions déjà testées.
 
-**Où tu travailles :** journal.py ; test_journal.py
+**Où tu travailles :** Mac · workspaces/socle · journal.py ; test_journal.py
 
 **Pour comprendre**
 
@@ -973,7 +1349,7 @@ Assembler un dictionnaire de résultats à partir de fonctions déjà testées.
 
 **Éditeur · Exemple Python à lire ou essayer**
 
-Éditeur : copie cet exemple dans exemple.py (jetable), enregistre-le, puis lance python3 exemple.py. Si plusieurs exemples sont proposés, essaie-les un par un en remplaçant le contenu du fichier. Retire ensuite les fichiers générés et le fichier d’exemple.
+VS Code sur le Mac : copie cet exemple dans exemple.py (jetable), enregistre-le, puis lance python3 exemple.py. Si plusieurs exemples sont proposés, essaie-les un par un en remplaçant le contenu du fichier. Retire ensuite les fichiers générés et le fichier d’exemple.
 
 ```python
 rapport = {"nom": "pain", "quantite": 2}
@@ -982,7 +1358,7 @@ print(rapport["quantite"])
 
 **Éditeur · Import à ajouter dans journal.py**
 
-Éditeur : cette ligne se place en haut de journal.py. Elle réutilise tes fonctions de MR1 ; ce n’est pas un exemple jetable.
+VS Code sur le Mac : cette ligne se place en haut de journal.py. Elle réutilise tes fonctions de MR1 ; ce n’est pas un exemple jetable.
 
 ```python
 from outils import compter_evenements, echecs_par_utilisateur
@@ -1030,7 +1406,7 @@ L’entrée est ce que tu donnes au code ; l’attendu est ce que ton test doit 
 
 **Terminal · Commande à lancer au moment indiqué**
 
-Terminal du parcours : reste à la racine du dépôt. Exécute ces lignes au moment demandé dans les actions, avec les modifications manuelles entre les blocs.
+Terminal du Mac, dans cyberatelier/workspaces/socle, venv Mac activé. Exécute chaque ligne au moment indiqué, avec les modifications manuelles entre les blocs.
 
 ```bash
 python3 -m unittest -v
@@ -1045,13 +1421,36 @@ git commit -m "Ajoute construire_rapport"
 
 **Tu sais que c’est bon quand :** S11 à S15 et S18 passent.
 
-*Indice si tu bloques :* Calcule d’abord les compteurs, puis range-les dans le dictionnaire. Pour alice, echecs_par_utilisateur renvoie déjà un dictionnaire : reprends-le tel quel.
+**Indices progressifs**
+
+Depuis le terminal dans `cyberatelier`, `python3 atelier.py indice` révèle un niveau à la fois. Ouvre seulement le niveau nécessaire.
+
+<details>
+<summary>Indice 1</summary>
+
+Un rapport rassemble des résultats déjà calculés ; les compteurs doivent rester cohérents avec les événements reçus.
+
+</details>
+
+<details>
+<summary>Indice 2</summary>
+
+Réutilise les fonctions de MR1 plutôt que recopier leurs boucles, puis teste un cas vide et un cas avec plusieurs utilisateurs.
+
+</details>
+
+<details>
+<summary>Indice 3</summary>
+
+Un rapport de commandes peut contenir total=3 et par_client={'lea': 2, 'sam': 1} : la somme des clients retrouve le total.
+
+</details>
 
 #### Palier 7 — Sauver et relire le JSON (14 min)
 
 Écrire un rapport en JSON, le relire, et transformer un JSON abîmé en message clair.
 
-**Où tu travailles :** journal.py ; test_journal.py
+**Où tu travailles :** Mac · workspaces/socle · journal.py ; test_journal.py
 
 **Pour comprendre**
 
@@ -1060,7 +1459,7 @@ git commit -m "Ajoute construire_rapport"
 
 **Éditeur · Exemple Python à lire ou essayer**
 
-Éditeur : copie cet exemple dans exemple.py (jetable), enregistre-le, puis lance python3 exemple.py. Si plusieurs exemples sont proposés, essaie-les un par un en remplaçant le contenu du fichier. Retire ensuite les fichiers générés et le fichier d’exemple.
+VS Code sur le Mac : copie cet exemple dans exemple.py (jetable), enregistre-le, puis lance python3 exemple.py. Si plusieurs exemples sont proposés, essaie-les un par un en remplaçant le contenu du fichier. Retire ensuite les fichiers générés et le fichier d’exemple.
 
 ```python
 import json
@@ -1103,7 +1502,7 @@ L’entrée est ce que tu donnes au code ; l’attendu est ce que ton test doit 
 
 **Terminal · Commande à lancer au moment indiqué**
 
-Terminal du parcours : reste à la racine du dépôt. Exécute ces lignes au moment demandé dans les actions, avec les modifications manuelles entre les blocs.
+Terminal du Mac, dans cyberatelier/workspaces/socle, venv Mac activé. Exécute chaque ligne au moment indiqué, avec les modifications manuelles entre les blocs.
 
 ```bash
 python3 -m unittest -v
@@ -1118,13 +1517,36 @@ git commit -m "Ajoute sauvegarder_rapport et charger_rapport en JSON"
 
 **Tu sais que c’est bon quand :** S11 à S18 passent. Le fichier panier.json de l’exemple n’est pas dans git status (supprime-le après l’exemple).
 
-*Indice si tu bloques :* ensure_ascii=False garde les accents lisibles : ouvre le fichier en UTF-8 des deux côtés. JSONDecodeError est une sous-classe de ValueError : vérifie que ton except n’attrape pas aussi FileNotFoundError.
+**Indices progressifs**
+
+Depuis le terminal dans `cyberatelier`, `python3 atelier.py indice` révèle un niveau à la fois. Ouvre seulement le niveau nécessaire.
+
+<details>
+<summary>Indice 1</summary>
+
+JSON conserve des données structurées ; relire le fichier permet de vérifier ce qui a réellement été écrit.
+
+</details>
+
+<details>
+<summary>Indice 2</summary>
+
+Écris dans un dossier temporaire, recharge avec json.load et compare le dictionnaire ; observe aussi indentation et saut de ligne demandés.
+
+</details>
+
+<details>
+<summary>Indice 3</summary>
+
+json.loads('{"produit": "café", "quantite": 2}') donne un dictionnaire avec un entier ; le texte JSON seul ne prouve pas que le fichier est lisible.
+
+</details>
 
 #### Palier 8 — Git de rattrapage : commit fautif, revert, stash, restore (10 min)
 
 Défaire un commit sans réécrire l’historique, mettre une modification de côté, et jeter un brouillon.
 
-**Où tu travailles :** journal.py ; test_journal.py
+**Où tu travailles :** Mac · workspaces/socle · journal.py ; test_journal.py
 
 **Pour comprendre**
 
@@ -1141,7 +1563,7 @@ Défaire un commit sans réécrire l’historique, mettre une modification de c�
 
 **Terminal · Enregistrer le travail vérifié**
 
-Terminal du parcours : reste à la racine du dépôt. Exécute ces lignes au moment demandé dans les actions, avec les modifications manuelles entre les blocs.
+Terminal du Mac, dans cyberatelier/workspaces/socle, venv Mac activé. Exécute chaque ligne au moment indiqué, avec les modifications manuelles entre les blocs.
 
 ```bash
 git add journal.py
@@ -1211,13 +1633,36 @@ git stash list
 
 **Tu sais que c’est bon quand :** git log --oneline montre « Casse verifier_chemin (exercice) » puis son revert ; git status est propre ; git stash list est vide.
 
-*Indice si tu bloques :* --no-edit évite l’ouverture d’un éditeur. Si git stash pop signale un conflit, ne force rien : lis git status et demande de l’aide. Le commit fautif reste dans l’historique : c’est voulu, le revert le défait.
+**Indices progressifs**
+
+Depuis le terminal dans `cyberatelier`, `python3 atelier.py indice` révèle un niveau à la fois. Ouvre seulement le niveau nécessaire.
+
+<details>
+<summary>Indice 1</summary>
+
+revert crée un commit inverse ; stash met une modification de côté ; restore reprend une version d’un fichier.
+
+</details>
+
+<details>
+<summary>Indice 2</summary>
+
+Identifie le commit fautif avant revert et les fichiers modifiés avant stash/restore ; suis les essais sans jeter de travail utile.
+
+</details>
+
+<details>
+<summary>Indice 3</summary>
+
+Si un commit ajoute une ligne « brouillon », revert ajoute un second commit qui la retire : les deux restent visibles dans git log.
+
+</details>
 
 #### Palier 9 — Démonstration, pull request (8 min)
 
 Vérifier le rapport sur le journal fictif, puis livrer la MR.
 
-**Où tu travailles :** fixtures/socle/auth.log ; PR GitHub
+**Où tu travailles :** Mac · workspaces/socle · fixtures/socle/auth.log ; PR GitHub
 
 **Pour comprendre**
 
@@ -1237,7 +1682,7 @@ Vérifier le rapport sur le journal fictif, puis livrer la MR.
 
 **Terminal · Commande à lancer au moment indiqué**
 
-Terminal du parcours : reste à la racine du dépôt. Exécute ces lignes au moment demandé dans les actions, avec les modifications manuelles entre les blocs.
+Terminal du Mac, dans cyberatelier/workspaces/socle, venv Mac activé. Exécute chaque ligne au moment indiqué, avec les modifications manuelles entre les blocs.
 
 ```bash
 python3 -c "from journal import lire_journal, charger_evenements, construire_rapport; lignes = lire_journal('fixtures/socle/auth.log'); evenements, malformees = charger_evenements(lignes); print(construire_rapport(evenements, malformees))"
@@ -1265,11 +1710,34 @@ gh pr create --base main --title "Fichiers, erreurs et JSON" --body "Ajoute jour
 
 **Tu sais que c’est bon quand :** lignes_valides + lignes_malformees est égal au nombre affiché par grep. La pull request ne contient que journal.py et test_journal.py (et outils.py si tu l’as modifié, avec une raison).
 
-*Indice si tu bloques :* Si la démonstration affiche une erreur, lis la dernière ligne : elle dit quel fichier ou quelle fonction pose problème. Si fixtures/socle/auth.log manque, relance la commande de copie des fixtures de la préparation.
+**Indices progressifs**
+
+Depuis le terminal dans `cyberatelier`, `python3 atelier.py indice` révèle un niveau à la fois. Ouvre seulement le niveau nécessaire.
+
+<details>
+<summary>Indice 1</summary>
+
+La démonstration utilise un vrai fichier local ; les tests restent reproductibles avec leurs fichiers temporaires.
+
+</details>
+
+<details>
+<summary>Indice 2</summary>
+
+Retrouve fixtures/socle/auth.log depuis le dépôt du parcours et vérifie que lignes_valides + lignes_malformees retrouve les lignes non vides.
+
+</details>
+
+<details>
+<summary>Indice 3</summary>
+
+Pour un journal de 7 lignes non vides avec 2 refusées, les compteurs doivent donner 5 valides et 2 malformées ; une ligne blanche n’ajoute rien.
+
+</details>
 
 **Démonstrations manuelles (hors CI)**
 
-Ces essais utilisent le laboratoire ou les outils réels. Ils sont séparés des tests obligatoires.
+Ces essais lisent des fichiers locaux ou utilisent le labo et les outils réels, selon le parcours. Ils sont séparés des tests obligatoires.
 
 **D1 — Rapport sur la copie du journal fictif**
 - Entrée : Script local (hors tests) qui lit fixtures/socle/auth.log avec lire_journal, charger_evenements et construire_rapport
@@ -1298,7 +1766,7 @@ Tu vas construire analyseur.py, test_analyseur.py et README.md : un programme ut
 
 Partir d’une base à jour, avant d’écrire le programme complet.
 
-**Où tu travailles :** Dépôt
+**Où tu travailles :** Mac · workspaces/socle · Dépôt
 
 **Pour comprendre**
 
@@ -1307,7 +1775,7 @@ Partir d’une base à jour, avant d’écrire le programme complet.
 
 **Actions dans l’ordre**
 
-1. Ouvre workspaces/socle dans VS Code, ou Coder dans Cyber Atelier avec cwd sur « . ».
+1. Ouvre workspaces/socle dans VS Code. Dans le terminal du Mac, place-toi dans ce même dossier et active son venv avec source .venv/bin/activate.
 2. Vérifie que MR2 est fusionnée : outils.py et journal.py doivent être présents.
 3. Lis git status ; enregistre ton travail en cours avant de changer de branche.
 4. Reviens sur main avec git switch main, mets-la à jour avec git pull --ff-only, puis crée feat/analyseur. Remplace main par master si ton dépôt utilise ce nom.
@@ -1316,7 +1784,7 @@ Partir d’une base à jour, avant d’écrire le programme complet.
 
 **Terminal · Après la fusion : actualiser la principale**
 
-Terminal du parcours : reste à la racine du dépôt. Exécute ces lignes au moment demandé dans les actions, avec les modifications manuelles entre les blocs.
+Terminal du Mac, dans cyberatelier/workspaces/socle, venv Mac activé. Exécute chaque ligne au moment indiqué, avec les modifications manuelles entre les blocs.
 
 ```bash
 git switch main
@@ -1343,13 +1811,36 @@ git status
 
 **Tu sais que c’est bon quand :** git status affiche « On branch feat/analyseur » et « nothing to commit, working tree clean ».
 
-*Indice si tu bloques :* Si la branche existe déjà, utilise git switch feat/analyseur (sans -c). Si git pull --ff-only refuse, ne force rien : demande de l’aide.
+**Indices progressifs**
+
+Depuis le terminal dans `cyberatelier`, `python3 atelier.py indice` révèle un niveau à la fois. Ouvre seulement le niveau nécessaire.
+
+<details>
+<summary>Indice 1</summary>
+
+L’analyseur assemble les fonctions déjà fusionnées ; sa nouvelle branche doit repartir d’une base testée.
+
+</details>
+
+<details>
+<summary>Indice 2</summary>
+
+Retrouve outils.py et journal.py sur main, lance les tests existants, puis crée ou reprends feat/analyseur.
+
+</details>
+
+<details>
+<summary>Indice 3</summary>
+
+Dans un projet de recettes, un assembleur utilise les modules ingrédients et portions existants ; les recréer ailleurs casse la continuité du projet.
+
+</details>
 
 #### Palier 2 — Formater le rapport : le cas complet (7 min)
 
 Séparer le calcul du texte et son affichage : une fonction qui renvoie une chaîne, sans rien afficher.
 
-**Où tu travailles :** analyseur.py ; test_analyseur.py
+**Où tu travailles :** Mac · workspaces/socle · analyseur.py ; test_analyseur.py
 
 **Pour comprendre**
 
@@ -1358,7 +1849,7 @@ Séparer le calcul du texte et son affichage : une fonction qui renvoie une cha�
 
 **Éditeur · Exemple Python à lire ou essayer**
 
-Éditeur : copie cet exemple dans exemple.py (jetable), enregistre-le, puis lance python3 exemple.py. Si plusieurs exemples sont proposés, essaie-les un par un en remplaçant le contenu du fichier. Retire ensuite les fichiers générés et le fichier d’exemple.
+VS Code sur le Mac : copie cet exemple dans exemple.py (jetable), enregistre-le, puis lance python3 exemple.py. Si plusieurs exemples sont proposés, essaie-les un par un en remplaçant le contenu du fichier. Retire ensuite les fichiers générés et le fichier d’exemple.
 
 ```python
 def afficher_panier(articles):
@@ -1392,7 +1883,7 @@ L’entrée est ce que tu donnes au code ; l’attendu est ce que ton test doit 
 
 **Terminal · Commande à lancer au moment indiqué**
 
-Terminal du parcours : reste à la racine du dépôt. Exécute ces lignes au moment demandé dans les actions, avec les modifications manuelles entre les blocs.
+Terminal du Mac, dans cyberatelier/workspaces/socle, venv Mac activé. Exécute chaque ligne au moment indiqué, avec les modifications manuelles entre les blocs.
 
 ```bash
 python3 -m unittest -v
@@ -1407,13 +1898,36 @@ git commit -m "Ajoute formater_rapport avec le cas complet"
 
 **Tu sais que c’est bon quand :** S19 passe. Lance python3 analyseur.py : il n’affiche encore rien d’utile, et ce n’est pas grave à ce stade.
 
-*Indice si tu bloques :* Les libellés doivent être exactement ceux du contrat, accents compris : « Lignes valides : », « Connexions réussies : », « Échecs de connexion : », « Lignes malformées : ».
+**Indices progressifs**
+
+Depuis le terminal dans `cyberatelier`, `python3 atelier.py indice` révèle un niveau à la fois. Ouvre seulement le niveau nécessaire.
+
+<details>
+<summary>Indice 1</summary>
+
+Le formatage transforme un dictionnaire en texte ; l’ordre et les retours à la ligne font partie du résultat.
+
+</details>
+
+<details>
+<summary>Indice 2</summary>
+
+Écris S18 en comparant la chaîne entière, puis construis l’affichage depuis les données sans relire le journal.
+
+</details>
+
+<details>
+<summary>Indice 3</summary>
+
+Un bilan « Total : 2\nPain : 1\nRiz : 1 » diffère de « Total: 2 » ; compare des chaînes complètes pour repérer espaces et sauts de ligne.
+
+</details>
 
 #### Palier 3 — Formater le rapport : sans échec (6 min)
 
 Traiter le cas où personne n’a échoué.
 
-**Où tu travailles :** analyseur.py ; test_analyseur.py
+**Où tu travailles :** Mac · workspaces/socle · analyseur.py ; test_analyseur.py
 
 **Pour comprendre**
 
@@ -1437,7 +1951,7 @@ L’entrée est ce que tu donnes au code ; l’attendu est ce que ton test doit 
 
 **Terminal · Commande à lancer au moment indiqué**
 
-Terminal du parcours : reste à la racine du dépôt. Exécute ces lignes au moment demandé dans les actions, avec les modifications manuelles entre les blocs.
+Terminal du Mac, dans cyberatelier/workspaces/socle, venv Mac activé. Exécute chaque ligne au moment indiqué, avec les modifications manuelles entre les blocs.
 
 ```bash
 python3 -m unittest -v
@@ -1452,13 +1966,36 @@ git commit -m "Affiche Aucun échec quand il n’y a pas d’échec"
 
 **Tu sais que c’est bon quand :** S19 et S20 passent.
 
-*Indice si tu bloques :* Un seul if suffit : il décide si on ajoute les lignes d’utilisateurs ou la ligne « Aucun échec ».
+**Indices progressifs**
+
+Depuis le terminal dans `cyberatelier`, `python3 atelier.py indice` révèle un niveau à la fois. Ouvre seulement le niveau nécessaire.
+
+<details>
+<summary>Indice 1</summary>
+
+Le cas sans échec doit avoir un affichage prévu ; une collection vide n’est pas une erreur.
+
+</details>
+
+<details>
+<summary>Indice 2</summary>
+
+Écris S19 avec le rapport sans échec et compare sa chaîne entière au texte attendu, sans laisser une ligne de classement inventée.
+
+</details>
+
+<details>
+<summary>Indice 3</summary>
+
+Pour une liste de retards vide, une phrase « Aucun retard » est plus claire qu’un titre suivi d’une zone vide ; le test doit exiger la forme choisie par le contrat.
+
+</details>
 
 #### Palier 4 — Codes de retour : usage et fichier absent (10 min)
 
 Faire renvoyer un code de retour à main, sans jamais quitter le programme soi-même.
 
-**Où tu travailles :** analyseur.py ; test_analyseur.py
+**Où tu travailles :** Mac · workspaces/socle · analyseur.py ; test_analyseur.py
 
 **Pour comprendre**
 
@@ -1467,7 +2004,7 @@ Faire renvoyer un code de retour à main, sans jamais quitter le programme soi-m
 
 **Éditeur · Exemple Python à lire ou essayer**
 
-Éditeur : copie cet exemple dans exemple.py (jetable), enregistre-le, puis lance python3 exemple.py. Si plusieurs exemples sont proposés, essaie-les un par un en remplaçant le contenu du fichier. Retire ensuite les fichiers générés et le fichier d’exemple.
+VS Code sur le Mac : copie cet exemple dans exemple.py (jetable), enregistre-le, puis lance python3 exemple.py. Si plusieurs exemples sont proposés, essaie-les un par un en remplaçant le contenu du fichier. Retire ensuite les fichiers générés et le fichier d’exemple.
 
 ```python
 import sys
@@ -1526,7 +2063,7 @@ L’entrée est ce que tu donnes au code ; l’attendu est ce que ton test doit 
 
 **Terminal · Commande à lancer au moment indiqué**
 
-Terminal du parcours : reste à la racine du dépôt. Exécute ces lignes au moment demandé dans les actions, avec les modifications manuelles entre les blocs.
+Terminal du Mac, dans cyberatelier/workspaces/socle, venv Mac activé. Exécute chaque ligne au moment indiqué, avec les modifications manuelles entre les blocs.
 
 ```bash
 python3 -m unittest -v
@@ -1541,13 +2078,36 @@ git commit -m "Ajoute main avec les codes de retour 2 et 1"
 
 **Tu sais que c’est bon quand :** S19 à S22 passent. Aucun sys.exit n’apparaît dans analyseur.py à ce stade.
 
-*Indice si tu bloques :* argv est une liste : vérifie d’abord sa longueur. Pour le fichier absent, la fonction de lecture de journal.py fait le travail : main se contente d’attraper l’erreur et de choisir le code.
+**Indices progressifs**
+
+Depuis le terminal dans `cyberatelier`, `python3 atelier.py indice` révèle un niveau à la fois. Ouvre seulement le niveau nécessaire.
+
+<details>
+<summary>Indice 1</summary>
+
+main reçoit des arguments et retourne un code ; stderr et stdout sont distincts de ce nombre.
+
+</details>
+
+<details>
+<summary>Indice 2</summary>
+
+Sépare le refus d’usage du fichier absent et teste chaque code attendu sans dépendre du véritable sys.argv du terminal.
+
+</details>
+
+<details>
+<summary>Indice 3</summary>
+
+Une commande de catalogue sans argument peut rendre 2 pour usage, alors qu’un fichier demandé mais absent peut rendre 1 ; les causes doivent rester distinguables.
+
+</details>
 
 #### Palier 5 — Codes de retour : succès avec une ligne malformée (10 min)
 
 Faire afficher le rapport et renvoyer 0 quand le fichier est valide.
 
-**Où tu travailles :** analyseur.py ; test_analyseur.py
+**Où tu travailles :** Mac · workspaces/socle · analyseur.py ; test_analyseur.py
 
 **Pour comprendre**
 
@@ -1571,7 +2131,7 @@ L’entrée est ce que tu donnes au code ; l’attendu est ce que ton test doit 
 
 **Terminal · Commande à lancer au moment indiqué**
 
-Terminal du parcours : reste à la racine du dépôt. Exécute ces lignes au moment demandé dans les actions, avec les modifications manuelles entre les blocs.
+Terminal du Mac, dans cyberatelier/workspaces/socle, venv Mac activé. Exécute chaque ligne au moment indiqué, avec les modifications manuelles entre les blocs.
 
 ```bash
 python3 -m unittest -v
@@ -1586,13 +2146,36 @@ git commit -m "Affiche le rapport et renvoie 0 en cas de succes"
 
 **Tu sais que c’est bon quand :** S19 à S23 passent.
 
-*Indice si tu bloques :* Relie les fonctions déjà écrites dans l’ordre de la chaîne de traitement : lire, charger, construire, formater. Pas de copie de leur logique.
+**Indices progressifs**
+
+Depuis le terminal dans `cyberatelier`, `python3 atelier.py indice` révèle un niveau à la fois. Ouvre seulement le niveau nécessaire.
+
+<details>
+<summary>Indice 1</summary>
+
+Une ligne malformée tolérée n’empêche pas forcément un rapport réussi ; le contrat choisit le code final.
+
+</details>
+
+<details>
+<summary>Indice 2</summary>
+
+Teste un fichier temporaire mélangeant ligne valide et ligne malformée, puis vérifie le rapport et le code 0 ensemble.
+
+</details>
+
+<details>
+<summary>Indice 3</summary>
+
+Une liste de courses avec un élément illisible peut produire un bilan avec « ignorés : 1 » et réussir ; un refus de fichier entier est une autre situation.
+
+</details>
 
 #### Palier 6 — Point d’entrée et import sans effet (8 min)
 
 Lancer le programme en ligne de commande, sans qu’importer le module l’exécute.
 
-**Où tu travailles :** analyseur.py ; test_analyseur.py
+**Où tu travailles :** Mac · workspaces/socle · analyseur.py ; test_analyseur.py
 
 **Pour comprendre**
 
@@ -1601,7 +2184,7 @@ Lancer le programme en ligne de commande, sans qu’importer le module l’exéc
 
 **Éditeur · Exemple Python à lire ou essayer**
 
-Éditeur : copie cet exemple dans exemple.py (jetable), enregistre-le, puis lance python3 exemple.py. Si plusieurs exemples sont proposés, essaie-les un par un en remplaçant le contenu du fichier. Retire ensuite les fichiers générés et le fichier d’exemple.
+VS Code sur le Mac : copie cet exemple dans exemple.py (jetable), enregistre-le, puis lance python3 exemple.py. Si plusieurs exemples sont proposés, essaie-les un par un en remplaçant le contenu du fichier. Retire ensuite les fichiers générés et le fichier d’exemple.
 
 ```python
 import sys
@@ -1627,12 +2210,12 @@ L’entrée est ce que tu donnes au code ; l’attendu est ce que ton test doit 
 1. Écris S24 : importe analyseur dans un nouvel interpréteur ou recharge-le pour vérifier l’absence de sortie. Un import déjà en cache ne suffit pas à le prouver.
 2. Sous la garde du script seulement, appelle main avec sys.argv[1:] et transmets son retour à sys.exit.
 3. Relance les tests. Fais D2 avec la copie locale du journal : résultat et code 0.
-4. Lance sans argument : usage et code 2. Dans la console web, exécute le programme et echo $? dans la même commande.
+4. Lance sans argument : usage et code 2. Dans le terminal du Mac, lis echo $? immédiatement après le programme, avant toute autre commande.
 5. Commite quand les tests passent.
 
 **Terminal · Commande à lancer au moment indiqué**
 
-Terminal du parcours : reste à la racine du dépôt. Exécute ces lignes au moment demandé dans les actions, avec les modifications manuelles entre les blocs.
+Terminal du Mac, dans cyberatelier/workspaces/socle, venv Mac activé. Exécute chaque ligne au moment indiqué, avec les modifications manuelles entre les blocs.
 
 ```bash
 python3 -m unittest -v
@@ -1647,7 +2230,7 @@ git commit -m "Ajoute le point d’entrée en ligne de commande"
 
 **Terminal · Commande à lancer au moment indiqué**
 
-Terminal du parcours : reste à la racine du dépôt. Exécute ces lignes au moment demandé dans les actions, avec les modifications manuelles entre les blocs. Lance le programme et echo $? ensemble : le nombre affiché est le code du programme ; la console peut afficher code 0 pour echo lui-même.
+Terminal du Mac, dans cyberatelier/workspaces/socle, venv Mac activé. Exécute chaque ligne au moment indiqué, avec les modifications manuelles entre les blocs. Lis le code de sortie immédiatement après le programme, avant toute autre commande.
 
 ```bash
 python3 analyseur.py fixtures/socle/auth.log; echo $?
@@ -1661,13 +2244,36 @@ python3 analyseur.py; echo $?
 
 **Tu sais que c’est bon quand :** S19 à S24 passent. Le premier cas affiche le rapport et renvoie 0 ; le second affiche le message d’usage et renvoie 2.
 
-*Indice si tu bloques :* Dans le bloc, appelle main avec sys.argv[1:] et passe son résultat à sys.exit. Si S24 échoue, cherche un print ou un appel de main resté au niveau du module, en dehors du bloc.
+**Indices progressifs**
+
+Depuis le terminal dans `cyberatelier`, `python3 atelier.py indice` révèle un niveau à la fois. Ouvre seulement le niveau nécessaire.
+
+<details>
+<summary>Indice 1</summary>
+
+La garde __main__ distingue lancement direct et import ; sys.exit transmet le code de main au terminal.
+
+</details>
+
+<details>
+<summary>Indice 2</summary>
+
+Cherche les appels et affichages exécutés au niveau du module ; vérifie l’import dans un interpréteur neuf et lis echo $? juste après le programme.
+
+</details>
+
+<details>
+<summary>Indice 3</summary>
+
+importer un module de calcul doit rendre ses fonctions disponibles sans afficher « Calcul terminé » ; lancer son script peut afficher ce message.
+
+</details>
 
 #### Palier 7 — README et .gitignore (6 min)
 
 Documenter l’usage, les codes de retour et les limites du programme.
 
-**Où tu travailles :** README.md ; .gitignore
+**Où tu travailles :** Mac · workspaces/socle · README.md ; .gitignore
 
 **Pour comprendre**
 
@@ -1683,7 +2289,7 @@ Documenter l’usage, les codes de retour et les limites du programme.
 
 **Terminal · Commande à lancer au moment indiqué**
 
-Terminal du parcours : reste à la racine du dépôt. Exécute ces lignes au moment demandé dans les actions, avec les modifications manuelles entre les blocs.
+Terminal du Mac, dans cyberatelier/workspaces/socle, venv Mac activé. Exécute chaque ligne au moment indiqué, avec les modifications manuelles entre les blocs.
 
 ```bash
 cat .gitignore
@@ -1704,13 +2310,36 @@ git commit -m "Ajoute le README et complete le .gitignore"
 
 **Tu sais que c’est bon quand :** git status est propre, et le README contient les trois codes de retour et la mention des données fictives.
 
-*Indice si tu bloques :* Pour l’usage, écris la commande telle que tu l’as tapée dans la démonstration D2. Pour les limites, relis la section Limites de socle.md.
+**Indices progressifs**
+
+Depuis le terminal dans `cyberatelier`, `python3 atelier.py indice` révèle un niveau à la fois. Ouvre seulement le niveau nécessaire.
+
+<details>
+<summary>Indice 1</summary>
+
+Le README explique comment utiliser le programme ; .gitignore ne retire pas les fichiers déjà suivis par Git.
+
+</details>
+
+<details>
+<summary>Indice 2</summary>
+
+Reprends les commandes réellement vérifiées, explique les codes 0/1/2 et relis git status pour les caches et fixtures d’essai.
+
+</details>
+
+<details>
+<summary>Indice 3</summary>
+
+Une documentation « python3 carnet.py notes.txt » permet de reproduire un lancement ; « lance le code » ne dit ni le fichier ni l’argument attendu.
+
+</details>
 
 #### Palier 8 — Provoquer un conflit de fusion et le résoudre (10 min)
 
 Lire les marqueurs de conflit, choisir la ligne voulue, et conclure la fusion à la main.
 
-**Où tu travailles :** README.md dans les branches exercice/
+**Où tu travailles :** Mac · workspaces/socle · README.md dans les branches exercice/
 
 **Pour comprendre**
 
@@ -1728,7 +2357,7 @@ Lire les marqueurs de conflit, choisir la ligne voulue, et conclure la fusion à
 
 **Terminal · Commande à lancer au moment indiqué**
 
-Terminal du parcours : reste à la racine du dépôt. Exécute ces lignes au moment demandé dans les actions, avec les modifications manuelles entre les blocs.
+Terminal du Mac, dans cyberatelier/workspaces/socle, venv Mac activé. Exécute chaque ligne au moment indiqué, avec les modifications manuelles entre les blocs.
 
 ```bash
 git switch feat/analyseur
@@ -1819,13 +2448,36 @@ git branch
 
 **Tu sais que c’est bon quand :** La dernière commande grep ne trouve aucun marqueur dans README.md et git branch ne montre plus les branches exercice/. Pourquoi -D : git branch -d refuse de supprimer une branche dont les commits ne sont pas dans feat/analyseur ; tu le sais, et tu supprimes exprès, car c’est un exercice jetable.
 
-*Indice si tu bloques :* Si le conflit te semble pire, git merge --abort annule la fusion et te remet dans l’état d’avant. Une fois le texte corrigé, git diff ne doit plus montrer de lignes <<<<<<< ou >>>>>>>.
+**Indices progressifs**
+
+Depuis le terminal dans `cyberatelier`, `python3 atelier.py indice` révèle un niveau à la fois. Ouvre seulement le niveau nécessaire.
+
+<details>
+<summary>Indice 1</summary>
+
+Un conflit apparaît quand deux branches changent la même zone ; les marqueurs délimitent les deux versions.
+
+</details>
+
+<details>
+<summary>Indice 2</summary>
+
+Lis les deux variantes du README et garde une version cohérente ; supprime tous les marqueurs avant d’ajouter le fichier résolu.
+
+</details>
+
+<details>
+<summary>Indice 3</summary>
+
+Deux branches qui remplacent « Titre A » par « Titre B » et « Titre C » exigent un choix humain ; laisser <<<<<<< dans le fichier ne résout rien.
+
+</details>
 
 #### Palier 9 — Rebase local, tag v0.1.0 et pull request (8 min)
 
 Replacer ta branche au-dessus d’un main qui a avancé, poser un tag annoté, puis ouvrir la MR.
 
-**Où tu travailles :** Historique Git ; PR GitHub
+**Où tu travailles :** Mac · workspaces/socle · Historique Git ; PR GitHub
 
 **Pour comprendre**
 
@@ -1843,7 +2495,7 @@ Replacer ta branche au-dessus d’un main qui a avancé, poser un tag annoté, p
 
 **Terminal · Après la fusion : actualiser la principale**
 
-Terminal du parcours : reste à la racine du dépôt. Exécute ces lignes au moment demandé dans les actions, avec les modifications manuelles entre les blocs.
+Terminal du Mac, dans cyberatelier/workspaces/socle, venv Mac activé. Exécute chaque ligne au moment indiqué, avec les modifications manuelles entre les blocs.
 
 ```bash
 git switch main
@@ -1901,11 +2553,34 @@ gh pr create --base main --title "Analyseur de journal" --body "Ajoute analyseur
 
 **Tu sais que c’est bon quand :** git log --oneline --graph montre feat/analyseur posée au-dessus du commit de main ; git tag -l affiche v0.1.0 ; le README ne contient plus de marqueur de conflit.
 
-*Indice si tu bloques :* Si git rebase main s’arrête sur un conflit, ce n’est pas le conflit voulu : lis git status, ne force rien. Tu peux revenir en arrière avec git rebase --abort. Un tag annoté (-a) contient un message et une date ; un tag léger ne contient rien de plus qu’un nom.
+**Indices progressifs**
+
+Depuis le terminal dans `cyberatelier`, `python3 atelier.py indice` révèle un niveau à la fois. Ouvre seulement le niveau nécessaire.
+
+<details>
+<summary>Indice 1</summary>
+
+rebase rejoue des commits sur une nouvelle base ; un tag annoté nomme un commit de livraison.
+
+</details>
+
+<details>
+<summary>Indice 2</summary>
+
+Termine la relecture et les essais Git, reviens sur la branche utile, puis vérifie le commit visé par le tag après la fusion.
+
+</details>
+
+<details>
+<summary>Indice 3</summary>
+
+git show v0.2.0 dans un dépôt d’essai permet de voir le message du tag et le commit nommé ; le nom de tag seul ne garantit pas le bon contenu.
+
+</details>
 
 **Démonstrations manuelles (hors CI)**
 
-Ces essais utilisent le laboratoire ou les outils réels. Ils sont séparés des tests obligatoires.
+Ces essais lisent des fichiers locaux ou utilisent le labo et les outils réels, selon le parcours. Ils sont séparés des tests obligatoires.
 
 **D2 — Analyseur en ligne de commande**
 - Entrée : python analyseur.py fixtures/socle/auth.log, puis python analyseur.py sans argument ; vérifie le code avec echo $?
@@ -1927,7 +2602,7 @@ Chaque MR suit le même cycle, que tu dois pratiquer sur ton dépôt :
 
 1. mettre la branche principale à jour (`git switch main`, `git pull`) ;
 2. créer la branche de la MR (`git switch -c feat/...`) ;
-3. écrire le code et les tests, puis lancer `python -m unittest` ;
+3. écrire le code et les tests, puis lancer `python3 -m unittest` ;
 4. contrôler `git status` et `git diff` avant chaque commit ;
 5. commiter avec un message clair, puis relire `git log --oneline` ;
 6. pousser, ouvrir la MR, relire son diff avant de la déclarer prête.
@@ -1947,13 +2622,13 @@ Quatre résultats différents ne se confondent pas : les tests locaux (ce que tu
 
 ## Préparation (20 min)
 
-Dans la console du parcours, dans l’ordre : vérifie Python et Git, configure ton identité Git avec tes propres valeurs (commande à faire une seule fois), clone le dépôt (commande interactive, dans `docker compose exec atelier bash`, puis `cd /workspaces/socle`), vérifie avec `git status`, copie les fixtures, crée la branche `feat/bases`.
+Dans le terminal du Mac depuis `workspaces/socle`, vérifie Python et Git, configure ton identité avec tes propres valeurs et clone le dépôt seulement s’il n’existe pas encore. Crée et active le venv Mac, puis copie les fixtures depuis `../../fixtures/socle`. La section « Préparation sur le Mac » donne les commandes ; MR1 crée ensuite `feat/bases`. Ton exercice existant conserve ses fichiers et sa branche : ne le reclone pas.
 
 ## Livrables
 
 - Dépôt contenant `outils.py`, `journal.py`, `analyseur.py`, leurs tests unittest, `README.md` et `.gitignore`.
 - Trois MR successives, chacune créée depuis la branche principale à jour et relue avant fusion.
-- Tests S1 à S24 exécutés localement avec `python -m unittest` ; démonstrations D1 et D2 faites à la main, hors CI.
+- Tests S1 à S24 exécutés localement avec `python3 -m unittest` ; démonstrations D1 et D2 faites à la main, hors CI.
 - Tag `v0.1.0` posé, avec conflit et rebase réalisés sur des branches locales.
 
 ## Limites

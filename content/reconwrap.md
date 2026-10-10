@@ -41,14 +41,9 @@ Bibliothèque standard uniquement : pas de dépendance pip, un venv suffit.
 
 ## Setup
 
-Le dossier du parcours est vide au départ. Dans la console de Cyber Atelier, prépare l’environnement dans cet ordre :
+Dans le terminal du Mac, place-toi dans `workspaces/reconwrap`. Vérifie Python 3 et Git, configure ton identité scolaire et clone le dépôt dans ce dossier seulement s’il n’existe pas encore. Remplace l’URL d’exemple par l’URL réelle avant exécution. Crée un venv avec `python3 -m venv .venv`, puis active-le avec `source .venv/bin/activate`. Dans un nouveau terminal, réactive-le ou utilise `.venv/bin/python` explicitement. Ajoute `.venv/` à `.gitignore` avant ton premier ajout Git. La section « Préparation sur le Mac » détaille les commandes ; MR1 crée ensuite `feat/architecture`.
 
-1. Vérifier Python : `python --version` (utilise `python3` si besoin).
-2. Vérifier Git : `git --version`.
-3. Configurer ton identité Git une seule fois, avec les informations de ton compte scolaire.
-4. Cloner le dépôt directement dans le dossier courant : `git clone <URL_DU_DEPOT> .`. Ce clone est interactif : fais-le dans `docker compose exec atelier bash`, depuis le dossier Cyber Atelier, puis `cd /workspaces/reconwrap`.
-5. Créer le venv : `python -m venv .venv`. Dans la console web, chaque commande repart à neuf : une activation (`source .venv/bin/activate`) ne persiste pas. Appelle `.venv/bin/python` explicitement. Ajoute `.venv/` à `.gitignore` dans la MR1, avant ton premier `git add`.
-6. Créer la branche de la MR1 : `git switch -c feat/architecture`.
+Les tests habituels tournent sur le Mac avec ce venv. Pour les démos réelles, un second terminal Mac dans `cyberatelier` pilote le labo Docker avec `python3 atelier.py labo demarrer` puis lance le package avec `docker compose exec -T -w /workspaces/reconwrap atelier python3 -m reconwrap ...`. Conserve le montage du dossier hôte `workspaces` dans `compose.override.yaml` : Docker doit voir ton package. Le venv du Mac n’est pas utilisé dans le conteneur.
 
 <!-- BEGIN GENERATED EXERCISES -->
 ## Comment travailler un exercice
@@ -59,17 +54,74 @@ Ces exercices sont ton entraînement. Chaque palier explique les notions utiles,
 2. Les cartes de tests donnent l’entrée et le résultat attendu. Écris les tests correspondants dans le fichier indiqué ; cocher un palier ne les exécute pas. Avec unittest, « Ran 0 tests » signifie qu’aucun test n’a été exécuté : ce n’est pas une validation. Un cas décrit peut contenir plusieurs valeurs ; le nombre de méthodes Python n’est donc pas forcément le nombre d’identifiants.
 3. Suis les actions numérotées, une à la fois. Les exemples servent à apprendre une notion ; tu écris toi-même la solution de l’exercice. Les blocs Terminal donnent les commandes à lancer au moment indiqué.
 4. Vérifie le résultat indiqué avant de poursuivre. Un échec attendu (phase rouge, argument refusé ou conflit volontaire) est expliqué dans le palier.
-5. Si tu bloques, lis la dernière ligne de l’erreur, compare l’entrée et l’attendu, puis ouvre l’indice. Fais un petit changement et relance.
+5. Si tu bloques, lis la dernière ligne de l’erreur, compare entrée et attendu, puis demande un seul indice à la fois avec python3 atelier.py indice depuis cyberatelier. Les trois niveaux vont du rappel à un petit exemple ; ils ne donnent pas une fonction corrigée.
 
 ### Le bon endroit pour chaque action
 
-Sur ton Mac, ouvre `workspaces/reconwrap` dans VS Code. Dans Cyber Atelier, utilise l’éditeur et la console de **Coder**, avec `cwd` sur `.` (la racine du dépôt). Fais la préparation de **Environnement** avant MR1 ; la mission crée ensuite sa branche.
+Ouvre `workspaces/reconwrap` dans VS Code et un terminal du Mac dans ce même dossier. Tu écris et testes le code ici, dans le dépôt Git de l’exercice. Ouvre un second terminal dans `cyberatelier` pour lire les consignes avec `python3 atelier.py voir` et piloter Docker. Le site reste disponible pour la lecture ; l’onglet Coder est facultatif.
 
-Le code Python se place dans l’éditeur. Les commandes `docker compose ...` se lancent sur ton Mac depuis `cyberatelier` ; `/app/...` existe dans le conteneur. Le laboratoire interrogé doit tourner dans le même environnement que ton programme.
+Depuis `cyberatelier`, `mkdir -p workspaces/reconwrap` puis `cd workspaces/reconwrap` permet de rejoindre le dossier du parcours. S’il contient déjà ton exercice, garde ses fichiers, sa branche et son dépôt : ne le reclone pas. La préparation ci-dessous se fait une fois ; la mission crée ensuite sa branche.
 
-La console web repart à neuf à chaque exécution : un `cd`, une activation de venv ou `echo $?` ne se transmet pas à la commande suivante. Lance le programme et `echo $?` ensemble quand le palier le demande. Le nombre affiché par echo est celui du programme ; la console peut afficher code 0 pour echo lui-même.
+Le code Python se place dans VS Code et doit être enregistré avant les tests. Les commandes `docker compose ...` et `python3 atelier.py ...` se lancent depuis `cyberatelier`. Leurs appels Docker entrent dans le conteneur ; `/app/fixtures`, `/app/tools` et `/workspaces` sont des chemins internes à celui-ci. Depuis le dépôt d’exercice sur le Mac, les fixtures fournies sont dans `../../fixtures`.
 
-Un venv créé sur le Mac ne fonctionne pas dans le conteneur : utilise `python3` dans ce dernier. Remplace `main` par `master` si nécessaire. Si une branche existe déjà, reprends-la avec `git switch NOM` sans `-c`. Après chaque fusion, actualise la branche principale avant la mission suivante.
+Le terminal du Mac conserve son `cd` et son activation de venv. Active `.venv` dans chaque nouveau terminal d’exercice ; `python3` utilise alors ce venv, ou appelle `.venv/bin/python` explicitement. Lis `echo $?` immédiatement après le programme dont tu veux le code, avant toute autre commande. Ajoute `.venv/` à `.gitignore` avant `git add`.
+
+PortPilot et HeaderScope exécutés sur le Mac : lance `python3 labs.py` depuis `cyberatelier` dans un autre terminal et garde-le ouvert ; Ctrl+C arrête ce labo Mac. Les outils ToolWrap et les démos ReconWrap tournent dans Docker : `python3 atelier.py labo demarrer`, `labo arreter` et `labo statut` depuis `cyberatelier` pilotent uniquement le labo Docker. Le même numéro 8000 ne relie pas automatiquement les deux environnements.
+
+Un venv créé sur le Mac ne fonctionne pas dans Docker : les démos dans le conteneur utilisent son `python3`. Le dossier hôte `workspaces` doit être monté dans Docker pour que les démos ReconWrap lisent ton code ; conserve le `compose.override.yaml` du mode VS Code. Remplace `main` par `master` si nécessaire. Si une branche existe, reprends-la avec `git switch NOM` sans `-c`. Après chaque fusion, actualise la principale dans le dépôt du parcours avant la mission suivante.
+
+### Préparation sur le Mac
+
+**Vérifier Python**
+
+Terminal du Mac, dans cyberatelier/workspaces/reconwrap.
+
+```bash
+python3 --version
+```
+
+Python 3 doit être installé sur ton Mac. Ce parcours utilise seulement sa bibliothèque standard ; aucun pip install n’est demandé.
+
+**Vérifier Git**
+
+Terminal du Mac, dans cyberatelier/workspaces/reconwrap.
+
+```bash
+git --version
+```
+
+Vérifie Git sur ton Mac. Les commandes du parcours agissent sur ce dépôt d’exercice, distinct du dépôt cyberatelier.
+
+**Configurer ton identité Git (une seule fois)**
+
+Terminal du Mac, dans cyberatelier/workspaces/reconwrap.
+
+```bash
+git config --global user.name "Prénom Nom" && git config --global user.email "adresse@ecole.example"
+```
+
+Remplace les deux valeurs d’exemple par ton nom et l’adresse de ton compte scolaire. Cette configuration globale est enregistrée sur ton Mac ; sans identité, git commit refuse le commit.
+
+**Cloner le dépôt**
+
+Terminal du Mac, dans cyberatelier/workspaces/reconwrap.
+
+```bash
+git clone <URL_DU_DEPOT> .
+```
+
+Depuis le terminal du Mac dans workspaces/reconwrap, clone seulement si le dossier est vide et n’a pas encore de dépôt. Remplace <URL_DU_DEPOT> par l’URL autorisée réelle avant exécution ; le point signifie « ici ». Si ton exercice existe déjà, garde-le et passe directement à git status. HTTPS ou SSH peut demander une saisie dans ce terminal.
+
+**Créer le venv**
+
+Terminal du Mac, dans cyberatelier/workspaces/reconwrap.
+
+```bash
+python3 -m venv .venv
+source .venv/bin/activate
+```
+
+Crée ce venv sur le Mac une seule fois, puis active-le dans chaque nouveau terminal d’exercice. python3 désigne alors le Python du venv. Tu peux aussi utiliser .venv/bin/python explicitement. Ajoute .venv/ à .gitignore avant git add ; un venv Mac ne s’utilise pas dans Docker.
 
 ### Les mots utiles
 
@@ -140,7 +192,7 @@ Le registre relie un nom à une fonction ; le dispatch appelle cette fonction et
 
 Avoir un package reconwrap/ importable, et un .gitignore qui protège le venv avant ton premier commit.
 
-**Où tu travailles :** .gitignore ; reconwrap/__init__.py ; reconwrap/__main__.py
+**Où tu travailles :** Mac · workspaces/reconwrap · .gitignore ; reconwrap/__init__.py ; reconwrap/__main__.py
 
 **Pour comprendre**
 
@@ -149,7 +201,7 @@ Avoir un package reconwrap/ importable, et un .gitignore qui protège le venv av
 
 **Actions dans l’ordre**
 
-1. Ouvre workspaces/reconwrap dans VS Code, ou Coder dans Cyber Atelier avec cwd sur « . ».
+1. Ouvre workspaces/reconwrap dans VS Code. Dans le terminal du Mac, place-toi dans ce même dossier et active son venv avec source .venv/bin/activate.
 2. Termine la préparation, notamment le venv de cet environnement.
 3. Lis git status ; enregistre ton travail en cours avant de changer de branche.
 4. Reviens sur main avec git switch main, mets-la à jour avec git pull --ff-only, puis crée feat/architecture. Remplace main par master si ton dépôt utilise ce nom.
@@ -158,7 +210,7 @@ Avoir un package reconwrap/ importable, et un .gitignore qui protège le venv av
 
 **Terminal · Relire l’état du dépôt**
 
-Terminal du parcours : reste à la racine du dépôt. Exécute ces lignes au moment demandé dans les actions, avec les modifications manuelles entre les blocs.
+Terminal du Mac, dans cyberatelier/workspaces/reconwrap, venv Mac activé. Exécute chaque ligne au moment indiqué, avec les modifications manuelles entre les blocs.
 
 ```bash
 git status
@@ -199,13 +251,36 @@ git commit -m "Crée la structure du package reconwrap"
 
 **Tu sais que c’est bon quand :** git status n’affiche plus .venv/, et .venv/bin/python -m reconwrap s’exécute sans traceback.
 
-*Indice si tu bloques :* Si .venv/ apparaît encore dans git status, ton .gitignore n’est pas enregistré ou un motif est mal écrit (le point au début de .venv compte). Le message de l’exemple jetable doit venir de ton __main__.py.
+**Indices progressifs**
+
+Depuis le terminal dans `cyberatelier`, `python3 atelier.py indice` révèle un niveau à la fois. Ouvre seulement le niveau nécessaire.
+
+<details>
+<summary>Indice 1</summary>
+
+Un package Python contient __init__.py ; __main__.py permet le lancement avec -m ; le venv Mac reste hors Git.
+
+</details>
+
+<details>
+<summary>Indice 2</summary>
+
+Dans workspaces/reconwrap, vérifie .venv et crée le package avant de lancer .venv/bin/python -m reconwrap sur feat/architecture.
+
+</details>
+
+<details>
+<summary>Indice 3</summary>
+
+Un dossier carnet avec __init__.py et __main__.py devient lançable avec python -m carnet ; son environnement .venv n’est pas un fichier de livraison.
+
+</details>
 
 #### Palier 2 — La fabrique du résultat (R1) (10 min)
 
 Construire un dict à cinq clés exactes depuis une fonction, avec annotations de type et docstring.
 
-**Où tu travailles :** reconwrap/core.py ; tests/test_core.py
+**Où tu travailles :** Mac · workspaces/reconwrap · reconwrap/core.py ; tests/test_core.py
 
 **Pour comprendre**
 
@@ -214,7 +289,7 @@ Construire un dict à cinq clés exactes depuis une fonction, avec annotations d
 
 **Éditeur · Exemple travaillé, sans rapport avec ReconWrap **
 
-Éditeur : copie cet exemple dans exemple.py (jetable), enregistre-le, puis lance python3 exemple.py. Si plusieurs exemples sont proposés, essaie-les un par un en remplaçant le contenu du fichier. Retire ensuite les fichiers générés et le fichier d’exemple.
+VS Code sur le Mac : copie cet exemple dans exemple.py (jetable), enregistre-le, puis lance python3 exemple.py. Si plusieurs exemples sont proposés, essaie-les un par un en remplaçant le contenu du fichier. Retire ensuite les fichiers générés et le fichier d’exemple.
 
 ```python
 def doubler(n: int) -> int:
@@ -261,7 +336,7 @@ L’entrée est ce que tu donnes au code ; l’attendu est ce que ton test doit 
 
 **Terminal · Commande à lancer au moment indiqué**
 
-Terminal du parcours : reste à la racine du dépôt. Exécute ces lignes au moment demandé dans les actions, avec les modifications manuelles entre les blocs.
+Terminal du Mac, dans cyberatelier/workspaces/reconwrap, venv Mac activé. Exécute chaque ligne au moment indiqué, avec les modifications manuelles entre les blocs.
 
 ```bash
 .venv/bin/python -m unittest -v
@@ -269,13 +344,36 @@ Terminal du parcours : reste à la racine du dépôt. Exécute ces lignes au mom
 
 **Tu sais que c’est bon quand :** R1 passe : le dict a exactement les clés module, statut, donnees, alertes, duree_s.
 
-*Indice si tu bloques :* Commence par écrire le dict littéral, puis relis le contrat. Un test par règle : ici, seule la forme du dict est testée.
+**Indices progressifs**
+
+Depuis le terminal dans `cyberatelier`, `python3 atelier.py indice` révèle un niveau à la fois. Ouvre seulement le niveau nécessaire.
+
+<details>
+<summary>Indice 1</summary>
+
+La fabrique impose un contrat commun de cinq clés ; les modules futurs fourniront leurs valeurs.
+
+</details>
+
+<details>
+<summary>Indice 2</summary>
+
+Écris R1 sur un résultat fictif avant la fabrique et compare les noms exacts, le type liste d’alertes et la durée non négative.
+
+</details>
+
+<details>
+<summary>Indice 3</summary>
+
+Un résultat de module 'faux' avec donnees={} et alertes=[] doit conserver ces deux types ; les remplacer par du texte change le contrat.
+
+</details>
 
 #### Palier 3 — Le statut refusé (R2) (10 min)
 
 Refuser tout statut hors de OK, ERREUR et IGNORE, avec une erreur qui explique ce qui ne va pas.
 
-**Où tu travailles :** reconwrap/core.py ; tests/test_core.py
+**Où tu travailles :** Mac · workspaces/reconwrap · reconwrap/core.py ; tests/test_core.py
 
 **Pour comprendre**
 
@@ -284,7 +382,7 @@ Refuser tout statut hors de OK, ERREUR et IGNORE, avec une erreur qui explique c
 
 **Éditeur · Exemple travaillé, sans rapport avec ReconWrap **
 
-Éditeur : copie cet exemple dans exemple.py (jetable), enregistre-le, puis lance python3 exemple.py. Si plusieurs exemples sont proposés, essaie-les un par un en remplaçant le contenu du fichier. Retire ensuite les fichiers générés et le fichier d’exemple.
+VS Code sur le Mac : copie cet exemple dans exemple.py (jetable), enregistre-le, puis lance python3 exemple.py. Si plusieurs exemples sont proposés, essaie-les un par un en remplaçant le contenu du fichier. Retire ensuite les fichiers générés et le fichier d’exemple.
 
 ```python
 MENU = ("margherita", "reine")
@@ -311,7 +409,7 @@ L’entrée est ce que tu donnes au code ; l’attendu est ce que ton test doit 
 
 **Terminal · Commande à lancer au moment indiqué**
 
-Terminal du parcours : reste à la racine du dépôt. Exécute ces lignes au moment demandé dans les actions, avec les modifications manuelles entre les blocs.
+Terminal du Mac, dans cyberatelier/workspaces/reconwrap, venv Mac activé. Exécute chaque ligne au moment indiqué, avec les modifications manuelles entre les blocs.
 
 ```bash
 .venv/bin/python -m unittest -v
@@ -326,13 +424,36 @@ git commit -m "Ajoute le contrat de résultat normalisé"
 
 **Tu sais que c’est bon quand :** R1 et R2 passent. « ok » en minuscules est refusé.
 
-*Indice si tu bloques :* Un tuple de statuts et l’opérateur in comparent exactement : les minuscules sont donc refusées. Le message doit contenir le statut reçu.
+**Indices progressifs**
+
+Depuis le terminal dans `cyberatelier`, `python3 atelier.py indice` révèle un niveau à la fois. Ouvre seulement le niveau nécessaire.
+
+<details>
+<summary>Indice 1</summary>
+
+Un statut inconnu doit être refusé, même si sa casse ressemble à celle d’un statut accepté.
+
+</details>
+
+<details>
+<summary>Indice 2</summary>
+
+Écris R2 pour 'FAUX' puis 'ok', avec ValueError et message citant la valeur, avant le contrôle dans la fabrique.
+
+</details>
+
+<details>
+<summary>Indice 3</summary>
+
+Un contrat qui admet 'OK' peut refuser 'ok' ; convertir toutes les entrées en majuscules ferait disparaître ce refus demandé.
+
+</details>
 
 #### Palier 4 — La cible loopback seulement (R5) (10 min)
 
 Refuser toute cible qui n’est pas 127.0.0.1 avant qu’un module soit appelé.
 
-**Où tu travailles :** reconwrap/core.py ; tests/test_core.py
+**Où tu travailles :** Mac · workspaces/reconwrap · reconwrap/core.py ; tests/test_core.py
 
 **Pour comprendre**
 
@@ -341,7 +462,7 @@ Refuser toute cible qui n’est pas 127.0.0.1 avant qu’un module soit appelé.
 
 **Éditeur · Exemple travaillé, sans rapport avec ReconWrap **
 
-Éditeur : copie cet exemple dans exemple.py (jetable), enregistre-le, puis lance python3 exemple.py. Si plusieurs exemples sont proposés, essaie-les un par un en remplaçant le contenu du fichier. Retire ensuite les fichiers générés et le fichier d’exemple.
+VS Code sur le Mac : copie cet exemple dans exemple.py (jetable), enregistre-le, puis lance python3 exemple.py. Si plusieurs exemples sont proposés, essaie-les un par un en remplaçant le contenu du fichier. Retire ensuite les fichiers générés et le fichier d’exemple.
 
 ```python
 try:
@@ -367,7 +488,7 @@ L’entrée est ce que tu donnes au code ; l’attendu est ce que ton test doit 
 
 **Terminal · Commande à lancer au moment indiqué**
 
-Terminal du parcours : reste à la racine du dépôt. Exécute ces lignes au moment demandé dans les actions, avec les modifications manuelles entre les blocs.
+Terminal du Mac, dans cyberatelier/workspaces/reconwrap, venv Mac activé. Exécute chaque ligne au moment indiqué, avec les modifications manuelles entre les blocs.
 
 ```bash
 .venv/bin/python -m unittest -v
@@ -382,13 +503,36 @@ git commit -m "Valide la cible : seule 127.0.0.1 est acceptée"
 
 **Tu sais que c’est bon quand :** La validation accepte 127.0.0.1 et refuse 192.0.2.10, example.com, le texte vide, 10.0.0.0/24 et « 127.0.0.1; ls ». La partie dispatch de R5 reste à compléter au palier 6.
 
-*Indice si tu bloques :* Vérifie d’abord le type, puis compare la chaîne exacte. Une chaîne qui contient autre chose (espace, point-virgule) doit être refusée, pas réparée.
+**Indices progressifs**
+
+Depuis le terminal dans `cyberatelier`, `python3 atelier.py indice` révèle un niveau à la fois. Ouvre seulement le niveau nécessaire.
+
+<details>
+<summary>Indice 1</summary>
+
+Loopback désigne l’environnement courant ; ReconWrap exige exactement la cible texte 127.0.0.1.
+
+</details>
+
+<details>
+<summary>Indice 2</summary>
+
+Contrôle le type avant la comparaison et écris les cinq refus R5 ; la preuve d’absence d’appel viendra quand le dispatch existera.
+
+</details>
+
+<details>
+<summary>Indice 3</summary>
+
+'localhost' et '127.0.0.1 ' ne sont pas exactement '127.0.0.1' ; accepter une résolution ou retirer l’espace élargirait cette règle stricte.
+
+</details>
 
 #### Palier 5 — Le registre des modules (R3) (10 min)
 
 Associer un nom de module à sa fonction, et signaler clairement un nom inconnu.
 
-**Où tu travailles :** reconwrap/core.py ; tests/test_core.py
+**Où tu travailles :** Mac · workspaces/reconwrap · reconwrap/core.py ; tests/test_core.py
 
 **Pour comprendre**
 
@@ -397,7 +541,7 @@ Associer un nom de module à sa fonction, et signaler clairement un nom inconnu.
 
 **Éditeur · Exemple travaillé, sans rapport avec ReconWrap **
 
-Éditeur : copie cet exemple dans exemple.py (jetable), enregistre-le, puis lance python3 exemple.py. Si plusieurs exemples sont proposés, essaie-les un par un en remplaçant le contenu du fichier. Retire ensuite les fichiers générés et le fichier d’exemple.
+VS Code sur le Mac : copie cet exemple dans exemple.py (jetable), enregistre-le, puis lance python3 exemple.py. Si plusieurs exemples sont proposés, essaie-les un par un en remplaçant le contenu du fichier. Retire ensuite les fichiers générés et le fichier d’exemple.
 
 ```python
 def dire_bonjour():
@@ -425,7 +569,7 @@ L’entrée est ce que tu donnes au code ; l’attendu est ce que ton test doit 
 
 **Terminal · Commande à lancer au moment indiqué**
 
-Terminal du parcours : reste à la racine du dépôt. Exécute ces lignes au moment demandé dans les actions, avec les modifications manuelles entre les blocs.
+Terminal du Mac, dans cyberatelier/workspaces/reconwrap, venv Mac activé. Exécute chaque ligne au moment indiqué, avec les modifications manuelles entre les blocs.
 
 ```bash
 .venv/bin/python -m unittest -v
@@ -440,13 +584,36 @@ git commit -m "Ajoute le registre des modules"
 
 **Tu sais que c’est bon quand :** R3 passe : le nom inconnu donne une erreur qui liste les noms connus, sans appel de module.
 
-*Indice si tu bloques :* Une fonction peut être rangée dans un dictionnaire comme n’importe quelle valeur. Pour la liste des noms connus, sorted() donne un ordre stable.
+**Indices progressifs**
+
+Depuis le terminal dans `cyberatelier`, `python3 atelier.py indice` révèle un niveau à la fois. Ouvre seulement le niveau nécessaire.
+
+<details>
+<summary>Indice 1</summary>
+
+Un registre associe un nom à une fonction ; rechercher un nom inconnu ne doit exécuter aucun module.
+
+</details>
+
+<details>
+<summary>Indice 2</summary>
+
+Écris R3 avec trois faux modules qui comptent leurs appels et demande scanner ; vérifie l’erreur et les noms connus.
+
+</details>
+
+<details>
+<summary>Indice 3</summary>
+
+{'livres': lire_livres, 'prix': lire_prix} permet de chercher la fonction 'prix' ; ajouter une entrée n’exige pas une branche if supplémentaire par nom.
+
+</details>
 
 #### Palier 6 — Le dispatch et l’isolation des pannes (R4) (10 min)
 
 Appeler un module par son nom, et transformer une exception en résultat ERREUR sans rien propager.
 
-**Où tu travailles :** reconwrap/core.py ; tests/test_core.py
+**Où tu travailles :** Mac · workspaces/reconwrap · reconwrap/core.py ; tests/test_core.py
 
 **Pour comprendre**
 
@@ -455,7 +622,7 @@ Appeler un module par son nom, et transformer une exception en résultat ERREUR 
 
 **Éditeur · Exemple travaillé, sans rapport avec ReconWrap **
 
-Éditeur : copie cet exemple dans exemple.py (jetable), enregistre-le, puis lance python3 exemple.py. Si plusieurs exemples sont proposés, essaie-les un par un en remplaçant le contenu du fichier. Retire ensuite les fichiers générés et le fichier d’exemple.
+VS Code sur le Mac : copie cet exemple dans exemple.py (jetable), enregistre-le, puis lance python3 exemple.py. Si plusieurs exemples sont proposés, essaie-les un par un en remplaçant le contenu du fichier. Retire ensuite les fichiers générés et le fichier d’exemple.
 
 ```python
 def lire_note(texte):
@@ -486,7 +653,7 @@ L’entrée est ce que tu donnes au code ; l’attendu est ce que ton test doit 
 
 **Terminal · Commande à lancer au moment indiqué**
 
-Terminal du parcours : reste à la racine du dépôt. Exécute ces lignes au moment demandé dans les actions, avec les modifications manuelles entre les blocs.
+Terminal du Mac, dans cyberatelier/workspaces/reconwrap, venv Mac activé. Exécute chaque ligne au moment indiqué, avec les modifications manuelles entre les blocs.
 
 ```bash
 .venv/bin/python -m unittest -v
@@ -501,13 +668,36 @@ git commit -m "Isole les erreurs des modules dans le dispatch"
 
 **Tu sais que c’est bon quand :** R1 à R5 passent. Un module qui lève une exception donne un résultat ERREUR, sans traceback.
 
-*Indice si tu bloques :* Le texte de l’exception est dans la variable de l’except (as erreur). Il doit finir dans donnees, pas être affiché.
+**Indices progressifs**
+
+Depuis le terminal dans `cyberatelier`, `python3 atelier.py indice` révèle un niveau à la fois. Ouvre seulement le niveau nécessaire.
+
+<details>
+<summary>Indice 1</summary>
+
+Le dispatch choisit une fonction puis isole ses pannes ; les validations d’entrée précèdent l’exécution.
+
+</details>
+
+<details>
+<summary>Indice 2</summary>
+
+Écris R4 avec un module qui lève RuntimeError et complète R5 avec assert_not_called pour les cibles refusées.
+
+</details>
+
+<details>
+<summary>Indice 3</summary>
+
+Un module fictif qui lève RuntimeError('boom') doit donner un résultat ERREUR avec le message dans donnees, sans interrompre l’appelant.
+
+</details>
 
 #### Palier 7 — Un logger par module (10 min)
 
 Ajouter du logging au dispatch sans que les tests dépendent du texte affiché.
 
-**Où tu travailles :** reconwrap/core.py ; tests/test_core.py
+**Où tu travailles :** Mac · workspaces/reconwrap · reconwrap/core.py ; tests/test_core.py
 
 **Pour comprendre**
 
@@ -516,7 +706,7 @@ Ajouter du logging au dispatch sans que les tests dépendent du texte affiché.
 
 **Éditeur · Exemple travaillé, sans rapport avec ReconWrap **
 
-Éditeur : copie cet exemple dans exemple.py (jetable), enregistre-le, puis lance python3 exemple.py. Si plusieurs exemples sont proposés, essaie-les un par un en remplaçant le contenu du fichier. Retire ensuite les fichiers générés et le fichier d’exemple.
+VS Code sur le Mac : copie cet exemple dans exemple.py (jetable), enregistre-le, puis lance python3 exemple.py. Si plusieurs exemples sont proposés, essaie-les un par un en remplaçant le contenu du fichier. Retire ensuite les fichiers générés et le fichier d’exemple.
 
 ```python
 import logging
@@ -535,7 +725,7 @@ journal.debug("température lue : 180")
 
 **Terminal · Commande à lancer au moment indiqué**
 
-Terminal du parcours : reste à la racine du dépôt. Exécute ces lignes au moment demandé dans les actions, avec les modifications manuelles entre les blocs.
+Terminal du Mac, dans cyberatelier/workspaces/reconwrap, venv Mac activé. Exécute chaque ligne au moment indiqué, avec les modifications manuelles entre les blocs.
 
 ```bash
 .venv/bin/python -m unittest -v
@@ -550,13 +740,36 @@ git commit -m "Ajoute le logging du dispatch"
 
 **Tu sais que c’est bon quand :** Une panne simulée produit une ligne de niveau ERROR identifiant le module. Le résultat garde le statut ERREUR ; R1 à R5 passent.
 
-*Indice si tu bloques :* Avec level=INFO, la ligne DEBUG n’apparaît pas : c’est normal. Regarde ce que le format affiche avant de choisir le nom du logger.
+**Indices progressifs**
+
+Depuis le terminal dans `cyberatelier`, `python3 atelier.py indice` révèle un niveau à la fois. Ouvre seulement le niveau nécessaire.
+
+<details>
+<summary>Indice 1</summary>
+
+Un logger nommé aide à identifier le module ; les niveaux INFO/DEBUG/ERROR classent les traces.
+
+</details>
+
+<details>
+<summary>Indice 2</summary>
+
+Donne à chaque module son logger, observe une panne simulée en ERROR et garde la distinction avec le statut ERREUR du résultat.
+
+</details>
+
+<details>
+<summary>Indice 3</summary>
+
+logging.getLogger('catalogue') identifie les messages du catalogue ; journal.error('lecture impossible') produit le niveau ERROR, pas un statut de rapport.
+
+</details>
 
 #### Palier 8 — Ajouter un module ne touche pas le dispatch (10 min)
 
 Vérifier l’acceptance clé : un nouveau module ne demande que de l’ajouter au registre.
 
-**Où tu travailles :** reconwrap/core.py ; tests/test_core.py
+**Où tu travailles :** Mac · workspaces/reconwrap · reconwrap/core.py ; tests/test_core.py
 
 **Pour comprendre**
 
@@ -572,7 +785,7 @@ Vérifier l’acceptance clé : un nouveau module ne demande que de l’ajouter 
 
 **Terminal · Relire l’état du dépôt**
 
-Terminal du parcours : reste à la racine du dépôt. Exécute ces lignes au moment demandé dans les actions, avec les modifications manuelles entre les blocs.
+Terminal du Mac, dans cyberatelier/workspaces/reconwrap, venv Mac activé. Exécute chaque ligne au moment indiqué, avec les modifications manuelles entre les blocs.
 
 ```bash
 git diff reconwrap/core.py
@@ -586,13 +799,36 @@ git diff reconwrap/core.py
 
 **Tu sais que c’est bon quand :** Le faux module « cloud » répond via le dispatch, et le diff du dispatch est vide depuis le palier précédent.
 
-*Indice si tu bloques :* Si tu as dû modifier le dispatch pour le faire fonctionner, la structure n’est pas bonne : reviens au registre seul.
+**Indices progressifs**
+
+Depuis le terminal dans `cyberatelier`, `python3 atelier.py indice` révèle un niveau à la fois. Ouvre seulement le niveau nécessaire.
+
+<details>
+<summary>Indice 1</summary>
+
+Un dispatch générique dépend du registre et du contrat, pas du nombre de modules connus.
+
+</details>
+
+<details>
+<summary>Indice 2</summary>
+
+Ajoute le faux module cloud seulement au registre du test et vérifie son appel sans modifier le dispatch.
+
+</details>
+
+<details>
+<summary>Indice 3</summary>
+
+Si ajouter 'prix' à un registre oblige à changer la fonction d’aiguillage, cette fonction connaît encore les noms en dur.
+
+</details>
 
 #### Palier 9 — Vérifier et committer proprement (10 min)
 
 Contrôler chaque commit avant de le faire : état, diff en zone de préparation, tests, commandes.
 
-**Où tu travailles :** Dépôt ; historique Git
+**Où tu travailles :** Mac · workspaces/reconwrap · Dépôt ; historique Git
 
 **Pour comprendre**
 
@@ -609,7 +845,7 @@ Contrôler chaque commit avant de le faire : état, diff en zone de préparation
 
 **Terminal · Exemple travaillé dans un dépôt jetable, hors de ReconWrap **
 
-Terminal du parcours : reste à la racine du dépôt. Exécute ces lignes au moment demandé dans les actions, avec les modifications manuelles entre les blocs.
+Terminal du Mac, dans cyberatelier/workspaces/reconwrap, venv Mac activé. Exécute chaque ligne au moment indiqué, avec les modifications manuelles entre les blocs.
 
 ```bash
 mkdir ~/essai-git && cd ~/essai-git && git init -b main
@@ -660,13 +896,36 @@ git commit -m "Vérifie l’extension du registre sans modifier le dispatch"
 
 **Tu sais que c’est bon quand :** git log --oneline montre les commits atomiques de la MR, git status est propre, et python -m reconwrap ne lève pas d’erreur.
 
-*Indice si tu bloques :* Si un commit contient plusieurs sujets, tu peux le scinder : git reset --soft HEAD~1 annule le dernier commit en gardant les modifications. Demande-toi d’abord si c’est nécessaire.
+**Indices progressifs**
+
+Depuis le terminal dans `cyberatelier`, `python3 atelier.py indice` révèle un niveau à la fois. Ouvre seulement le niveau nécessaire.
+
+<details>
+<summary>Indice 1</summary>
+
+Un commit enregistre les fichiers choisis ; une suite verte et un diff relu rendent cet ensemble vérifiable.
+
+</details>
+
+<details>
+<summary>Indice 2</summary>
+
+Lance le package et R1 à R5, lis git diff --staged et conserve le test cloud dans la livraison de MR1.
+
+</details>
+
+<details>
+<summary>Indice 3</summary>
+
+Un diff staged contenant core.py mais pas son test publierait une moitié du travail ; la liste de fichiers permet de repérer cet oubli.
+
+</details>
 
 #### Palier 10 — Pousser la MR1 et la faire relire (10 min)
 
 Pousser la branche, ouvrir la merge request sur le dépôt de l’école, et distinguer ce qui est vérifié de ce qui est autorisé.
 
-**Où tu travailles :** MR GitLab
+**Où tu travailles :** Mac · workspaces/reconwrap · MR GitLab
 
 **Pour comprendre**
 
@@ -686,7 +945,7 @@ Pousser la branche, ouvrir la merge request sur le dépôt de l’école, et dis
 
 **Terminal · Relire l’état du dépôt**
 
-Terminal du parcours : reste à la racine du dépôt. Exécute ces lignes au moment demandé dans les actions, avec les modifications manuelles entre les blocs.
+Terminal du Mac, dans cyberatelier/workspaces/reconwrap, venv Mac activé. Exécute chaque ligne au moment indiqué, avec les modifications manuelles entre les blocs.
 
 ```bash
 git status
@@ -713,7 +972,30 @@ git pull --ff-only
 
 **Tu sais que c’est bon quand :** La merge request est ouverte avec seulement les fichiers de MR1 ; ton main local est à jour après fusion (git log --oneline).
 
-*Indice si tu bloques :* Si git push se plaint, vérifie d’abord que tu es bien sur feat/architecture (git branch --show-current). Ne fusionne pas sans relecture.
+**Indices progressifs**
+
+Depuis le terminal dans `cyberatelier`, `python3 atelier.py indice` révèle un niveau à la fois. Ouvre seulement le niveau nécessaire.
+
+<details>
+<summary>Indice 1</summary>
+
+La MR1 livre une architecture testée avec des faux ; elle ne prouve pas encore les outils réels.
+
+</details>
+
+<details>
+<summary>Indice 2</summary>
+
+Pousse feat/architecture, relis le contrat et le test d’extension, puis fusionne et récupère main avant la mission suivante.
+
+</details>
+
+<details>
+<summary>Indice 3</summary>
+
+« un module cloud ajouté au registre sans changer dispatch » est une preuve de modularité ; « nmap marche » serait une autre preuve encore absente.
+
+</details>
 
 **Avant de livrer**
 
@@ -737,25 +1019,34 @@ Tu assembles les composants précédents sans rendre la CI dépendante des outil
 
 Rendre les fixtures nmap et adsim suivies par Git, pour que la CI les lise à la place des vrais outils.
 
-**Où tu travailles :** Dépôt ; fixtures/
+**Où tu travailles :** Mac · workspaces/reconwrap · Dépôt ; fixtures/
 
 **Pour comprendre**
 
 - La branche principale (main) contient le travail déjà fusionné. Ta branche feat/... reçoit les changements de cette mission.
 - Un dépôt « propre » n’a aucune modification en attente : git status te le confirme.
 
+**Terminal · Exemple travaillé, sans rapport avec ReconWrap **
+
+Exemple de copie à lire : recettes/ représente un dossier fictif déjà existant. Ne lance pas cet extrait dans le dépôt de l’exercice ; utilise le bloc de copie des fixtures juste après.
+
+```bash
+mkdir -p recettes_copie && cp -r recettes/. recettes_copie/
+# le point après recettes/ copie le contenu du dossier, pas le dossier lui-même
+```
+
 **Actions dans l’ordre**
 
-1. Ouvre workspaces/reconwrap dans VS Code, ou Coder dans Cyber Atelier avec cwd sur « . ».
+1. Ouvre workspaces/reconwrap dans VS Code. Dans le terminal du Mac, place-toi dans ce même dossier et active son venv avec source .venv/bin/activate.
 2. Vérifie que MR1 est fusionnée et que R1 à R5 passent.
 3. Lis git status ; enregistre ton travail en cours avant de changer de branche.
 4. Reviens sur main avec git switch main, mets-la à jour avec git pull --ff-only, puis crée feat/orchestration-rapport. Remplace main par master si ton dépôt utilise ce nom.
-5. Copie fixtures/nmap et fixtures/adsim depuis ../../fixtures sur le Mac, ou /app/fixtures dans Docker. Rends les copies modifiables, ajoute-les explicitement et commite ; aucun venv ni rapport ne doit être ajouté.
+5. Copie fixtures/nmap et fixtures/adsim depuis ../../fixtures sur le Mac. Rends les copies modifiables, ajoute-les explicitement et commite ; aucun venv ni rapport ne doit être ajouté.
 6. Vérifie le nom de ta branche avec git status. Si elle existe déjà, reprends-la avec git switch sans -c.
 
 **Terminal · Relire l’état du dépôt**
 
-Terminal du parcours : reste à la racine du dépôt. Exécute ces lignes au moment demandé dans les actions, avec les modifications manuelles entre les blocs.
+Terminal du Mac, dans cyberatelier/workspaces/reconwrap, venv Mac activé. Exécute chaque ligne au moment indiqué, avec les modifications manuelles entre les blocs.
 
 ```bash
 git status
@@ -764,24 +1055,17 @@ git pull --ff-only
 git switch -c feat/orchestration-rapport
 ```
 
-**Terminal · Exemple travaillé, sans rapport avec ReconWrap **
-
-```bash
-mkdir -p recettes_copie && cp -r recettes/. recettes_copie/
-# le point après recettes/ copie le contenu du dossier, pas le dossier lui-même
-```
-
 **Terminal · Commande à lancer au moment indiqué**
 
-Terminal de ton Mac, depuis workspaces/reconwrap. Dans le conteneur, remplace ../../fixtures par /app/fixtures ; garde le reste de la commande. Les copies vont dans ton dépôt.
+Terminal du Mac, dans cyberatelier/workspaces/reconwrap, venv Mac activé. Exécute chaque ligne au moment indiqué, avec les modifications manuelles entre les blocs. ../../fixtures est la source sur le Mac ; les copies sont placées dans ton dépôt d’exercice.
 
 ```bash
-mkdir -p fixtures && cp -r ../../fixtures/nmap/. fixtures/nmap/ && cp -r ../../fixtures/adsim/. fixtures/adsim/ && chmod -R u+w fixtures
+mkdir -p fixtures/nmap fixtures/adsim && cp -r ../../fixtures/nmap/. fixtures/nmap/ && cp -r ../../fixtures/adsim/. fixtures/adsim/ && chmod -R u+w fixtures
 ```
 
 **Terminal · Relire l’état du dépôt**
 
-Terminal du parcours : reste à la racine du dépôt. Exécute ces lignes au moment demandé dans les actions, avec les modifications manuelles entre les blocs.
+Terminal du Mac, dans cyberatelier/workspaces/reconwrap, venv Mac activé. Exécute chaque ligne au moment indiqué, avec les modifications manuelles entre les blocs.
 
 ```bash
 git status
@@ -796,13 +1080,36 @@ git commit -m "Ajoute les fixtures nmap et adsim"
 
 **Tu sais que c’est bon quand :** git status a listé les fichiers de fixtures/nmap et fixtures/adsim, et ces fichiers sont dans le commit.
 
-*Indice si tu bloques :* Si cp refuse d’écrire, tu essaies d’écrire dans les originaux : vérifie que ta destination est bien fixtures/ dans ton dépôt.
+**Indices progressifs**
+
+Depuis le terminal dans `cyberatelier`, `python3 atelier.py indice` révèle un niveau à la fois. Ouvre seulement le niveau nécessaire.
+
+<details>
+<summary>Indice 1</summary>
+
+Les fixtures sont des sorties fictives locales ; leur copie rend les tests réalisables sans outils réels.
+
+</details>
+
+<details>
+<summary>Indice 2</summary>
+
+Depuis workspaces/reconwrap, copie ../../fixtures/nmap et ../../fixtures/adsim, puis vérifie les noms et la branche feat/orchestration-rapport.
+
+</details>
+
+<details>
+<summary>Indice 3</summary>
+
+Copier open_8000.xml dans fixtures/nmap permet de le lire sur le Mac et sur le runner une fois commité ; /app reste réservé aux outils Docker.
+
+</details>
 
 #### Palier 2 — Lire un XML avec ElementTree (8 min)
 
 Lire un fichier XML et retrouver ses balises et attributs avec la bibliothèque standard.
 
-**Où tu travailles :** fixtures/nmap/open_8000.xml
+**Où tu travailles :** Mac · workspaces/reconwrap · fixtures/nmap/open_8000.xml
 
 **Pour comprendre**
 
@@ -811,7 +1118,7 @@ Lire un fichier XML et retrouver ses balises et attributs avec la bibliothèque 
 
 **Éditeur · Exemple travaillé, sans rapport avec ReconWrap **
 
-Éditeur : copie cet exemple dans exemple.py (jetable), enregistre-le, puis lance python3 exemple.py. Si plusieurs exemples sont proposés, essaie-les un par un en remplaçant le contenu du fichier. Retire ensuite les fichiers générés et le fichier d’exemple.
+VS Code sur le Mac : copie cet exemple dans exemple.py (jetable), enregistre-le, puis lance python3 exemple.py. Si plusieurs exemples sont proposés, essaie-les un par un en remplaçant le contenu du fichier. Retire ensuite les fichiers générés et le fichier d’exemple.
 
 ```python
 import xml.etree.ElementTree as ET
@@ -834,7 +1141,7 @@ except ET.ParseError as erreur:
 
 **Terminal · Commande à lancer au moment indiqué**
 
-Terminal du parcours : reste à la racine du dépôt. Exécute ces lignes au moment demandé dans les actions, avec les modifications manuelles entre les blocs.
+Terminal du Mac, dans cyberatelier/workspaces/reconwrap, venv Mac activé. Exécute chaque ligne au moment indiqué, avec les modifications manuelles entre les blocs.
 
 ```bash
 .venv/bin/python -c "import xml.etree.ElementTree as ET; print(ET.parse('fixtures/nmap/open_8000.xml').getroot().tag)"
@@ -842,13 +1149,36 @@ Terminal du parcours : reste à la racine du dépôt. Exécute ces lignes au mom
 
 **Tu sais que c’est bon quand :** Tu affiches le tag de la racine de open_8000.xml, et tu as repéré la balise qui porte l’état du port 8000.
 
-*Indice si tu bloques :* Utilise les noms de balises tels qu’ils apparaissent dans le fichier. Les attributs se lisent avec get(), pas avec le texte entre balises.
+**Indices progressifs**
+
+Depuis le terminal dans `cyberatelier`, `python3 atelier.py indice` révèle un niveau à la fois. Ouvre seulement le niveau nécessaire.
+
+<details>
+<summary>Indice 1</summary>
+
+XML forme un arbre ; le port et son état se trouvent dans des attributs précis.
+
+</details>
+
+<details>
+<summary>Indice 2</summary>
+
+Affiche le tag de la racine, puis repère portid, protocol et state avant d’écrire le module réseau.
+
+</details>
+
+<details>
+<summary>Indice 3</summary>
+
+Dans <boite numero="4"><etat valeur="pleine"/></boite>, numero appartient à boite et valeur appartient à son enfant etat.
+
+</details>
 
 #### Palier 3 — Le module réseau et le XML nmap (R12) (10 min)
 
 Transformer un XML nmap en résultat du contrat : open, closed, filtered, ou ERREUR si le XML est cassé.
 
-**Où tu travailles :** reconwrap/network.py ; tests/test_network.py
+**Où tu travailles :** Mac · workspaces/reconwrap · reconwrap/network.py ; tests/test_network.py
 
 **Pour comprendre**
 
@@ -873,7 +1203,7 @@ L’entrée est ce que tu donnes au code ; l’attendu est ce que ton test doit 
 
 **Terminal · Commande à lancer au moment indiqué**
 
-Terminal du parcours : reste à la racine du dépôt. Exécute ces lignes au moment demandé dans les actions, avec les modifications manuelles entre les blocs.
+Terminal du Mac, dans cyberatelier/workspaces/reconwrap, venv Mac activé. Exécute chaque ligne au moment indiqué, avec les modifications manuelles entre les blocs.
 
 ```bash
 .venv/bin/python -m unittest -v
@@ -888,13 +1218,36 @@ git commit -m "Ajoute le module réseau et la lecture XML nmap"
 
 **Tu sais que c’est bon quand :** R12 passe : open, closed, filtered pour les bons fichiers, ERREUR sans traceback pour broken.xml.
 
-*Indice si tu bloques :* Pour mixed.xml, un port peut avoir un état différent des autres : cherche le port 8000 précisément, pas le premier port du fichier. Pour broken.xml, attrape l’erreur de lecture et retourne ERREUR.
+**Indices progressifs**
+
+Depuis le terminal dans `cyberatelier`, `python3 atelier.py indice` révèle un niveau à la fois. Ouvre seulement le niveau nécessaire.
+
+<details>
+<summary>Indice 1</summary>
+
+Le module réseau adapte les états nmap au contrat commun ; R12 lit quatre fichiers sans lancer nmap.
+
+</details>
+
+<details>
+<summary>Indice 2</summary>
+
+Écris R12 sur open/closed/mixed/broken, garde les états observés et convertis ParseError en résultat ERREUR.
+
+</details>
+
+<details>
+<summary>Indice 3</summary>
+
+Une fixture mixte contient des ports open, closed et filtered ; filtered est une donnée à conserver, pas une exception de parsing.
+
+</details>
 
 #### Palier 4 — Le module web et le classement hors réseau (R14) (10 min)
 
 Classer une réponse HTTP (code et en-têtes) sans ouvrir de connexion, et distinguer code HTTP, panne et timeout.
 
-**Où tu travailles :** reconwrap/web.py ; tests/test_web.py
+**Où tu travailles :** Mac · workspaces/reconwrap · reconwrap/web.py ; tests/test_web.py
 
 **Pour comprendre**
 
@@ -903,7 +1256,7 @@ Classer une réponse HTTP (code et en-têtes) sans ouvrir de connexion, et disti
 
 **Éditeur · Exemple travaillé, sans rapport avec ReconWrap **
 
-Éditeur : copie cet exemple dans exemple.py (jetable), enregistre-le, puis lance python3 exemple.py. Si plusieurs exemples sont proposés, essaie-les un par un en remplaçant le contenu du fichier. Retire ensuite les fichiers générés et le fichier d’exemple.
+VS Code sur le Mac : copie cet exemple dans exemple.py (jetable), enregistre-le, puis lance python3 exemple.py. Si plusieurs exemples sont proposés, essaie-les un par un en remplaçant le contenu du fichier. Retire ensuite les fichiers générés et le fichier d’exemple.
 
 ```python
 stock = {"Pommes": 3, "Poires": 0}
@@ -929,7 +1282,7 @@ L’entrée est ce que tu donnes au code ; l’attendu est ce que ton test doit 
 
 **Terminal · Commande à lancer au moment indiqué**
 
-Terminal du parcours : reste à la racine du dépôt. Exécute ces lignes au moment demandé dans les actions, avec les modifications manuelles entre les blocs.
+Terminal du Mac, dans cyberatelier/workspaces/reconwrap, venv Mac activé. Exécute chaque ligne au moment indiqué, avec les modifications manuelles entre les blocs.
 
 ```bash
 .venv/bin/python -m unittest -v
@@ -944,13 +1297,36 @@ git commit -m "Ajoute le classement web hors réseau"
 
 **Tu sais que c’est bon quand :** R14 passe : 404 donne ERREUR avec le code conservé, 200 conforme donne zéro alerte, et aucune connexion n’est ouverte.
 
-*Indice si tu bloques :* Une fonction pure est plus simple à tester : elle ne fait que transformer ses arguments. Garde la connexion dans une autre fonction, plus tard.
+**Indices progressifs**
+
+Depuis le terminal dans `cyberatelier`, `python3 atelier.py indice` révèle un niveau à la fois. Ouvre seulement le niveau nécessaire.
+
+<details>
+<summary>Indice 1</summary>
+
+Le module web réutilise des règles pures ; HTTP 404 est une réponse avec code, pas une panne sans code.
+
+</details>
+
+<details>
+<summary>Indice 2</summary>
+
+Écris R14 avec code/en-têtes injectés et compare 404 sans alerte à 200 conforme ; garde le réseau pour D2 à D4/D6.
+
+</details>
+
+<details>
+<summary>Indice 3</summary>
+
+Un résultat web avec donnees contenant code=404 peut être ERREUR avec alertes=[] ; une connexion refusée n’a pas ce code disponible.
+
+</details>
 
 #### Palier 5 — Le module AD et la sortie capturée (R13) (10 min)
 
 Lire une sortie JSON d’adsim capturée et la transformer en résultat du contrat, sans appeler adsim.
 
-**Où tu travailles :** reconwrap/ad.py ; tests/test_ad.py
+**Où tu travailles :** Mac · workspaces/reconwrap · reconwrap/ad.py ; tests/test_ad.py
 
 **Pour comprendre**
 
@@ -959,7 +1335,7 @@ Lire une sortie JSON d’adsim capturée et la transformer en résultat du contr
 
 **Éditeur · Exemple travaillé, sans rapport avec ReconWrap **
 
-Éditeur : copie cet exemple dans exemple.py (jetable), enregistre-le, puis lance python3 exemple.py. Si plusieurs exemples sont proposés, essaie-les un par un en remplaçant le contenu du fichier. Retire ensuite les fichiers générés et le fichier d’exemple.
+VS Code sur le Mac : copie cet exemple dans exemple.py (jetable), enregistre-le, puis lance python3 exemple.py. Si plusieurs exemples sont proposés, essaie-les un par un en remplaçant le contenu du fichier. Retire ensuite les fichiers générés et le fichier d’exemple.
 
 ```python
 import json
@@ -989,7 +1365,7 @@ L’entrée est ce que tu donnes au code ; l’attendu est ce que ton test doit 
 
 **Terminal · Commande à lancer au moment indiqué**
 
-Terminal du parcours : reste à la racine du dépôt. Exécute ces lignes au moment demandé dans les actions, avec les modifications manuelles entre les blocs.
+Terminal du Mac, dans cyberatelier/workspaces/reconwrap, venv Mac activé. Exécute chaque ligne au moment indiqué, avec les modifications manuelles entre les blocs.
 
 ```bash
 .venv/bin/python -m unittest -v
@@ -1004,13 +1380,36 @@ git commit -m "Ajoute la lecture des sorties adsim capturées"
 
 **Tu sais que c’est bon quand :** R13 passe : le nombre de comptes égale count, actifs et inactifs sont séparés, et broken.json donne ERREUR.
 
-*Indice si tu bloques :* Relis la structure de users.json avant d’écrire le code : le nom des champs compte. Compte les comptes à partir de la liste, puis compare à count.
+**Indices progressifs**
+
+Depuis le terminal dans `cyberatelier`, `python3 atelier.py indice` révèle un niveau à la fois. Ouvre seulement le niveau nécessaire.
+
+<details>
+<summary>Indice 1</summary>
+
+Le module AD lit les comptes fictifs ; count et enabled permettent de vérifier leur nombre et leur état.
+
+</details>
+
+<details>
+<summary>Indice 2</summary>
+
+Écris R13 sur users.json puis broken.json, compare les comptes à count et transforme le JSON cassé en ERREUR.
+
+</details>
+
+<details>
+<summary>Indice 3</summary>
+
+Un utilisateur enabled=true est actif ; enabled=false est inactif ; ces valeurs concernent LAB.LOCAL fictif, sans connexion à un annuaire réel.
+
+</details>
 
 #### Palier 6 — Lancer adsim sans shell (8 min)
 
 Appeler adsim depuis Python de façon sûre : liste d’arguments, délai maximal, et ERREUR en cas de panne.
 
-**Où tu travailles :** reconwrap/ad.py
+**Où tu travailles :** Mac · workspaces/reconwrap · reconwrap/ad.py
 
 **Pour comprendre**
 
@@ -1019,7 +1418,7 @@ Appeler adsim depuis Python de façon sûre : liste d’arguments, délai maxima
 
 **Éditeur · Exemple travaillé, sans rapport avec ReconWrap **
 
-Éditeur : copie cet exemple dans exemple.py (jetable), enregistre-le, puis lance python3 exemple.py. Si plusieurs exemples sont proposés, essaie-les un par un en remplaçant le contenu du fichier. Retire ensuite les fichiers générés et le fichier d’exemple.
+VS Code sur le Mac : copie cet exemple dans exemple.py (jetable), enregistre-le, puis lance python3 exemple.py. Si plusieurs exemples sont proposés, essaie-les un par un en remplaçant le contenu du fichier. Retire ensuite les fichiers générés et le fichier d’exemple.
 
 ```python
 import subprocess
@@ -1036,7 +1435,7 @@ print(resultat.returncode, resultat.stdout.strip())
 
 **Terminal · Commande à lancer au moment indiqué**
 
-Terminal du parcours : reste à la racine du dépôt. Exécute ces lignes au moment demandé dans les actions, avec les modifications manuelles entre les blocs.
+Terminal du Mac, dans cyberatelier/workspaces/reconwrap, venv Mac activé. Exécute chaque ligne au moment indiqué, avec les modifications manuelles entre les blocs.
 
 ```bash
 grep -n "shell=True" reconwrap/*.py   # aucune ligne ne doit s’afficher
@@ -1057,13 +1456,36 @@ git commit -m "Lance adsim avec subprocess et délai maximal"
 
 **Tu sais que c’est bon quand :** grep ne trouve aucun shell=True, et les tests R1 à R14 passent toujours.
 
-*Indice si tu bloques :* Le chemin d’adsim se construit à partir du dossier du projet (pathlib), pas à partir de l’endroit où tu tapes la commande. Lis la documentation de subprocess.run pour timeout.
+**Indices progressifs**
+
+Depuis le terminal dans `cyberatelier`, `python3 atelier.py indice` révèle un niveau à la fois. Ouvre seulement le niveau nécessaire.
+
+<details>
+<summary>Indice 1</summary>
+
+La voie réelle d’AD lance adsim sans shell ; les tests continuent à utiliser leurs fichiers JSON.
+
+</details>
+
+<details>
+<summary>Indice 2</summary>
+
+Prépare la liste d’arguments pour python3 /app/tools/adsim.py dans Docker, fixe le délai et normalise TimeoutExpired sans toucher à la voie fixture.
+
+</details>
+
+<details>
+<summary>Indice 3</summary>
+
+['python3', '/app/tools/adsim.py', 'users', '--format', 'json'] est une liste pour le processus Docker ; ce chemin ne s’ouvre pas directement sur le Mac.
+
+</details>
 
 #### Palier 7 — L’orchestration : un échec ne bloque pas les autres (R6) (8 min)
 
 Exécuter plusieurs modules dans l’ordre demandé, en isolant chaque échec.
 
-**Où tu travailles :** reconwrap/core.py ; tests/test_orchestration.py
+**Où tu travailles :** Mac · workspaces/reconwrap · reconwrap/core.py ; tests/test_orchestration.py
 
 **Pour comprendre**
 
@@ -1072,7 +1494,7 @@ Exécuter plusieurs modules dans l’ordre demandé, en isolant chaque échec.
 
 **Éditeur · Exemple travaillé, sans rapport avec ReconWrap **
 
-Éditeur : copie cet exemple dans exemple.py (jetable), enregistre-le, puis lance python3 exemple.py. Si plusieurs exemples sont proposés, essaie-les un par un en remplaçant le contenu du fichier. Retire ensuite les fichiers générés et le fichier d’exemple.
+VS Code sur le Mac : copie cet exemple dans exemple.py (jetable), enregistre-le, puis lance python3 exemple.py. Si plusieurs exemples sont proposés, essaie-les un par un en remplaçant le contenu du fichier. Retire ensuite les fichiers générés et le fichier d’exemple.
 
 ```python
 nombres = [1, 2, 3]
@@ -1113,7 +1535,7 @@ L’entrée est ce que tu donnes au code ; l’attendu est ce que ton test doit 
 
 **Terminal · Commande à lancer au moment indiqué**
 
-Terminal du parcours : reste à la racine du dépôt. Exécute ces lignes au moment demandé dans les actions, avec les modifications manuelles entre les blocs.
+Terminal du Mac, dans cyberatelier/workspaces/reconwrap, venv Mac activé. Exécute chaque ligne au moment indiqué, avec les modifications manuelles entre les blocs.
 
 ```bash
 .venv/bin/python -m unittest -v
@@ -1128,13 +1550,36 @@ git commit -m "Exécute plusieurs modules en isolant les échecs"
 
 **Tu sais que c’est bon quand :** R6 passe : résultats dans l’ordre A OK, B ERREUR, C OK ; C est bien exécuté après l’échec de B.
 
-*Indice si tu bloques :* L’ordre des résultats suit l’ordre de la liste reçue, pas celui du dictionnaire ni celui de l’exécution.
+**Indices progressifs**
+
+Depuis le terminal dans `cyberatelier`, `python3 atelier.py indice` révèle un niveau à la fois. Ouvre seulement le niveau nécessaire.
+
+<details>
+<summary>Indice 1</summary>
+
+Une boucle d’orchestration conserve l’ordre des modules et continue après une panne isolée par le dispatch.
+
+</details>
+
+<details>
+<summary>Indice 2</summary>
+
+Écris R6 avec A OK, B qui lève, C OK et vérifie à la fois les trois résultats et l’appel effectif de C.
+
+</details>
+
+<details>
+<summary>Indice 3</summary>
+
+Avec les résultats [A OK, B ERREUR, C OK], la présence de C montre que l’échec de B n’a pas arrêté toute la série.
+
+</details>
 
 #### Palier 8 — La CLI argparse et les modules inconnus (R7) (8 min)
 
 Lire les options de la ligne de commande et refuser un module inconnu avec le code de sortie 2.
 
-**Où tu travailles :** reconwrap/cli.py ; tests/test_cli.py
+**Où tu travailles :** Mac · workspaces/reconwrap · reconwrap/cli.py ; tests/test_cli.py
 
 **Pour comprendre**
 
@@ -1143,7 +1588,7 @@ Lire les options de la ligne de commande et refuser un module inconnu avec le co
 
 **Éditeur · Exemple travaillé, sans rapport avec ReconWrap **
 
-Éditeur : copie cet exemple dans exemple.py (jetable), enregistre-le, puis lance python3 exemple.py. Si plusieurs exemples sont proposés, essaie-les un par un en remplaçant le contenu du fichier. Retire ensuite les fichiers générés et le fichier d’exemple.
+VS Code sur le Mac : copie cet exemple dans exemple.py (jetable), enregistre-le, puis lance python3 exemple.py. Si plusieurs exemples sont proposés, essaie-les un par un en remplaçant le contenu du fichier. Retire ensuite les fichiers générés et le fichier d’exemple.
 
 ```python
 import argparse
@@ -1171,7 +1616,7 @@ L’entrée est ce que tu donnes au code ; l’attendu est ce que ton test doit 
 
 **Terminal · Commande à lancer au moment indiqué**
 
-Terminal du parcours : reste à la racine du dépôt. Exécute ces lignes au moment demandé dans les actions, avec les modifications manuelles entre les blocs.
+Terminal du Mac, dans cyberatelier/workspaces/reconwrap, venv Mac activé. Exécute chaque ligne au moment indiqué, avec les modifications manuelles entre les blocs.
 
 ```bash
 .venv/bin/python -m unittest -v
@@ -1179,7 +1624,7 @@ Terminal du parcours : reste à la racine du dépôt. Exécute ces lignes au mom
 
 **Terminal · Commande à lancer au moment indiqué**
 
-Terminal du parcours : reste à la racine du dépôt. Exécute ces lignes au moment demandé dans les actions, avec les modifications manuelles entre les blocs. Lance le programme et echo $? ensemble : le nombre affiché est le code du programme ; la console peut afficher code 0 pour echo lui-même.
+Terminal du Mac, dans cyberatelier/workspaces/reconwrap, venv Mac activé. Exécute chaque ligne au moment indiqué, avec les modifications manuelles entre les blocs. Lis le code de sortie immédiatement après le programme, avant toute autre commande.
 
 ```bash
 .venv/bin/python -m reconwrap --modules scanner; echo $?
@@ -1187,7 +1632,7 @@ Terminal du parcours : reste à la racine du dépôt. Exécute ces lignes au mom
 
 **Terminal · Enregistrer le travail vérifié**
 
-Terminal du parcours : reste à la racine du dépôt. Exécute ces lignes au moment demandé dans les actions, avec les modifications manuelles entre les blocs.
+Terminal du Mac, dans cyberatelier/workspaces/reconwrap, venv Mac activé. Exécute chaque ligne au moment indiqué, avec les modifications manuelles entre les blocs.
 
 ```bash
 git add reconwrap/cli.py reconwrap/__main__.py tests/test_cli.py
@@ -1196,13 +1641,36 @@ git commit -m "Ajoute la CLI argparse et le refus des modules inconnus"
 
 **Tu sais que c’est bon quand :** R7 passe, et la commande avec un module inconnu affiche 2 après le message d’erreur.
 
-*Indice si tu bloques :* Pour tester une sortie avec code 2, attends une exception SystemExit dans le test (assertRaises) et vérifie son code.
+**Indices progressifs**
+
+Depuis le terminal dans `cyberatelier`, `python3 atelier.py indice` révèle un niveau à la fois. Ouvre seulement le niveau nécessaire.
+
+<details>
+<summary>Indice 1</summary>
+
+La CLI valide tous les noms avant l’orchestration et l’écriture du rapport.
+
+</details>
+
+<details>
+<summary>Indice 2</summary>
+
+Écris R7 avec network,scanner et un dossier temporaire ; vérifie code 2, stderr et absence de fichier avant d’ajouter les appels.
+
+</details>
+
+<details>
+<summary>Indice 3</summary>
+
+Si un nom inconnu placé en second laisse déjà un rapport du premier module, la validation globale est arrivée trop tard.
+
+</details>
 
 #### Palier 9 — La cible refusée en CLI (R8) et git stash (10 min)
 
 Refuser une cible autre que 127.0.0.1 dans la CLI avant tout appel, et pratiquer git stash et git restore.
 
-**Où tu travailles :** reconwrap/cli.py ; tests/test_cli.py
+**Où tu travailles :** Mac · workspaces/reconwrap · reconwrap/cli.py ; tests/test_cli.py
 
 **Pour comprendre**
 
@@ -1227,7 +1695,7 @@ L’entrée est ce que tu donnes au code ; l’attendu est ce que ton test doit 
 
 **Terminal · Exemple jetable **
 
-Terminal du parcours : reste à la racine du dépôt. Exécute ces lignes au moment demandé dans les actions, avec les modifications manuelles entre les blocs.
+Terminal du Mac, dans cyberatelier/workspaces/reconwrap, venv Mac activé. Exécute chaque ligne au moment indiqué, avec les modifications manuelles entre les blocs.
 
 ```bash
 cd ~/essai-git && echo "ligne en trop" >> a.txt
@@ -1263,13 +1731,36 @@ git commit -m "Refuse une cible autre que 127.0.0.1 dans la CLI"
 
 **Tu sais que c’est bon quand :** R8 passe ; tu as vu git stash mettre tes modifications de côté et les rendre (git stash list est vide).
 
-*Indice si tu bloques :* Une cible refusée doit échouer avant le lancement de tout module : le contrôle se fait en tête de la CLI.
+**Indices progressifs**
+
+Depuis le terminal dans `cyberatelier`, `python3 atelier.py indice` révèle un niveau à la fois. Ouvre seulement le niveau nécessaire.
+
+<details>
+<summary>Indice 1</summary>
+
+Une cible refusée doit empêcher modules et fichiers ; stash conserve momentanément une modification suivie.
+
+</details>
+
+<details>
+<summary>Indice 2</summary>
+
+Écris R8 avant l’orchestration, puis observe stash/pop avec un commentaire d’essai et restore dans un dépôt jetable séparé.
+
+</details>
+
+<details>
+<summary>Indice 3</summary>
+
+Après stash, un commentaire temporaire disparaît du fichier ; après stash pop, il revient : cette expérience ne nécessite pas de supprimer ton travail utile.
+
+</details>
 
 #### Palier 10 — Rapports JSON et Markdown (R9, R10, R11) (12 min)
 
 Écrire un rapport JSON et Markdown déterministe, dans un dossier dédié, avec des noms de fichiers sûrs.
 
-**Où tu travailles :** reconwrap/rapport.py ; tests/test_rapport.py
+**Où tu travailles :** Mac · workspaces/reconwrap · reconwrap/rapport.py ; tests/test_rapport.py
 
 **Pour comprendre**
 
@@ -1279,7 +1770,7 @@ git commit -m "Refuse une cible autre que 127.0.0.1 dans la CLI"
 
 **Éditeur · Exemple travaillé, sans rapport avec ReconWrap **
 
-Éditeur : copie cet exemple dans exemple.py (jetable), enregistre-le, puis lance python3 exemple.py. Si plusieurs exemples sont proposés, essaie-les un par un en remplaçant le contenu du fichier. Retire ensuite les fichiers générés et le fichier d’exemple.
+VS Code sur le Mac : copie cet exemple dans exemple.py (jetable), enregistre-le, puis lance python3 exemple.py. Si plusieurs exemples sont proposés, essaie-les un par un en remplaçant le contenu du fichier. Retire ensuite les fichiers générés et le fichier d’exemple.
 
 ```python
 import json
@@ -1332,7 +1823,7 @@ L’entrée est ce que tu donnes au code ; l’attendu est ce que ton test doit 
 
 **Terminal · Commande à lancer au moment indiqué**
 
-Terminal du parcours : reste à la racine du dépôt. Exécute ces lignes au moment demandé dans les actions, avec les modifications manuelles entre les blocs.
+Terminal du Mac, dans cyberatelier/workspaces/reconwrap, venv Mac activé. Exécute chaque ligne au moment indiqué, avec les modifications manuelles entre les blocs.
 
 ```bash
 .venv/bin/python -m unittest -v
@@ -1340,15 +1831,11 @@ Terminal du parcours : reste à la racine du dépôt. Exécute ces lignes au mom
 
 **Terminal · Commande à lancer au moment indiqué**
 
-Terminal du parcours : reste à la racine du dépôt. Exécute ces lignes au moment demandé dans les actions, avec les modifications manuelles entre les blocs. rapport_a et rapport_b désignent les deux dossiers que tu crées pour ton essai ; adapte leurs noms aux sorties de ton programme.
-
 ```bash
 cmp rapport_a/rapport.json rapport_b/rapport.json   # sans sortie : fichiers identiques
 ```
 
 **Terminal · Enregistrer le travail vérifié**
-
-Terminal du parcours : reste à la racine du dépôt. Exécute ces lignes au moment demandé dans les actions, avec les modifications manuelles entre les blocs.
 
 ```bash
 git add reconwrap/rapport.py tests/test_rapport.py
@@ -1357,70 +1844,114 @@ git commit -m "Ajoute les rapports JSON et Markdown"
 
 **Tu sais que c’est bon quand :** R9, R10 et R11 passent ; deux écritures donnent des JSON identiques ; aucun fichier ne sort du dossier demandé.
 
-*Indice si tu bloques :* Passe la date en argument de la fonction et écris le JSON avec sort_keys=True. Pour R11, lis les résultats dans l’ordre reçu et construis les lignes au fur et à mesure.
+**Indices progressifs**
+
+Depuis le terminal dans `cyberatelier`, `python3 atelier.py indice` révèle un niveau à la fois. Ouvre seulement le niveau nécessaire.
+
+<details>
+<summary>Indice 1</summary>
+
+Un rapport déterministe reçoit sa date ; un nom de sortie ne doit pas permettre de sortir du dossier prévu.
+
+</details>
+
+<details>
+<summary>Indice 2</summary>
+
+Écris R9 à R11 avec date injectée, chemins refusés/nettoyés et ordre Markdown, puis compare les octets de deux sorties JSON.
+
+</details>
+
+<details>
+<summary>Indice 3</summary>
+
+Même données et date fixe doivent donner deux JSON identiques ; un nom '../../ailleurs' ne doit jamais créer un fichier hors du dossier de rapport.
+
+</details>
 
 #### Palier 11 — Démonstrations contre le labo (hors CI) (8 min)
 
 Prouver, à un moment donné et labo démarré, que D1 à D6 se comportent comme attendu. Ce ne sont pas des tests.
 
-**Où tu travailles :** Outils réels dans Docker ; MR GitLab
+**Où tu travailles :** Mac · cyberatelier pour piloter les démos Docker ; workspaces/reconwrap pour tests et Git
 
 **Pour comprendre**
 
 - Les six démos lancent les voies réelles. Le pipeline futur continuera à lire des fixtures et des données injectées.
 - Dans Docker, utilise python3 ; un venv créé sur le Mac n’est pas réutilisable dans le conteneur.
+- Docker doit monter le dossier workspaces du Mac : conserve compose.override.yaml prévu par le mode VS Code. Vérifie que /workspaces/reconwrap contient ton package avant les démos ; le conteneur ne peut pas voir un dossier Mac qui n’est pas monté.
 
 **Actions dans l’ordre**
 
-1. Démarre le labo intégré. Ouvre le conteneur et place-toi dans /workspaces/reconwrap.
+1. Depuis un second terminal du Mac placé dans cyberatelier, lance python3 atelier.py labo demarrer. Les commandes docker compose exec -T -w /workspaces/reconwrap ci-dessous exécutent le package dans Docker, où nmap et /app/tools/adsim.py sont fournis. Tu n’entres pas dans un shell du conteneur.
 2. D1 : réseau, port 8000 open. D2 : web /fragile, trois alertes. D3 : web /durci, zéro alerte.
 3. D4 : /absent puis /erreur, ERREUR avec les codes 404 puis 500 conservés.
-4. D5 : adsim, comptes fictifs LAB.LOCAL. D6 : arrête le labo, observe une panne web sans code HTTP et un rapport tout de même écrit ; relance ensuite le labo.
-5. Note les résultats dans les notes du parcours, puis relance les tests et relis le diff contre main.
+4. D5 : adsim, comptes fictifs LAB.LOCAL. Pour D6, lance python3 atelier.py labo arreter depuis cyberatelier, observe une panne web sans code HTTP et un rapport tout de même écrit ; relance avec python3 atelier.py labo demarrer.
+5. Note les résultats dans ton bilan (ou python3 atelier.py note depuis cyberatelier), puis retourne au terminal Mac dans workspaces/reconwrap avec le venv activé pour les tests et git diff contre main.
 6. Commite le travail nécessaire, pousse feat/orchestration-rapport et ouvre MR2 dans GitLab. Fusionne après relecture et autorisation de l’école ; la CI arrive en MR3. Mets main à jour.
 
-**Terminal · Commande à lancer au moment indiqué**
+**Terminal · Démarrer le labo Docker**
 
-Terminal du parcours : reste à la racine du dépôt. Exécute ces lignes au moment demandé dans les actions, avec les modifications manuelles entre les blocs.
+Terminal du Mac dans cyberatelier. D1 à D5 ci-dessous tournent dans le conteneur et utilisent son labo interne.
 
 ```bash
-python3 -m reconwrap --modules network --cible 127.0.0.1 --format json --sortie rapports/   # D1
+python3 atelier.py labo demarrer
+```
+
+**Terminal · Vérifier le code monté dans Docker**
+
+Terminal du Mac dans cyberatelier. Le dossier listé doit contenir les fichiers de ton package actuel, sans copier ni remplacer ton code.
+
+```bash
+docker compose exec -T -w /workspaces/reconwrap atelier ls reconwrap
+```
+
+**Terminal · Commande à lancer au moment indiqué**
+
+Terminal du Mac dans cyberatelier. Docker exécute le package dans /workspaces/reconwrap avec son python3 ; le venv .venv du Mac ne fonctionne pas dans le conteneur. Les rapports apparaissent dans workspaces/reconwrap/rapports si ce dossier hôte est monté.
+
+```bash
+docker compose exec -T -w /workspaces/reconwrap atelier python3 -m reconwrap --modules network --cible 127.0.0.1 --format json --sortie rapports/   # D1
 ```
 
 **Terminal · Commande à lancer au moment indiqué**
 
 ```bash
-python3 -m reconwrap --modules web --chemin /fragile --format md --sortie rapports/   # D2
+docker compose exec -T -w /workspaces/reconwrap atelier python3 -m reconwrap --modules web --chemin /fragile --format md --sortie rapports/   # D2
 ```
 
 **Terminal · Commande à lancer au moment indiqué**
 
 ```bash
-python3 -m reconwrap --modules web --chemin /durci --format md --sortie rapports/   # D3
+docker compose exec -T -w /workspaces/reconwrap atelier python3 -m reconwrap --modules web --chemin /durci --format md --sortie rapports/   # D3
 ```
 
 **Terminal · Commande à lancer au moment indiqué**
 
 ```bash
-python3 -m reconwrap --modules web --chemin /absent --format md --sortie rapports/   # D4 (puis --chemin /erreur)
+docker compose exec -T -w /workspaces/reconwrap atelier python3 -m reconwrap --modules web --chemin /absent --format md --sortie rapports/   # D4 (puis --chemin /erreur)
 ```
 
 **Terminal · Commande à lancer au moment indiqué**
 
 ```bash
-python3 -m reconwrap --modules ad --format json --sortie rapports/   # D5, dans le conteneur
+docker compose exec -T -w /workspaces/reconwrap atelier python3 -m reconwrap --modules ad --format json --sortie rapports/   # D5, dans le conteneur
 ```
 
 **Terminal · Commande à lancer au moment indiqué**
 
 ```bash
-python3 -m reconwrap --modules network,web,ad --format json --sortie rapports/   # D6, labo arrêté
+python3 atelier.py labo arreter
+docker compose exec -T -w /workspaces/reconwrap atelier python3 -m reconwrap --modules network,web,ad --format json --sortie rapports/   # D6, labo arrêté
+python3 atelier.py labo demarrer
 ```
 
 **Terminal · Commande à lancer au moment indiqué**
 
+Terminal du Mac, dans cyberatelier/workspaces/reconwrap, venv Mac activé. Exécute chaque ligne au moment indiqué, avec les modifications manuelles entre les blocs.
+
 ```bash
-python3 -m unittest -v
+.venv/bin/python -m unittest -v
 ```
 
 **Terminal · Relire l’état du dépôt**
@@ -1450,11 +1981,36 @@ git pull --ff-only
 
 **Tu sais que c’est bon quand :** D1 : port 8000 open. D2 : trois alertes. D3 : zéro alerte. D4 : ERREUR avec 404, puis 500. D5 : comptes LAB.LOCAL. D6 : panne web distincte d’un code HTTP, et le rapport est écrit.
 
-*Indice si tu bloques :* Si une démonstration donne un résultat inattendu, vérifie d’abord que le labo est démarré (son bouton) avant de changer le code.
+**Indices progressifs**
+
+Depuis le terminal dans `cyberatelier`, `python3 atelier.py indice` révèle un niveau à la fois. Ouvre seulement le niveau nécessaire.
+
+<details>
+<summary>Indice 1</summary>
+
+Les démos de ReconWrap exécutent le package dans Docker depuis le terminal Mac ; les tests Mac utilisent toujours leur venv.
+
+</details>
+
+<details>
+<summary>Indice 2</summary>
+
+Depuis cyberatelier, démarre le labo Docker avec atelier.py, lance les commandes exec -w /workspaces/reconwrap et observe D1 à D6 avant de revenir aux tests Mac.
+
+</details>
+
+<details>
+<summary>Indice 3</summary>
+
+Avec le labo Docker arrêté, le module web doit signaler une panne sans code HTTP et l’orchestrateur écrire quand même le rapport des autres résultats.
+
+</details>
 
 **Démonstrations manuelles (hors CI)**
 
-Ces essais utilisent le laboratoire ou les outils réels. Ils sont séparés des tests obligatoires.
+Ces essais lisent des fichiers locaux ou utilisent le labo et les outils réels, selon le parcours. Ils sont séparés des tests obligatoires.
+
+Les cartes ci-dessous conservent le contrat de démonstration initial. Depuis le terminal Mac dans `cyberatelier`, les mentions du « bouton du labo » se réalisent avec `python3 atelier.py labo demarrer` ou `python3 atelier.py labo arreter`. Utilise les commandes Docker du palier de démonstration pour exécuter les outils dans le bon environnement.
 
 **D1 — Réseau contre le labo**
 - Entrée : Labo démarré avec son bouton. python -m reconwrap --modules network --cible 127.0.0.1 --format json --sortie rapports/
@@ -1502,7 +2058,7 @@ Tu livres une version qu’une autre personne peut lancer et étendre avec le co
 
 Relire ton diff comme si c’était celui d’un autre, puis ajouter docstrings et annotations à l’API publique.
 
-**Où tu travailles :** reconwrap/
+**Où tu travailles :** Mac · workspaces/reconwrap · reconwrap/
 
 **Pour comprendre**
 
@@ -1511,7 +2067,7 @@ Relire ton diff comme si c’était celui d’un autre, puis ajouter docstrings 
 
 **Éditeur · Exemple travaillé, sans rapport avec ReconWrap **
 
-Éditeur : copie cet exemple dans exemple.py (jetable), enregistre-le, puis lance python3 exemple.py. Si plusieurs exemples sont proposés, essaie-les un par un en remplaçant le contenu du fichier. Retire ensuite les fichiers générés et le fichier d’exemple.
+VS Code sur le Mac : copie cet exemple dans exemple.py (jetable), enregistre-le, puis lance python3 exemple.py. Si plusieurs exemples sont proposés, essaie-les un par un en remplaçant le contenu du fichier. Retire ensuite les fichiers générés et le fichier d’exemple.
 
 ```python
 def compter_mots(texte: str) -> int:
@@ -1521,7 +2077,7 @@ def compter_mots(texte: str) -> int:
 
 **Actions dans l’ordre**
 
-1. Ouvre workspaces/reconwrap dans VS Code, ou Coder dans Cyber Atelier avec cwd sur « . ».
+1. Ouvre workspaces/reconwrap dans VS Code. Dans le terminal du Mac, place-toi dans ce même dossier et active son venv avec source .venv/bin/activate.
 2. Vérifie que MR2 est fusionnée.
 3. Lis git status ; enregistre ton travail en cours avant de changer de branche.
 4. Reviens sur main avec git switch main, mets-la à jour avec git pull --ff-only, puis crée feat/doc-qualite. Remplace main par master si ton dépôt utilise ce nom.
@@ -1530,7 +2086,7 @@ def compter_mots(texte: str) -> int:
 
 **Terminal · Commande à lancer au moment indiqué**
 
-Terminal du parcours : reste à la racine du dépôt. Exécute ces lignes au moment demandé dans les actions, avec les modifications manuelles entre les blocs.
+Terminal du Mac, dans cyberatelier/workspaces/reconwrap, venv Mac activé. Exécute chaque ligne au moment indiqué, avec les modifications manuelles entre les blocs.
 
 ```bash
 git switch main && git pull --ff-only && git switch -c feat/doc-qualite
@@ -1558,13 +2114,36 @@ git commit -m "Ajoute docstrings et annotations de type"
 
 **Tu sais que c’est bon quand :** Chaque fonction publique a une docstring exacte et des annotations ; les tests passent toujours.
 
-*Indice si tu bloques :* Relis en te mettant à la place de quelqu’un qui n’a pas écrit le code : si un nom ou un message ne dit pas ce qu’il fait, corrige le nom ou la docstring.
+**Indices progressifs**
+
+Depuis le terminal dans `cyberatelier`, `python3 atelier.py indice` révèle un niveau à la fois. Ouvre seulement le niveau nécessaire.
+
+<details>
+<summary>Indice 1</summary>
+
+Une API documentée précise entrées, retours, erreurs et effets ; la relecture porte sur les fonctions publiques finales.
+
+</details>
+
+<details>
+<summary>Indice 2</summary>
+
+Actualise main, crée feat/doc-qualite et relis le code avec une checklist avant d’ajouter annotations et docstrings.
+
+</details>
+
+<details>
+<summary>Indice 3</summary>
+
+Une docstring « reçoit une liste de noms et retourne leurs résultats dans l’ordre » aide l’appelant davantage que « fait le travail ».
+
+</details>
 
 #### Palier 2 — Écrire le README (10 min)
 
 Écrire un README qu’une personne sans aide peut suivre pour installer, lancer et étendre l’outil.
 
-**Où tu travailles :** README.md
+**Où tu travailles :** Mac · workspaces/reconwrap · README.md
 
 **Pour comprendre**
 
@@ -1573,7 +2152,7 @@ git commit -m "Ajoute docstrings et annotations de type"
 
 **Éditeur · Exemple travaillé, sans rapport avec ReconWrap **
 
-Éditeur : exemple de syntaxe, à adapter ; ce bloc ne se lance pas dans le terminal.
+VS Code sur le Mac : exemple de syntaxe, à adapter ; ce bloc ne se lance pas dans le terminal.
 
 ````markdown
 # Recettes
@@ -1593,7 +2172,7 @@ python3 -m venv .venv
 
 **Terminal · Enregistrer le travail vérifié**
 
-Terminal du parcours : reste à la racine du dépôt. Exécute ces lignes au moment demandé dans les actions, avec les modifications manuelles entre les blocs.
+Terminal du Mac, dans cyberatelier/workspaces/reconwrap, venv Mac activé. Exécute chaque ligne au moment indiqué, avec les modifications manuelles entre les blocs.
 
 ```bash
 git add README.md
@@ -1602,13 +2181,36 @@ git commit -m "Rédige le README"
 
 **Tu sais que c’est bon quand :** Tu as suivi le README dans un dossier propre et tu lances les tests et l’aide sans rien devoir deviner.
 
-*Indice si tu bloques :* Pour chaque étape du README, écris la commande exacte puis le résultat attendu. Une phrase qui ne correspond à rien dans le code doit être corrigée.
+**Indices progressifs**
+
+Depuis le terminal dans `cyberatelier`, `python3 atelier.py indice` révèle un niveau à la fois. Ouvre seulement le niveau nécessaire.
+
+<details>
+<summary>Indice 1</summary>
+
+Le README permet de reproduire installation, tests et démos dans les bons environnements.
+
+</details>
+
+<details>
+<summary>Indice 2</summary>
+
+Écris les commandes Mac/venv pour les tests et racine Cyber Atelier/Docker pour les démos, puis distingue leurs preuves.
+
+</details>
+
+<details>
+<summary>Indice 3</summary>
+
+Une instruction « python -m reconwrap » sans dossier ni interpréteur ne dit pas si le package du Mac ou celui monté dans Docker est utilisé.
+
+</details>
 
 #### Palier 3 — Contrat des trois modules et aide CLI (R15, R17) (8 min)
 
 Vérifier que les trois modules respectent le contrat hors ligne, et que l’aide de la CLI est complète.
 
-**Où tu travailles :** tests/test_contrat.py ; tests/test_cli.py
+**Où tu travailles :** Mac · workspaces/reconwrap · tests/test_contrat.py ; tests/test_cli.py
 
 **Pour comprendre**
 
@@ -1617,7 +2219,7 @@ Vérifier que les trois modules respectent le contrat hors ligne, et que l’aid
 
 **Éditeur · Exemple travaillé, sans rapport avec ReconWrap **
 
-Éditeur : place ce code dans un fichier d’exemple jetable, puis lance ce fichier avec python3. Un extrait avec self se place dans une méthode de test.
+VS Code sur le Mac : place ce code dans un fichier d’exemple jetable, puis lance ce fichier avec python3. Un extrait avec self se place dans une méthode de test.
 
 ```python
 import unittest
@@ -1649,7 +2251,7 @@ L’entrée est ce que tu donnes au code ; l’attendu est ce que ton test doit 
 
 **Terminal · Commande à lancer au moment indiqué**
 
-Terminal du parcours : reste à la racine du dépôt. Exécute ces lignes au moment demandé dans les actions, avec les modifications manuelles entre les blocs.
+Terminal du Mac, dans cyberatelier/workspaces/reconwrap, venv Mac activé. Exécute chaque ligne au moment indiqué, avec les modifications manuelles entre les blocs.
 
 ```bash
 .venv/bin/python -m unittest -v
@@ -1657,7 +2259,7 @@ Terminal du parcours : reste à la racine du dépôt. Exécute ces lignes au mom
 
 **Terminal · Commande à lancer au moment indiqué**
 
-Terminal du parcours : reste à la racine du dépôt. Exécute ces lignes au moment demandé dans les actions, avec les modifications manuelles entre les blocs. Lance le programme et echo $? ensemble : le nombre affiché est le code du programme ; la console peut afficher code 0 pour echo lui-même.
+Terminal du Mac, dans cyberatelier/workspaces/reconwrap, venv Mac activé. Exécute chaque ligne au moment indiqué, avec les modifications manuelles entre les blocs. Lis le code de sortie immédiatement après le programme, avant toute autre commande.
 
 ```bash
 .venv/bin/python -m reconwrap --help; echo $?
@@ -1665,7 +2267,7 @@ Terminal du parcours : reste à la racine du dépôt. Exécute ces lignes au mom
 
 **Terminal · Enregistrer le travail vérifié**
 
-Terminal du parcours : reste à la racine du dépôt. Exécute ces lignes au moment demandé dans les actions, avec les modifications manuelles entre les blocs.
+Terminal du Mac, dans cyberatelier/workspaces/reconwrap, venv Mac activé. Exécute chaque ligne au moment indiqué, avec les modifications manuelles entre les blocs.
 
 ```bash
 git add tests/test_contrat.py tests/test_cli.py
@@ -1674,13 +2276,36 @@ git commit -m "Ajoute les tests de contrat et d’aide CLI"
 
 **Tu sais que c’est bon quand :** R15 et R17 passent, et l’aide affiche les cinq options.
 
-*Indice si tu bloques :* Pour un module hors ligne, passe-lui le fichier de fixture au lieu de le lancer : le test reste rapide et sans réseau.
+**Indices progressifs**
+
+Depuis le terminal dans `cyberatelier`, `python3 atelier.py indice` révèle un niveau à la fois. Ouvre seulement le niveau nécessaire.
+
+<details>
+<summary>Indice 1</summary>
+
+Le même contrat s’applique aux trois modules ; --help doit décrire les options sans lancer de reconnaissance.
+
+</details>
+
+<details>
+<summary>Indice 2</summary>
+
+Écris R15 sur les entrées injectées et R17 dans un nouvel interpréteur ; vérifie les cinq clés et le code 0 de l’aide.
+
+</details>
+
+<details>
+<summary>Indice 3</summary>
+
+network depuis XML, ad depuis JSON et web depuis code/en-têtes peuvent tous rendre module/statut/donnees/alertes/duree_s sans partager leurs données internes.
+
+</details>
 
 #### Palier 4 — Le pipeline GitLab et la suite complète (R16) (10 min)
 
 Écrire le pipeline qui lance les tests sur chaque merge request, et prouver que la suite passe sans labo ni nmap.
 
-**Où tu travailles :** .gitlab-ci.yml
+**Où tu travailles :** Mac · workspaces/reconwrap · .gitlab-ci.yml
 
 **Pour comprendre**
 
@@ -1689,7 +2314,7 @@ git commit -m "Ajoute les tests de contrat et d’aide CLI"
 
 **Éditeur · Exemple YAML sans rapport avec ReconWrap **
 
-Éditeur : exemple de syntaxe, à adapter ; ce bloc ne se lance pas dans le terminal.
+VS Code sur le Mac : exemple de syntaxe, à adapter ; ce bloc ne se lance pas dans le terminal.
 
 ```yaml
 courses:
@@ -1715,7 +2340,7 @@ L’entrée est ce que tu donnes au code ; l’attendu est ce que ton test doit 
 
 **Terminal · Commande à lancer au moment indiqué**
 
-Terminal du parcours : reste à la racine du dépôt. Exécute ces lignes au moment demandé dans les actions, avec les modifications manuelles entre les blocs. Lance le programme et echo $? ensemble : le nombre affiché est le code du programme ; la console peut afficher code 0 pour echo lui-même.
+Terminal du Mac, dans cyberatelier/workspaces/reconwrap, venv Mac activé. Exécute chaque ligne au moment indiqué, avec les modifications manuelles entre les blocs. Lis le code de sortie immédiatement après le programme, avant toute autre commande.
 
 ```bash
 .venv/bin/python -m unittest; echo $?
@@ -1723,7 +2348,7 @@ Terminal du parcours : reste à la racine du dépôt. Exécute ces lignes au mom
 
 **Terminal · Enregistrer le travail vérifié**
 
-Terminal du parcours : reste à la racine du dépôt. Exécute ces lignes au moment demandé dans les actions, avec les modifications manuelles entre les blocs.
+Terminal du Mac, dans cyberatelier/workspaces/reconwrap, venv Mac activé. Exécute chaque ligne au moment indiqué, avec les modifications manuelles entre les blocs.
 
 ```bash
 git add .gitlab-ci.yml
@@ -1738,13 +2363,36 @@ git push -u origin feat/doc-qualite
 
 **Tu sais que c’est bon quand :** La commande du pipeline est celle que tu as testée en local, depuis la racine, et elle sort avec 0. Le statut du pipeline dans GitLab est noté tel qu’il est.
 
-*Indice si tu bloques :* Le piège fréquent : une commande qui marche depuis un sous-dossier, mais pas depuis la racine. Tu lances tes tests depuis la racine, comme le pipeline.
+**Indices progressifs**
+
+Depuis le terminal dans `cyberatelier`, `python3 atelier.py indice` révèle un niveau à la fois. Ouvre seulement le niveau nécessaire.
+
+<details>
+<summary>Indice 1</summary>
+
+La suite complète doit être découverte par unittest et tourner sans labo, nmap ou adsim sur le runner.
+
+</details>
+
+<details>
+<summary>Indice 2</summary>
+
+Arrête le labo, vérifie R1 à R15 réellement exécutés puis la CI de MR ; R17 couvre l’aide CLI séparément.
+
+</details>
+
+<details>
+<summary>Indice 3</summary>
+
+« Ran 0 tests » suivi de OK signifie que la découverte n’a trouvé aucune vérification ; ce n’est pas une réussite de R16.
+
+</details>
 
 #### Palier 5 — Le CHANGELOG de la version 0.1.0 (8 min)
 
 Écrire l’historique de la version 0.1.0 : ce qui est ajouté et ce qui reste limité.
 
-**Où tu travailles :** CHANGELOG.md
+**Où tu travailles :** Mac · workspaces/reconwrap · CHANGELOG.md
 
 **Pour comprendre**
 
@@ -1753,7 +2401,7 @@ git push -u origin feat/doc-qualite
 
 **Éditeur · Exemple travaillé, sans rapport avec ReconWrap **
 
-Éditeur : exemple de syntaxe, à adapter ; ce bloc ne se lance pas dans le terminal.
+VS Code sur le Mac : exemple de syntaxe, à adapter ; ce bloc ne se lance pas dans le terminal.
 
 ```markdown
 ## 0.1.0
@@ -1772,7 +2420,7 @@ git push -u origin feat/doc-qualite
 
 **Terminal · Enregistrer le travail vérifié**
 
-Terminal du parcours : reste à la racine du dépôt. Exécute ces lignes au moment demandé dans les actions, avec les modifications manuelles entre les blocs.
+Terminal du Mac, dans cyberatelier/workspaces/reconwrap, venv Mac activé. Exécute chaque ligne au moment indiqué, avec les modifications manuelles entre les blocs.
 
 ```bash
 git add CHANGELOG.md
@@ -1781,13 +2429,36 @@ git commit -m "Ajoute le CHANGELOG pour la version 0.1.0"
 
 **Tu sais que c’est bon quand :** CHANGELOG.md contient une section 0.1.0 avec des ajouts et des limites connues.
 
-*Indice si tu bloques :* Une limite connue est une information utile : par exemple, le module AD ne tourne que sur le domaine fictif.
+**Indices progressifs**
+
+Depuis le terminal dans `cyberatelier`, `python3 atelier.py indice` révèle un niveau à la fois. Ouvre seulement le niveau nécessaire.
+
+<details>
+<summary>Indice 1</summary>
+
+Un CHANGELOG décrit les changements livrés d’une version, avec une date et des limites compréhensibles.
+
+</details>
+
+<details>
+<summary>Indice 2</summary>
+
+Liste architecture, modules, rapports et tests effectivement présents en 0.1.0, sans annoncer les fonctions du futur projet.
+
+</details>
+
+<details>
+<summary>Indice 3</summary>
+
+Une entrée « Ajoute export Markdown et isolation des erreurs de module » décrit du livré ; « ajoutera Active Directory réel » est un projet futur.
+
+</details>
 
 #### Palier 6 — La page sur le projet final (8 min)
 
 Rédiger un bilan honnête : ce qui est fait, ce qui reste à apprendre, et les autorisations nécessaires.
 
-**Où tu travailles :** docs/PROJET_FINAL.md
+**Où tu travailles :** Mac · workspaces/reconwrap · docs/PROJET_FINAL.md
 
 **Pour comprendre**
 
@@ -1803,7 +2474,7 @@ Rédiger un bilan honnête : ce qui est fait, ce qui reste à apprendre, et les 
 
 **Terminal · Enregistrer le travail vérifié**
 
-Terminal du parcours : reste à la racine du dépôt. Exécute ces lignes au moment demandé dans les actions, avec les modifications manuelles entre les blocs.
+Terminal du Mac, dans cyberatelier/workspaces/reconwrap, venv Mac activé. Exécute chaque ligne au moment indiqué, avec les modifications manuelles entre les blocs.
 
 ```bash
 git add docs/PROJET_FINAL.md
@@ -1812,13 +2483,36 @@ git commit -m "Rédige la page sur le projet final"
 
 **Tu sais que c’est bon quand :** docs/PROJET_FINAL.md distingue fait, à faire, et autorisation nécessaire.
 
-*Indice si tu bloques :* Un projet qui touche à un vrai réseau ou un vrai annuaire demande une autorisation écrite avant le premier test, même pour un essai rapide.
+**Indices progressifs**
+
+Depuis le terminal dans `cyberatelier`, `python3 atelier.py indice` révèle un niveau à la fois. Ouvre seulement le niveau nécessaire.
+
+<details>
+<summary>Indice 1</summary>
+
+La page sur le projet final relie compétences acquises et prochains besoins sans changer le cadre de l’entraînement.
+
+</details>
+
+<details>
+<summary>Indice 2</summary>
+
+Explique les éléments réutilisables puis les travaux encore nécessaires sur le domaine personnel et les outils réels.
+
+</details>
+
+<details>
+<summary>Indice 3</summary>
+
+Réutiliser le contrat de module et le registre prépare une extension ; adsim fictif ne fournit pas un module pour un vrai annuaire.
+
+</details>
 
 #### Palier 7 — Un conflit et un revert dans des branches jetables (8 min)
 
 Résoudre un conflit en lisant les marqueurs, et annuler un commit avec git revert, sans toucher à la branche principale.
 
-**Où tu travailles :** README.md dans les branches jetables
+**Où tu travailles :** Mac · workspaces/reconwrap · README.md dans les branches jetables
 
 **Pour comprendre**
 
@@ -1836,7 +2530,7 @@ Résoudre un conflit en lisant les marqueurs, et annuler un commit avec git reve
 
 **Terminal · Relire l’état du dépôt**
 
-Terminal du parcours : reste à la racine du dépôt. Exécute ces lignes au moment demandé dans les actions, avec les modifications manuelles entre les blocs.
+Terminal du Mac, dans cyberatelier/workspaces/reconwrap, venv Mac activé. Exécute chaque ligne au moment indiqué, avec les modifications manuelles entre les blocs.
 
 ```bash
 git status
@@ -1907,13 +2601,36 @@ git branch
 
 **Tu sais que c’est bon quand :** Avant nettoyage, tu as observé un conflit résolu sans marqueurs et un commit suivi de son revert. Après nettoyage, tu es sur feat/doc-qualite, les branches jetables ont disparu et les tests passent.
 
-*Indice si tu bloques :* Ne garde jamais les marqueurs. Pour annuler, utilise git revert sur une branche jetable, pas git reset. git branch -D ne sert qu’aux branches jetables.
+**Indices progressifs**
+
+Depuis le terminal dans `cyberatelier`, `python3 atelier.py indice` révèle un niveau à la fois. Ouvre seulement le niveau nécessaire.
+
+<details>
+<summary>Indice 1</summary>
+
+Les branches jetables isolent un conflit ou un revert ; revert garde le commit initial et son inverse dans l’historique.
+
+</details>
+
+<details>
+<summary>Indice 2</summary>
+
+Commence avec status propre, résous les marqueurs dans les branches d’essai, puis reviens sur feat/doc-qualite avant leur nettoyage.
+
+</details>
+
+<details>
+<summary>Indice 3</summary>
+
+Un commit « ajoute ligne test » suivi d’un revert conserve deux entrées du graphe même si la ligne a disparu du fichier final.
+
+</details>
 
 #### Palier 8 — Ouvrir la MR3, la fusionner et poser le tag v0.1.0 (8 min)
 
 Faire relire la MR3, la fusionner si l’école l’autorise, puis poser le tag annoté v0.1.0 sur la principale.
 
-**Où tu travailles :** MR GitLab ; tag v0.1.0
+**Où tu travailles :** Mac · workspaces/reconwrap · MR GitLab ; tag v0.1.0
 
 **Pour comprendre**
 
@@ -1930,7 +2647,7 @@ Faire relire la MR3, la fusionner si l’école l’autorise, puis poser le tag 
 
 **Terminal · Relire l’état du dépôt**
 
-Terminal du parcours : reste à la racine du dépôt. Exécute ces lignes au moment demandé dans les actions, avec les modifications manuelles entre les blocs.
+Terminal du Mac, dans cyberatelier/workspaces/reconwrap, venv Mac activé. Exécute chaque ligne au moment indiqué, avec les modifications manuelles entre les blocs.
 
 ```bash
 git status
@@ -1968,7 +2685,30 @@ git show --stat v0.1.0
 
 **Tu sais que c’est bon quand :** git tag --list affiche v0.1.0, et git show v0.1.0 pointe sur le même commit que main après fusion.
 
-*Indice si tu bloques :* Si la fusion n’a pas eu lieu, ne pose pas le tag. Un tag annoté a son propre message : écris-le court.
+**Indices progressifs**
+
+Depuis le terminal dans `cyberatelier`, `python3 atelier.py indice` révèle un niveau à la fois. Ouvre seulement le niveau nécessaire.
+
+<details>
+<summary>Indice 1</summary>
+
+Le tag de version doit nommer la livraison finale fusionnée ; son push est distinct du push de branche.
+
+</details>
+
+<details>
+<summary>Indice 2</summary>
+
+Vérifie le dernier pipeline et le diff MR3, récupère la fusion sur main puis crée et inspecte v0.1.0 avant son push.
+
+</details>
+
+<details>
+<summary>Indice 3</summary>
+
+git show --stat v0.1.0 affiche le commit nommé ; si la documentation finale manque dans ce commit, le tag a été créé sur la mauvaise version.
+
+</details>
 
 **Avant de livrer**
 
@@ -1981,7 +2721,7 @@ git show --stat v0.1.0
 
 ## Méthode GitLab
 
-Utilise un dépôt autorisé par ton école. Vérifie que le runner est actif sur les branches de merge request et que tu as les droits d’ouverture et de fusion. Pour chaque étape : pars de la branche principale à jour, écris le code et les tests, lance `python -m unittest` en local, relis le diff, pousse, ouvre la merge request, attends un pipeline vert, puis fusionne. Après chaque fusion, mets la principale à jour avant de créer la branche suivante.
+Utilise un dépôt autorisé par ton école. Vérifie que le runner est actif sur les branches de merge request et que tu as les droits d’ouverture et de fusion. Pour chaque étape : pars de la branche principale à jour, écris le code et les tests, lance `python3 -m unittest` en local, relis le diff, pousse, ouvre la merge request, attends un pipeline vert, puis fusionne. Après chaque fusion, mets la principale à jour avant de créer la branche suivante.
 
 **Quatre résultats à ne pas confondre :**
 

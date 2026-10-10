@@ -29,17 +29,74 @@ Ces exercices sont ton entraînement. Chaque palier explique les notions utiles,
 2. Les cartes de tests donnent l’entrée et le résultat attendu. Écris les tests correspondants dans le fichier indiqué ; cocher un palier ne les exécute pas. Avec unittest, « Ran 0 tests » signifie qu’aucun test n’a été exécuté : ce n’est pas une validation. Un cas décrit peut contenir plusieurs valeurs ; le nombre de méthodes Python n’est donc pas forcément le nombre d’identifiants.
 3. Suis les actions numérotées, une à la fois. Les exemples servent à apprendre une notion ; tu écris toi-même la solution de l’exercice. Les blocs Terminal donnent les commandes à lancer au moment indiqué.
 4. Vérifie le résultat indiqué avant de poursuivre. Un échec attendu (phase rouge, argument refusé ou conflit volontaire) est expliqué dans le palier.
-5. Si tu bloques, lis la dernière ligne de l’erreur, compare l’entrée et l’attendu, puis ouvre l’indice. Fais un petit changement et relance.
+5. Si tu bloques, lis la dernière ligne de l’erreur, compare entrée et attendu, puis demande un seul indice à la fois avec python3 atelier.py indice depuis cyberatelier. Les trois niveaux vont du rappel à un petit exemple ; ils ne donnent pas une fonction corrigée.
 
 ### Le bon endroit pour chaque action
 
-Sur ton Mac, ouvre `workspaces/headerscope` dans VS Code. Dans Cyber Atelier, utilise l’éditeur et la console de **Coder**, avec `cwd` sur `.` (la racine du dépôt). Fais la préparation de **Environnement** avant MR1 ; la mission crée ensuite sa branche.
+Ouvre `workspaces/headerscope` dans VS Code et un terminal du Mac dans ce même dossier. Tu écris et testes le code ici, dans le dépôt Git de l’exercice. Ouvre un second terminal dans `cyberatelier` pour lire les consignes avec `python3 atelier.py voir` et piloter Docker. Le site reste disponible pour la lecture ; l’onglet Coder est facultatif.
 
-Le code Python se place dans l’éditeur. Les commandes `docker compose ...` se lancent sur ton Mac depuis `cyberatelier` ; `/app/...` existe dans le conteneur. Le laboratoire interrogé doit tourner dans le même environnement que ton programme.
+Depuis `cyberatelier`, `mkdir -p workspaces/headerscope` puis `cd workspaces/headerscope` permet de rejoindre le dossier du parcours. S’il contient déjà ton exercice, garde ses fichiers, sa branche et son dépôt : ne le reclone pas. La préparation ci-dessous se fait une fois ; la mission crée ensuite sa branche.
 
-La console web repart à neuf à chaque exécution : un `cd`, une activation de venv ou `echo $?` ne se transmet pas à la commande suivante. Lance le programme et `echo $?` ensemble quand le palier le demande. Le nombre affiché par echo est celui du programme ; la console peut afficher code 0 pour echo lui-même.
+Le code Python se place dans VS Code et doit être enregistré avant les tests. Les commandes `docker compose ...` et `python3 atelier.py ...` se lancent depuis `cyberatelier`. Leurs appels Docker entrent dans le conteneur ; `/app/fixtures`, `/app/tools` et `/workspaces` sont des chemins internes à celui-ci. Depuis le dépôt d’exercice sur le Mac, les fixtures fournies sont dans `../../fixtures`.
 
-Un venv créé sur le Mac ne fonctionne pas dans le conteneur : utilise `python3` dans ce dernier. Remplace `main` par `master` si nécessaire. Si une branche existe déjà, reprends-la avec `git switch NOM` sans `-c`. Après chaque fusion, actualise la branche principale avant la mission suivante.
+Le terminal du Mac conserve son `cd` et son activation de venv. Active `.venv` dans chaque nouveau terminal d’exercice ; `python3` utilise alors ce venv, ou appelle `.venv/bin/python` explicitement. Lis `echo $?` immédiatement après le programme dont tu veux le code, avant toute autre commande. Ajoute `.venv/` à `.gitignore` avant `git add`.
+
+PortPilot et HeaderScope exécutés sur le Mac : lance `python3 labs.py` depuis `cyberatelier` dans un autre terminal et garde-le ouvert ; Ctrl+C arrête ce labo Mac. Les outils ToolWrap et les démos ReconWrap tournent dans Docker : `python3 atelier.py labo demarrer`, `labo arreter` et `labo statut` depuis `cyberatelier` pilotent uniquement le labo Docker. Le même numéro 8000 ne relie pas automatiquement les deux environnements.
+
+Un venv créé sur le Mac ne fonctionne pas dans Docker : les démos dans le conteneur utilisent son `python3`. Le dossier hôte `workspaces` doit être monté dans Docker pour que les démos ReconWrap lisent ton code ; conserve le `compose.override.yaml` du mode VS Code. Remplace `main` par `master` si nécessaire. Si une branche existe, reprends-la avec `git switch NOM` sans `-c`. Après chaque fusion, actualise la principale dans le dépôt du parcours avant la mission suivante.
+
+### Préparation sur le Mac
+
+**Vérifier Python**
+
+Terminal du Mac, dans cyberatelier/workspaces/headerscope.
+
+```bash
+python3 --version
+```
+
+Python 3 doit être installé sur ton Mac. Ce parcours utilise seulement sa bibliothèque standard ; aucun pip install n’est demandé.
+
+**Vérifier Git**
+
+Terminal du Mac, dans cyberatelier/workspaces/headerscope.
+
+```bash
+git --version
+```
+
+Vérifie Git sur ton Mac. Les commandes du parcours agissent sur ce dépôt d’exercice, distinct du dépôt cyberatelier.
+
+**Configurer ton identité Git (une seule fois)**
+
+Terminal du Mac, dans cyberatelier/workspaces/headerscope.
+
+```bash
+git config --global user.name "Prénom Nom" && git config --global user.email "adresse@ecole.example"
+```
+
+Remplace les deux valeurs d’exemple par ton nom et l’adresse de ton compte scolaire. Cette configuration globale est enregistrée sur ton Mac ; sans identité, git commit refuse le commit.
+
+**Cloner le dépôt**
+
+Terminal du Mac, dans cyberatelier/workspaces/headerscope.
+
+```bash
+git clone <URL_DU_DEPOT> .
+```
+
+Depuis le terminal du Mac dans workspaces/headerscope, clone seulement si le dossier est vide et n’a pas encore de dépôt. Remplace <URL_DU_DEPOT> par l’URL autorisée réelle avant exécution ; le point signifie « ici ». Si ton exercice existe déjà, garde-le et passe directement à git status. HTTPS ou SSH peut demander une saisie dans ce terminal.
+
+**Créer le venv**
+
+Terminal du Mac, dans cyberatelier/workspaces/headerscope.
+
+```bash
+python3 -m venv .venv
+source .venv/bin/activate
+```
+
+Après le clone, crée ce venv sur le Mac une seule fois ; s’il existe, active-le simplement. L’activation reste valable dans ce terminal. Dans un nouveau terminal, réactive-le ou appelle .venv/bin/python. Ajoute .venv/ à .gitignore avant git add. Aucun paquet pip n’est nécessaire.
 
 ### Les mots utiles
 
@@ -110,7 +167,7 @@ Ces règles seront réutilisées sur une réponse HTTP en MR2. Avance dans l’o
 
 Partir d’une branche de travail propre, dédiée à cette MR.
 
-**Où tu travailles :** Dépôt
+**Où tu travailles :** Mac · workspaces/headerscope · Dépôt
 
 **Pour comprendre**
 
@@ -119,15 +176,15 @@ Partir d’une branche de travail propre, dédiée à cette MR.
 
 **Actions dans l’ordre**
 
-1. Ouvre workspaces/headerscope dans VS Code, ou Coder dans Cyber Atelier avec cwd sur « . ».
-2. Termine la préparation de l’onglet Environnement : Python, Git et dépôt cloné.
+1. Ouvre workspaces/headerscope dans VS Code. Dans le terminal du Mac, place-toi dans ce même dossier et active son venv avec source .venv/bin/activate.
+2. Termine la préparation décrite au début du guide : Python, Git et dépôt cloné.
 3. Lis git status ; enregistre ton travail en cours avant de changer de branche.
 4. Reviens sur main avec git switch main, mets-la à jour avec git pull --ff-only, puis crée feat/regles-entetes. Remplace main par master si ton dépôt utilise ce nom.
 5. Vérifie le nom de ta branche avec git status. Si elle existe déjà, reprends-la avec git switch sans -c.
 
 **Terminal · Relire l’état du dépôt**
 
-Terminal du parcours : reste à la racine du dépôt. Exécute ces lignes au moment demandé dans les actions, avec les modifications manuelles entre les blocs.
+Terminal du Mac, dans cyberatelier/workspaces/headerscope, venv Mac activé. Exécute chaque ligne au moment indiqué, avec les modifications manuelles entre les blocs.
 
 ```bash
 git status
@@ -147,13 +204,36 @@ git status
 
 **Tu sais que c’est bon quand :** git status affiche « On branch feat/regles-entetes » et « nothing to commit, working tree clean ».
 
-*Indice si tu bloques :* Si Git répond « not a git repository », tu n’es pas dans workspaces/headerscope. Si la branche n’existe pas, reviens sur main à jour (git switch main puis git pull --ff-only) puis crée-la avec git switch -c feat/regles-entetes.
+**Indices progressifs**
+
+Depuis le terminal dans `cyberatelier`, `python3 atelier.py indice` révèle un niveau à la fois. Ouvre seulement le niveau nécessaire.
+
+<details>
+<summary>Indice 1</summary>
+
+Les règles HTTP se développent dans le dépôt HeaderScope, sur sa branche distincte.
+
+</details>
+
+<details>
+<summary>Indice 2</summary>
+
+Vérifie Python, Git, le clone et le dossier workspaces/headerscope, puis crée ou reprends feat/regles-entetes.
+
+</details>
+
+<details>
+<summary>Indice 3</summary>
+
+pwd peut montrer workspaces/headerscope alors que git branch --show-current affiche feat/regles-entetes : tu as confirmé lieu et version avant d’éditer.
+
+</details>
 
 #### Palier 2 — Un premier unittest et le code de sortie (10 min)
 
 Savoir lire un test qui passe ou échoue, et comprendre pourquoi la CI se fie au code de sortie.
 
-**Où tu travailles :** exemple.py (jetable)
+**Où tu travailles :** Mac · workspaces/headerscope · exemple.py (jetable)
 
 **Pour comprendre**
 
@@ -162,7 +242,7 @@ Savoir lire un test qui passe ou échoue, et comprendre pourquoi la CI se fie au
 
 **Éditeur · Exemple Python à lire ou essayer**
 
-Éditeur : place ce code dans un fichier d’exemple jetable, puis lance ce fichier avec python3. Un extrait avec self se place dans une méthode de test.
+VS Code sur le Mac : place ce code dans un fichier d’exemple jetable, puis lance ce fichier avec python3. Un extrait avec self se place dans une méthode de test.
 
 ```python
 import unittest
@@ -187,7 +267,7 @@ if __name__ == '__main__':
 
 **Terminal · Commande à lancer au moment indiqué**
 
-Terminal du parcours : reste à la racine du dépôt. Exécute ces lignes au moment demandé dans les actions, avec les modifications manuelles entre les blocs.
+Terminal du Mac, dans cyberatelier/workspaces/headerscope, venv Mac activé. Exécute chaque ligne au moment indiqué, avec les modifications manuelles entre les blocs.
 
 ```bash
 python3 exemple.py
@@ -195,7 +275,7 @@ python3 exemple.py
 
 **Terminal · Commande à lancer au moment indiqué**
 
-Terminal du parcours : reste à la racine du dépôt. Exécute ces lignes au moment demandé dans les actions, avec les modifications manuelles entre les blocs. Lance le programme et echo $? ensemble : le nombre affiché est le code du programme ; la console peut afficher code 0 pour echo lui-même.
+Terminal du Mac, dans cyberatelier/workspaces/headerscope, venv Mac activé. Exécute chaque ligne au moment indiqué, avec les modifications manuelles entre les blocs. Lis le code de sortie immédiatement après le programme, avant toute autre commande.
 
 ```bash
 python3 exemple.py; echo $?
@@ -203,13 +283,36 @@ python3 exemple.py; echo $?
 
 **Tu sais que c’est bon quand :** Avec la bonne valeur, tu vois « OK » et echo affiche 0. Avec la mauvaise, tu vois « FAILED » et echo affiche 1.
 
-*Indice si tu bloques :* unittest.main() lance les tests du fichier. Le code de sortie 0 signifie succès ; toute autre valeur signifie qu’un test a échoué. Lis les messages d’échec de bas en haut : la dernière ligne dit ce qui ne va pas.
+**Indices progressifs**
+
+Depuis le terminal dans `cyberatelier`, `python3 atelier.py indice` révèle un niveau à la fois. Ouvre seulement le niveau nécessaire.
+
+<details>
+<summary>Indice 1</summary>
+
+unittest rend un code non nul si un test échoue ; unittest.main doit réellement lancer la suite.
+
+</details>
+
+<details>
+<summary>Indice 2</summary>
+
+Essaie un attendu correct puis incorrect dans le fichier d’exemple et lis echo $? immédiatement après, avant de restaurer le bon attendu.
+
+</details>
+
+<details>
+<summary>Indice 3</summary>
+
+Une assertion qui compare 4 à 5 échoue ; afficher « Échec » puis terminer avec code 0 ne ferait pas échouer le job CI.
+
+</details>
 
 #### Palier 3 — Dictionnaires et noms normalisés (10 min)
 
 Chercher une valeur par clé, après avoir normalisé le texte saisi.
 
-**Où tu travailles :** exemple2.py (jetable)
+**Où tu travailles :** Mac · workspaces/headerscope · exemple2.py (jetable)
 
 **Pour comprendre**
 
@@ -218,7 +321,7 @@ Chercher une valeur par clé, après avoir normalisé le texte saisi.
 
 **Éditeur · Exemple Python à lire ou essayer**
 
-Éditeur : copie cet exemple dans exemple2.py (jetable), enregistre-le, puis lance python3 exemple2.py. Si plusieurs exemples sont proposés, essaie-les un par un en remplaçant le contenu du fichier. Retire ensuite les fichiers générés et le fichier d’exemple.
+VS Code sur le Mac : copie cet exemple dans exemple2.py (jetable), enregistre-le, puis lance python3 exemple2.py. Si plusieurs exemples sont proposés, essaie-les un par un en remplaçant le contenu du fichier. Retire ensuite les fichiers générés et le fichier d’exemple.
 
 ```python
 prix = {'pomme': 1.2, 'poire': 1.5}
@@ -240,7 +343,7 @@ for nom, valeur in prix.items():
 
 **Terminal · Commande à lancer au moment indiqué**
 
-Terminal du parcours : reste à la racine du dépôt. Exécute ces lignes au moment demandé dans les actions, avec les modifications manuelles entre les blocs.
+Terminal du Mac, dans cyberatelier/workspaces/headerscope, venv Mac activé. Exécute chaque ligne au moment indiqué, avec les modifications manuelles entre les blocs.
 
 ```bash
 python3 exemple2.py
@@ -248,13 +351,36 @@ python3 exemple2.py
 
 **Tu sais que c’est bon quand :** Tu obtiens « pomme », puis 1.2, puis 0 (clé absente, sans erreur), puis les deux lignes de la boucle.
 
-*Indice si tu bloques :* strip() retire les espaces au début et à la fin ; lower() passe en minuscules. Les deux renvoient une nouvelle chaîne : le texte d’origine ne change pas. dict.get(clé, valeur_par_défaut) évite l’erreur quand la clé manque.
+**Indices progressifs**
+
+Depuis le terminal dans `cyberatelier`, `python3 atelier.py indice` révèle un niveau à la fois. Ouvre seulement le niveau nécessaire.
+
+<details>
+<summary>Indice 1</summary>
+
+Les clés d’un dictionnaire sont comparées exactement ; les noms d’en-têtes HTTP doivent être normalisés sans tenir compte de la casse.
+
+</details>
+
+<details>
+<summary>Indice 2</summary>
+
+Construis une représentation cohérente des noms reçus avant les trois contrôles ; observe comment accéder à une valeur avec get.
+
+</details>
+
+<details>
+<summary>Indice 3</summary>
+
+{'Couleur': 'bleu'} ne contient pas la clé 'couleur' ; normaliser les noms en minuscules permet de consulter une forme unique.
+
+</details>
 
 #### Palier 4 — H2 : aucun en-tête donne trois alertes (10 min)
 
 Écrire le premier test de règles, puis la première version de la fonction qui retourne les alertes.
 
-**Où tu travailles :** headerscope.py ; verification.py
+**Où tu travailles :** Mac · workspaces/headerscope · headerscope.py ; verification.py
 
 **Pour comprendre**
 
@@ -301,7 +427,7 @@ L’entrée est ce que tu donnes au code ; l’attendu est ce que ton test doit 
 
 **Terminal · Commande à lancer au moment indiqué**
 
-Terminal du parcours : reste à la racine du dépôt. Exécute ces lignes au moment demandé dans les actions, avec les modifications manuelles entre les blocs.
+Terminal du Mac, dans cyberatelier/workspaces/headerscope, venv Mac activé. Exécute chaque ligne au moment indiqué, avec les modifications manuelles entre les blocs.
 
 ```bash
 python3 verification.py
@@ -316,13 +442,36 @@ git commit -m "Ajoute les alertes d’absence des trois en-têtes"
 
 **Tu sais que c’est bon quand :** python3 verification.py affiche OK pour H2 et git log --oneline montre ton commit.
 
-*Indice si tu bloques :* Une alerte est une chaîne lisible, par exemple « CSP absente ». Crée une liste vide, puis ajoute une alerte pour chaque règle en échec. Commence par une seule règle si tu bloques, puis ajoute les deux autres.
+**Indices progressifs**
+
+Depuis le terminal dans `cyberatelier`, `python3 atelier.py indice` révèle un niveau à la fois. Ouvre seulement le niveau nécessaire.
+
+<details>
+<summary>Indice 1</summary>
+
+Trois contrôles indépendants en échec donnent trois alertes ; une entrée vide n’empêche pas de les vérifier.
+
+</details>
+
+<details>
+<summary>Indice 2</summary>
+
+Écris H2 avec {} et vérifie le nombre ainsi que les messages attendus, puis ajoute uniquement les règles nécessaires.
+
+</details>
+
+<details>
+<summary>Indice 3</summary>
+
+Une fiche vide sans nom, prix ni stock peut produire trois messages séparés ; un seul message « fiche invalide » perd le détail des contrôles.
+
+</details>
 
 #### Palier 5 — H3 et H4 : noms sans casse, CSP vide (11 min)
 
 Reconnaître les noms d’en-têtes quelle que soit la casse, et refuser une CSP vide.
 
-**Où tu travailles :** headerscope.py ; verification.py
+**Où tu travailles :** Mac · workspaces/headerscope · headerscope.py ; verification.py
 
 **Pour comprendre**
 
@@ -355,7 +504,7 @@ L’entrée est ce que tu donnes au code ; l’attendu est ce que ton test doit 
 
 **Terminal · Commande à lancer au moment indiqué**
 
-Terminal du parcours : reste à la racine du dépôt. Exécute ces lignes au moment demandé dans les actions, avec les modifications manuelles entre les blocs.
+Terminal du Mac, dans cyberatelier/workspaces/headerscope, venv Mac activé. Exécute chaque ligne au moment indiqué, avec les modifications manuelles entre les blocs.
 
 ```bash
 python3 verification.py
@@ -370,13 +519,36 @@ git commit -m "Reconnais les noms sans casse et refuse une CSP vide"
 
 **Tu sais que c’est bon quand :** H2, H3 et H4 passent, et le commit apparaît dans git log --oneline.
 
-*Indice si tu bloques :* Piège : une clé en minuscules ne se retrouve pas avec la casse d’origine. Compare des noms normalisés des deux côtés. La règle « après retrait des espaces » s’applique à la valeur de la CSP, pas à son nom.
+**Indices progressifs**
+
+Depuis le terminal dans `cyberatelier`, `python3 atelier.py indice` révèle un niveau à la fois. Ouvre seulement le niveau nécessaire.
+
+<details>
+<summary>Indice 1</summary>
+
+La présence d’une clé et une valeur non vide sont deux conditions différentes ; les noms sont insensibles à la casse.
+
+</details>
+
+<details>
+<summary>Indice 2</summary>
+
+Teste les variantes de nom puis CSP vide ou composée d’espaces, en nettoyant seulement les bords pour cette valeur.
+
+</details>
+
+<details>
+<summary>Indice 3</summary>
+
+{'Titre': '   '} possède une clé, mais sa valeur après strip() est vide ; la seule présence du champ ne valide pas son contenu.
+
+</details>
 
 #### Palier 6 — H5 et H6 : valeurs sans casse ni espaces (11 min)
 
 Comparer les valeurs nosniff, DENY et SAMEORIGIN après normalisation.
 
-**Où tu travailles :** headerscope.py ; verification.py
+**Où tu travailles :** Mac · workspaces/headerscope · headerscope.py ; verification.py
 
 **Pour comprendre**
 
@@ -385,7 +557,7 @@ Comparer les valeurs nosniff, DENY et SAMEORIGIN après normalisation.
 
 **Éditeur · Exemple Python à lire ou essayer**
 
-Éditeur : copie cet exemple dans exemple.py (jetable), enregistre-le, puis lance python3 exemple.py. Si plusieurs exemples sont proposés, essaie-les un par un en remplaçant le contenu du fichier. Retire ensuite les fichiers générés et le fichier d’exemple.
+VS Code sur le Mac : copie cet exemple dans exemple.py (jetable), enregistre-le, puis lance python3 exemple.py. Si plusieurs exemples sont proposés, essaie-les un par un en remplaçant le contenu du fichier. Retire ensuite les fichiers générés et le fichier d’exemple.
 
 ```python
 fruits_admis = ['pomme', 'poire']
@@ -420,7 +592,7 @@ L’entrée est ce que tu donnes au code ; l’attendu est ce que ton test doit 
 
 **Terminal · Commande à lancer au moment indiqué**
 
-Terminal du parcours : reste à la racine du dépôt. Exécute ces lignes au moment demandé dans les actions, avec les modifications manuelles entre les blocs.
+Terminal du Mac, dans cyberatelier/workspaces/headerscope, venv Mac activé. Exécute chaque ligne au moment indiqué, avec les modifications manuelles entre les blocs.
 
 ```bash
 python3 verification.py
@@ -435,13 +607,36 @@ git commit -m "Accepte nosniff, DENY et SAMEORIGIN sans tenir compte de la casse
 
 **Tu sais que c’est bon quand :** H2 à H6 passent. L’exemple des fruits affiche True puis False.
 
-*Indice si tu bloques :* Normalise la valeur avant de la comparer, comme pour la saisie de l’exemple du palier 3. Pour les deux règles, teste une valeur admise avec espaces et majuscules, puis une valeur refusée.
+**Indices progressifs**
+
+Depuis le terminal dans `cyberatelier`, `python3 atelier.py indice` révèle un niveau à la fois. Ouvre seulement le niveau nécessaire.
+
+<details>
+<summary>Indice 1</summary>
+
+Deux valeurs d’en-tête demandent une comparaison sans casse et sans espaces aux bords.
+
+</details>
+
+<details>
+<summary>Indice 2</summary>
+
+Isole le nettoyage de X-Content-Type-Options et X-Frame-Options ; écris H5/H6 avec les variantes conformes et refusées.
+
+</details>
+
+<details>
+<summary>Indice 3</summary>
+
+«  Bleu  ».strip().lower() donne « bleu » ; « bleu vert » garde son espace intérieur et ne devient pas « bleu ».
+
+</details>
 
 #### Palier 7 — H1 et H7 : profil conforme et règles indépendantes (11 min)
 
 Vérifier qu’un profil complet ne donne aucune alerte, et qu’une seule règle en échec ne fait ressortir qu’une seule alerte.
 
-**Où tu travailles :** headerscope.py ; verification.py
+**Où tu travailles :** Mac · workspaces/headerscope · headerscope.py ; verification.py
 
 **Pour comprendre**
 
@@ -469,7 +664,7 @@ L’entrée est ce que tu donnes au code ; l’attendu est ce que ton test doit 
 
 **Terminal · Commande à lancer au moment indiqué**
 
-Terminal du parcours : reste à la racine du dépôt. Exécute ces lignes au moment demandé dans les actions, avec les modifications manuelles entre les blocs.
+Terminal du Mac, dans cyberatelier/workspaces/headerscope, venv Mac activé. Exécute chaque ligne au moment indiqué, avec les modifications manuelles entre les blocs.
 
 ```bash
 python3 verification.py
@@ -484,13 +679,36 @@ git commit -m "Vérifie le profil conforme et l’indépendance des règles"
 
 **Tu sais que c’est bon quand :** python3 verification.py affiche OK pour H1 à H7 et se termine avec 0 ; git log --oneline montre le commit.
 
-*Indice si tu bloques :* Si H7 donne deux alertes au lieu d’une, une règle regarde probablement un autre en-tête que le sien ou compare mal une valeur. Vérifie-les une par une avec un seul en-tête à la fois.
+**Indices progressifs**
+
+Depuis le terminal dans `cyberatelier`, `python3 atelier.py indice` révèle un niveau à la fois. Ouvre seulement le niveau nécessaire.
+
+<details>
+<summary>Indice 1</summary>
+
+Un profil conforme donne zéro alerte ; un contrôle en échec ne doit pas faire échouer les deux autres.
+
+</details>
+
+<details>
+<summary>Indice 2</summary>
+
+Écris H1 avec les trois valeurs conformes, puis H7 où un seul contrôle manque et vérifie exactement une alerte.
+
+</details>
+
+<details>
+<summary>Indice 3</summary>
+
+Une fiche avec nom et prix corrects mais stock absent doit signaler seulement le stock, pas répéter les trois erreurs de la fiche vide.
+
+</details>
 
 #### Palier 8 — Test en CI puis merge request (12 min)
 
 Faire exécuter les tests par la CI de la merge request, puis fusionner seulement quand le pipeline du dernier commit est vert.
 
-**Où tu travailles :** .gitlab-ci.yml ; MR GitLab
+**Où tu travailles :** Mac · workspaces/headerscope · .gitlab-ci.yml ; MR GitLab
 
 **Pour comprendre**
 
@@ -499,7 +717,7 @@ Faire exécuter les tests par la CI de la merge request, puis fusionner seulemen
 
 **Éditeur · Exemple YAML à lire**
 
-Éditeur : exemple de syntaxe, à adapter ; ce bloc ne se lance pas dans le terminal.
+VS Code sur le Mac : exemple de syntaxe, à adapter ; ce bloc ne se lance pas dans le terminal.
 
 ```yaml
 # Exemple sans rapport avec HeaderScope : la forme d’un job de CI
@@ -521,7 +739,7 @@ saluer:
 
 **Terminal · Relire l’état du dépôt**
 
-Terminal du parcours : reste à la racine du dépôt. Exécute ces lignes au moment demandé dans les actions, avec les modifications manuelles entre les blocs.
+Terminal du Mac, dans cyberatelier/workspaces/headerscope, venv Mac activé. Exécute chaque ligne au moment indiqué, avec les modifications manuelles entre les blocs.
 
 ```bash
 git status
@@ -555,7 +773,30 @@ git pull --ff-only
 
 **Tu sais que c’est bon quand :** Le pipeline du dernier commit est vert dans GitLab, la merge request ne contient que les fichiers attendus, et main local contient la fusion (git log --oneline).
 
-*Indice si tu bloques :* Si le pipeline ne démarre pas, vérifie dans la documentation GitLab de l’école que le job se déclenche sur les merge requests (mot-clé rules). Ne fusionne jamais sur un pipeline rouge ou absent.
+**Indices progressifs**
+
+Depuis le terminal dans `cyberatelier`, `python3 atelier.py indice` révèle un niveau à la fois. Ouvre seulement le niveau nécessaire.
+
+<details>
+<summary>Indice 1</summary>
+
+La CI doit lancer verification.py et échouer si ses assertions échouent ; la MR représente une version précise.
+
+</details>
+
+<details>
+<summary>Indice 2</summary>
+
+Écris le job, pousse la branche et vérifie le vrai pipeline du dernier commit ainsi que le diff avant fusion.
+
+</details>
+
+<details>
+<summary>Indice 3</summary>
+
+Une modification locale de verification.py ne se trouve pas sur le runner avant commit et push ; le job teste la version publiée, pas ton éditeur.
+
+</details>
 
 **Avant de livrer**
 
@@ -581,7 +822,7 @@ Tu sépares la réponse HTTP, son classement et les pannes avant d’écrire le 
 
 Partir de la version fusionnée de la MR1, sans mélanger deux merge requests.
 
-**Où tu travailles :** Dépôt
+**Où tu travailles :** Mac · workspaces/headerscope · Dépôt
 
 **Pour comprendre**
 
@@ -590,7 +831,7 @@ Partir de la version fusionnée de la MR1, sans mélanger deux merge requests.
 
 **Actions dans l’ordre**
 
-1. Ouvre workspaces/headerscope dans VS Code, ou Coder dans Cyber Atelier avec cwd sur « . ».
+1. Ouvre workspaces/headerscope dans VS Code. Dans le terminal du Mac, place-toi dans ce même dossier et active son venv avec source .venv/bin/activate.
 2. Vérifie que MR1 est fusionnée et que H1 à H7 passent sur main.
 3. Lis git status ; enregistre ton travail en cours avant de changer de branche.
 4. Reviens sur main avec git switch main, mets-la à jour avec git pull --ff-only, puis crée feat/client-http. Remplace main par master si ton dépôt utilise ce nom.
@@ -598,7 +839,7 @@ Partir de la version fusionnée de la MR1, sans mélanger deux merge requests.
 
 **Terminal · Relire l’état du dépôt**
 
-Terminal du parcours : reste à la racine du dépôt. Exécute ces lignes au moment demandé dans les actions, avec les modifications manuelles entre les blocs.
+Terminal du Mac, dans cyberatelier/workspaces/headerscope, venv Mac activé. Exécute chaque ligne au moment indiqué, avec les modifications manuelles entre les blocs.
 
 ```bash
 git status
@@ -636,13 +877,36 @@ git status
 
 **Tu sais que c’est bon quand :** git log --oneline -5 montre le commit de fusion de la MR1, et git status affiche « On branch feat/client-http ».
 
-*Indice si tu bloques :* Si git status n’est pas propre, ne force rien : demande-toi quels fichiers tu as modifiés et range-les dans un commit ou mets-les de côté. Si git pull --ff-only refuse, ton main local a divergé : relis git log avant d’aller plus loin.
+**Indices progressifs**
+
+Depuis le terminal dans `cyberatelier`, `python3 atelier.py indice` révèle un niveau à la fois. Ouvre seulement le niveau nécessaire.
+
+<details>
+<summary>Indice 1</summary>
+
+Le client réutilise les règles déjà fusionnées ; MR2 commence avec H1 à H7 verts.
+
+</details>
+
+<details>
+<summary>Indice 2</summary>
+
+Actualise main, lance la suite, puis crée feat/client-http dans le dépôt HeaderScope.
+
+</details>
+
+<details>
+<summary>Indice 3</summary>
+
+Un module de lecture construit sur une ancienne branche peut manquer les derniers contrôles ; le test de base avant travail révèle ce décalage.
+
+</details>
 
 #### Palier 2 — urllib et les deux sortes d’erreurs (10 min)
 
 Comprendre qu’une réponse HTTP d’erreur et une panne de connexion ne sont pas la même chose.
 
-**Où tu travailles :** exemple_reseau.py (jetable)
+**Où tu travailles :** Mac · workspaces/headerscope · exemple_reseau.py (jetable)
 
 **Pour comprendre**
 
@@ -651,7 +915,7 @@ Comprendre qu’une réponse HTTP d’erreur et une panne de connexion ne sont p
 
 **Éditeur · Exemple Python à lire ou essayer**
 
-Éditeur : copie cet exemple dans exemple_reseau.py (jetable), enregistre-le, puis lance python3 exemple_reseau.py. Si plusieurs exemples sont proposés, essaie-les un par un en remplaçant le contenu du fichier. Retire ensuite les fichiers générés et le fichier d’exemple.
+VS Code sur le Mac : copie cet exemple dans exemple_reseau.py (jetable), enregistre-le, puis lance python3 exemple_reseau.py. Si plusieurs exemples sont proposés, essaie-les un par un en remplaçant le contenu du fichier. Retire ensuite les fichiers générés et le fichier d’exemple.
 
 ```python
 import urllib.error
@@ -670,7 +934,7 @@ print(erreur_http.code, erreur_http.reason)
 
 **Terminal · Commande à lancer au moment indiqué**
 
-Terminal du parcours : reste à la racine du dépôt. Exécute ces lignes au moment demandé dans les actions, avec les modifications manuelles entre les blocs.
+Terminal du Mac, dans cyberatelier/workspaces/headerscope, venv Mac activé. Exécute chaque ligne au moment indiqué, avec les modifications manuelles entre les blocs.
 
 ```bash
 python3 exemple_reseau.py
@@ -678,13 +942,36 @@ python3 exemple_reseau.py
 
 **Tu sais que c’est bon quand :** Tu vois « panne : » suivi d’un message de connexion, puis « 404 Introuvable ». Le second résultat ne demande aucun réseau.
 
-*Indice si tu bloques :* HTTPError est une sous-classe de URLError : si tu veux traiter les réponses d’erreur à part, place le except HTTPError avant le except URLError. Une connexion refusée donne une panne, jamais un code HTTP.
+**Indices progressifs**
+
+Depuis le terminal dans `cyberatelier`, `python3 atelier.py indice` révèle un niveau à la fois. Ouvre seulement le niveau nécessaire.
+
+<details>
+<summary>Indice 1</summary>
+
+HTTPError décrit une réponse HTTP d’erreur ; URLError peut décrire une panne sans réponse HTTP.
+
+</details>
+
+<details>
+<summary>Indice 2</summary>
+
+Regarde les deux exceptions et leur héritage, puis traite la réponse d’erreur avant la panne générale.
+
+</details>
+
+<details>
+<summary>Indice 3</summary>
+
+Un statut 404 prouve qu’un serveur a répondu ; une connexion refusée ne fournit aucun statut HTTP, même si les deux sont des échecs.
+
+</details>
 
 #### Palier 3 — H8 : une réponse 200 se classe sans réseau (12 min)
 
 Écrire une fonction pure qui reçoit un statut et des en-têtes, et retourne un triplet.
 
-**Où tu travailles :** headerscope.py ; verification.py
+**Où tu travailles :** Mac · workspaces/headerscope · headerscope.py ; verification.py
 
 **Pour comprendre**
 
@@ -693,7 +980,7 @@ python3 exemple_reseau.py
 
 **Éditeur · Exemple Python à lire ou essayer**
 
-Éditeur : copie cet exemple dans exemple.py (jetable), enregistre-le, puis lance python3 exemple.py. Si plusieurs exemples sont proposés, essaie-les un par un en remplaçant le contenu du fichier. Retire ensuite les fichiers générés et le fichier d’exemple.
+VS Code sur le Mac : copie cet exemple dans exemple.py (jetable), enregistre-le, puis lance python3 exemple.py. Si plusieurs exemples sont proposés, essaie-les un par un en remplaçant le contenu du fichier. Retire ensuite les fichiers générés et le fichier d’exemple.
 
 ```python
 def bornes(liste):
@@ -736,7 +1023,7 @@ L’entrée est ce que tu donnes au code ; l’attendu est ce que ton test doit 
 
 **Terminal · Commande à lancer au moment indiqué**
 
-Terminal du parcours : reste à la racine du dépôt. Exécute ces lignes au moment demandé dans les actions, avec les modifications manuelles entre les blocs.
+Terminal du Mac, dans cyberatelier/workspaces/headerscope, venv Mac activé. Exécute chaque ligne au moment indiqué, avec les modifications manuelles entre les blocs.
 
 ```bash
 python3 verification.py
@@ -751,13 +1038,36 @@ git commit -m "Ajoute classer_reponse pour les réponses 200"
 
 **Tu sais que c’est bon quand :** H1 à H8 passent, et git log --oneline montre le commit.
 
-*Indice si tu bloques :* Une fonction peut retourner plusieurs valeurs séparées par des virgules : c’est un triplet, comme l’exemple des bornes le montre. Ne refais pas les règles : appelle evaluer_entetes(entetes).
+**Indices progressifs**
+
+Depuis le terminal dans `cyberatelier`, `python3 atelier.py indice` révèle un niveau à la fois. Ouvre seulement le niveau nécessaire.
+
+<details>
+<summary>Indice 1</summary>
+
+classer_reponse est une fonction pure : code et en-têtes sont ses entrées, aucune requête n’est nécessaire.
+
+</details>
+
+<details>
+<summary>Indice 2</summary>
+
+Écris H8 avec code 200 et dictionnaire fourni, puis vérifie le triplet et les alertes calculées par les règles de MR1.
+
+</details>
+
+<details>
+<summary>Indice 3</summary>
+
+Classer un reçu ('payé', 12) ne demande pas de contacter une banque ; les données sont déjà fournies au classement.
+
+</details>
 
 #### Palier 4 — H9 : les erreurs 404 et 500 gardent leur code (10 min)
 
 Classer les erreurs HTTP sans leur donner d’alertes de politique.
 
-**Où tu travailles :** headerscope.py ; verification.py
+**Où tu travailles :** Mac · workspaces/headerscope · headerscope.py ; verification.py
 
 **Pour comprendre**
 
@@ -797,7 +1107,7 @@ L’entrée est ce que tu donnes au code ; l’attendu est ce que ton test doit 
 
 **Terminal · Commande à lancer au moment indiqué**
 
-Terminal du parcours : reste à la racine du dépôt. Exécute ces lignes au moment demandé dans les actions, avec les modifications manuelles entre les blocs.
+Terminal du Mac, dans cyberatelier/workspaces/headerscope, venv Mac activé. Exécute chaque ligne au moment indiqué, avec les modifications manuelles entre les blocs.
 
 ```bash
 python3 verification.py
@@ -812,13 +1122,36 @@ git commit -m "Classe les erreurs 404 et 500 sans alertes"
 
 **Tu sais que c’est bon quand :** python3 verification.py affiche OK pour H1 à H9 et se termine avec 0.
 
-*Indice si tu bloques :* Le contrat dit que les alertes restent vides pour une erreur HTTP : ne calcule rien dans ce cas. Vérifie que le code renvoyé est bien celui que tu as reçu en argument.
+**Indices progressifs**
+
+Depuis le terminal dans `cyberatelier`, `python3 atelier.py indice` révèle un niveau à la fois. Ouvre seulement le niveau nécessaire.
+
+<details>
+<summary>Indice 1</summary>
+
+Les réponses 404 et 500 gardent leur code HTTP, mais ne déclenchent pas les alertes de politique.
+
+</details>
+
+<details>
+<summary>Indice 2</summary>
+
+Écris H9 pour les deux codes et vérifie HTTP_ERREUR avec liste d’alertes vide, même si les en-têtes ressemblent au profil fragile.
+
+</details>
+
+<details>
+<summary>Indice 3</summary>
+
+Un objet (404, 'HTTP_ERREUR', []) distingue une réponse absente d’un succès HTTP dont la configuration aurait trois alertes.
+
+</details>
 
 #### Palier 5 — Le client : URL limitée et timeout de 2 secondes (10 min)
 
 Demander un chemin fixe du laboratoire avec un délai maximal de 2 secondes.
 
-**Où tu travailles :** headerscope.py
+**Où tu travailles :** Mac · workspaces/headerscope · headerscope.py
 
 **Pour comprendre**
 
@@ -840,7 +1173,7 @@ Demander un chemin fixe du laboratoire avec un délai maximal de 2 secondes.
 
 **Terminal · Commande à lancer au moment indiqué**
 
-Terminal du parcours : reste à la racine du dépôt. Exécute ces lignes au moment demandé dans les actions, avec les modifications manuelles entre les blocs.
+Terminal du Mac, dans cyberatelier/workspaces/headerscope, venv Mac activé. Exécute chaque ligne au moment indiqué, avec les modifications manuelles entre les blocs.
 
 ```bash
 python3 -c "from headerscope import demander; demander('/autre')"
@@ -855,13 +1188,36 @@ git commit -m "Ajoute le client HTTP local avec timeout de 2 secondes"
 
 **Tu sais que c’est bon quand :** demander('/autre') lève ValueError avant de contacter quoi que ce soit, et git log --oneline montre le commit.
 
-*Indice si tu bloques :* Le délai se donne avec l’argument nommé timeout de urlopen. Une liste fixe de chemins autorisés se teste avec in avant de construire l’URL. Un délai dépassé peut sortir sous forme de TimeoutError au lieu de URLError : le palier suivant prévoit les deux.
+**Indices progressifs**
+
+Depuis le terminal dans `cyberatelier`, `python3 atelier.py indice` révèle un niveau à la fois. Ouvre seulement le niveau nécessaire.
+
+<details>
+<summary>Indice 1</summary>
+
+Le client construit une URL de labo limitée et un timeout fixe ; les chemins acceptés sont connus.
+
+</details>
+
+<details>
+<summary>Indice 2</summary>
+
+Refuse toute autre origine ou chemin avant urlopen et garde deux secondes comme délai, sans ajouter de visite de liens.
+
+</details>
+
+<details>
+<summary>Indice 3</summary>
+
+Un chemin '/catalogue' ajouté à la fin d’une origine fixe ne donne pas le droit d’utiliser 'https://exemple.test' à la place de cette origine.
+
+</details>
 
 #### Palier 6 — Séparer réponse HTTP d’erreur et panne (10 min)
 
 Rendre une panne de connexion ou un délai dépassé comme un résultat distinct, sans code HTTP.
 
-**Où tu travailles :** headerscope.py
+**Où tu travailles :** Mac · workspaces/headerscope · headerscope.py
 
 **Pour comprendre**
 
@@ -877,7 +1233,7 @@ Rendre une panne de connexion ou un délai dépassé comme un résultat distinct
 
 **Terminal · Commande à lancer au moment indiqué**
 
-Terminal du parcours : reste à la racine du dépôt. Exécute ces lignes au moment demandé dans les actions, avec les modifications manuelles entre les blocs.
+Terminal du Mac, dans cyberatelier/workspaces/headerscope, venv Mac activé. Exécute chaque ligne au moment indiqué, avec les modifications manuelles entre les blocs.
 
 ```bash
 python3 -m py_compile headerscope.py
@@ -898,13 +1254,36 @@ git commit -m "Distingue les réponses HTTP d’erreur des pannes de connexion"
 
 **Tu sais que c’est bon quand :** py_compile ne signale aucune erreur, H1 à H9 passent, et le commit apparaît dans git log --oneline.
 
-*Indice si tu bloques :* Dans une suite de except, HTTPError doit venir avant URLError, sinon la première clause attrape tout. Un délai et une connexion refusée ne lèvent pas toujours la même exception : vérifie ce que ton code reçoit, sans le deviner.
+**Indices progressifs**
+
+Depuis le terminal dans `cyberatelier`, `python3 atelier.py indice` révèle un niveau à la fois. Ouvre seulement le niveau nécessaire.
+
+<details>
+<summary>Indice 1</summary>
+
+Une panne de transport reste distincte d’un statut HTTP d’erreur ; l’ordre des except protège cette distinction.
+
+</details>
+
+<details>
+<summary>Indice 2</summary>
+
+Conserve code et en-têtes pour HTTPError, puis rends un résultat sans code pour URLError/timeout ; relis les appels à classer_reponse.
+
+</details>
+
+<details>
+<summary>Indice 3</summary>
+
+« serveur injoignable, code absent » et « serveur a répondu 500 » donnent des informations différentes et doivent rester deux issues distinctes.
+
+</details>
 
 #### Palier 7 — Démonstration du client (hors tests) (11 min)
 
 Voir le client contre le vrai laboratoire, séparément des tests automatiques.
 
-**Où tu travailles :** Laboratoire local ; headerscope.py
+**Où tu travailles :** Mac · workspaces/headerscope · Laboratoire local ; headerscope.py
 
 **Pour comprendre**
 
@@ -913,15 +1292,15 @@ Voir le client contre le vrai laboratoire, séparément des tests automatiques.
 
 **Actions dans l’ordre**
 
-1. Choisis ton environnement : bouton du labo dans Docker, ou python3 labs.py depuis cyberatelier sur le Mac.
+1. Sur le Mac, ouvre un second terminal dans cyberatelier et lance python3 labs.py. Laisse-le ouvert pendant la démonstration ; le client continue dans le terminal du parcours avec son venv Mac.
 2. Depuis le même environnement, demande /fragile, /durci, /absent et /erreur, un par un.
 3. Observe 200 pour les deux premiers, 404 pour /absent et 500 pour /erreur.
 4. Arrête le labo et réessaie : attends une panne sans code HTTP.
 5. Relance le labo pour la suite. Garde ces appels hors de verification.py et dans le périmètre prévu.
 
-**Terminal · Option Mac : démarrer le laboratoire dans un autre terminal**
+**Terminal · Démarrer le laboratoire Mac dans un second terminal**
 
-Terminal séparé sur ton Mac, depuis le dossier cyberatelier. Laisse-le ouvert pendant la démonstration, puis arrête avec Ctrl+C. Dans Docker, utilise plutôt le bouton du laboratoire.
+Second terminal du Mac, dans cyberatelier. python3 labs.py démarre le labo sur 127.0.0.1:8000 du Mac ; garde ce terminal ouvert puis arrête avec Ctrl+C. Le labo interne de Docker est distinct.
 
 ```bash
 python3 labs.py
@@ -929,7 +1308,7 @@ python3 labs.py
 
 **Terminal · Commande à lancer au moment indiqué**
 
-Terminal du parcours : reste à la racine du dépôt. Exécute ces lignes au moment demandé dans les actions, avec les modifications manuelles entre les blocs.
+Terminal du Mac, dans cyberatelier/workspaces/headerscope, venv Mac activé. Exécute chaque ligne au moment indiqué, avec les modifications manuelles entre les blocs.
 
 ```bash
 python3 -c "from headerscope import demander; print(demander('/fragile'))"
@@ -943,13 +1322,36 @@ python3 -c "from headerscope import demander; print(demander('/absent'))"
 
 **Tu sais que c’est bon quand :** /fragile répond avec un statut 200, /absent avec 404 et /erreur avec 500. Labo arrêté : tu obtiens une panne, pas un code HTTP.
 
-*Indice si tu bloques :* Si la connexion est refusée alors que le laboratoire tourne, vérifie que tu es dans le dossier cyberatelier et que labs.py affiche bien son écoute. Ne change pas le port : les chemins et le client attendent 127.0.0.1:8000.
+**Indices progressifs**
+
+Depuis le terminal dans `cyberatelier`, `python3 atelier.py indice` révèle un niveau à la fois. Ouvre seulement le niveau nécessaire.
+
+<details>
+<summary>Indice 1</summary>
+
+La démonstration interroge le labo Mac réel ; les tests H8/H9 restent autonomes sans ce serveur.
+
+</details>
+
+<details>
+<summary>Indice 2</summary>
+
+Lance python3 labs.py depuis cyberatelier dans un autre terminal, observe les quatre chemins, puis Ctrl+C pour provoquer la panne du client Mac.
+
+</details>
+
+<details>
+<summary>Indice 3</summary>
+
+Si /absent donne 404 labo lancé et une connexion refusée labo arrêté, tu as vérifié deux causes d’échec, sans confondre leurs codes.
+
+</details>
 
 #### Palier 8 — Livrer la MR2 après un pipeline vert (12 min)
 
 Relire ce que tu livres, pousser la branche, et fusionner seulement après un pipeline vert sur le dernier commit.
 
-**Où tu travailles :** MR GitLab
+**Où tu travailles :** Mac · workspaces/headerscope · MR GitLab
 
 **Pour comprendre**
 
@@ -969,7 +1371,7 @@ Relire ce que tu livres, pousser la branche, et fusionner seulement après un pi
 
 **Terminal · Relire l’état du dépôt**
 
-Terminal du parcours : reste à la racine du dépôt. Exécute ces lignes au moment demandé dans les actions, avec les modifications manuelles entre les blocs.
+Terminal du Mac, dans cyberatelier/workspaces/headerscope, venv Mac activé. Exécute chaque ligne au moment indiqué, avec les modifications manuelles entre les blocs.
 
 ```bash
 git status
@@ -984,7 +1386,30 @@ git push -u origin feat/client-http
 
 **Tu sais que c’est bon quand :** La merge request ne contient que headerscope.py et verification.py (sans __pycache__), et le pipeline du dernier commit est vert dans GitLab.
 
-*Indice si tu bloques :* Un pipeline rouge se lit comme un test : la dernière ligne du journal dit quelle commande a échoué. Si __pycache__ apparaît dans git status, ne l’ajoute pas à la merge request.
+**Indices progressifs**
+
+Depuis le terminal dans `cyberatelier`, `python3 atelier.py indice` révèle un niveau à la fois. Ouvre seulement le niveau nécessaire.
+
+<details>
+<summary>Indice 1</summary>
+
+Livrer MR2 demande tests locaux, pipeline du dernier commit et relecture ; la démo ne remplace aucune de ces preuves.
+
+</details>
+
+<details>
+<summary>Indice 2</summary>
+
+Lance H1 à H9 sans réseau dans la suite, pousse les fichiers utiles et lis les journaux avant de fusionner.
+
+</details>
+
+<details>
+<summary>Indice 3</summary>
+
+Une démo locale réussie hier ne prouve pas qu’un commit poussé aujourd’hui passe les tests ; compare le commit testé à celui de la MR.
+
+</details>
 
 **Avant de livrer**
 
@@ -1009,7 +1434,7 @@ Tu rends lisibles les alertes, les erreurs HTTP et les pannes ; la CI reste ind�
 
 Partir de la version fusionnée des MR1 et MR2, dans une branche dédiée au bilan.
 
-**Où tu travailles :** Dépôt
+**Où tu travailles :** Mac · workspaces/headerscope · Dépôt
 
 **Pour comprendre**
 
@@ -1018,7 +1443,7 @@ Partir de la version fusionnée des MR1 et MR2, dans une branche dédiée au bil
 
 **Actions dans l’ordre**
 
-1. Ouvre workspaces/headerscope dans VS Code, ou Coder dans Cyber Atelier avec cwd sur « . ».
+1. Ouvre workspaces/headerscope dans VS Code. Dans le terminal du Mac, place-toi dans ce même dossier et active son venv avec source .venv/bin/activate.
 2. Vérifie que MR2 est fusionnée : main contient les deux premières missions.
 3. Lis git status ; enregistre ton travail en cours avant de changer de branche.
 4. Reviens sur main avec git switch main, mets-la à jour avec git pull --ff-only, puis crée feat/bilan. Remplace main par master si ton dépôt utilise ce nom.
@@ -1026,7 +1451,7 @@ Partir de la version fusionnée des MR1 et MR2, dans une branche dédiée au bil
 
 **Terminal · Relire l’état du dépôt**
 
-Terminal du parcours : reste à la racine du dépôt. Exécute ces lignes au moment demandé dans les actions, avec les modifications manuelles entre les blocs.
+Terminal du Mac, dans cyberatelier/workspaces/headerscope, venv Mac activé. Exécute chaque ligne au moment indiqué, avec les modifications manuelles entre les blocs.
 
 ```bash
 git status
@@ -1064,13 +1489,36 @@ git status
 
 **Tu sais que c’est bon quand :** git log --oneline -6 montre les fusions des MR1 et MR2, et git status affiche « On branch feat/bilan ».
 
-*Indice si tu bloques :* Si la branche feat/bilan existe déjà, utilise git switch feat/bilan sans -c, après avoir vérifié avec git log qu’elle contient bien les fusions. Si git pull --ff-only refuse, relis git log avant de continuer.
+**Indices progressifs**
+
+Depuis le terminal dans `cyberatelier`, `python3 atelier.py indice` révèle un niveau à la fois. Ouvre seulement le niveau nécessaire.
+
+<details>
+<summary>Indice 1</summary>
+
+MR3 relie les éléments stables des deux missions précédentes ; main doit les contenir avant la branche finale.
+
+</details>
+
+<details>
+<summary>Indice 2</summary>
+
+Vérifie MR2 fusionnée, actualise main et relance H1 à H9 avant de créer feat/bilan.
+
+</details>
+
+<details>
+<summary>Indice 3</summary>
+
+Si classer_reponse existe mais que le client manque sur main, le point de départ ne contient pas encore toute la MR2.
+
+</details>
 
 #### Palier 2 — Choisir un chemin depuis la ligne de commande (10 min)
 
 Lire un argument passé au programme et le refuser s’il n’est pas dans la liste autorisée.
 
-**Où tu travailles :** exemple_choix.py (jetable)
+**Où tu travailles :** Mac · workspaces/headerscope · exemple_choix.py (jetable)
 
 **Pour comprendre**
 
@@ -1079,7 +1527,7 @@ Lire un argument passé au programme et le refuser s’il n’est pas dans la li
 
 **Éditeur · Exemple Python à lire ou essayer**
 
-Éditeur : copie cet exemple dans exemple_choix.py (jetable), enregistre-le, puis lance python3 exemple_choix.py. Si plusieurs exemples sont proposés, essaie-les un par un en remplaçant le contenu du fichier. Retire ensuite les fichiers générés et le fichier d’exemple.
+VS Code sur le Mac : copie cet exemple dans exemple_choix.py (jetable), enregistre-le, puis lance python3 exemple_choix.py. Si plusieurs exemples sont proposés, essaie-les un par un en remplaçant le contenu du fichier. Retire ensuite les fichiers générés et le fichier d’exemple.
 
 ```python
 import sys
@@ -1101,7 +1549,7 @@ else:
 
 **Terminal · Commande à lancer au moment indiqué**
 
-Terminal du parcours : reste à la racine du dépôt. Exécute ces lignes au moment demandé dans les actions, avec les modifications manuelles entre les blocs.
+Terminal du Mac, dans cyberatelier/workspaces/headerscope, venv Mac activé. Exécute chaque ligne au moment indiqué, avec les modifications manuelles entre les blocs.
 
 ```bash
 python3 exemple_choix.py poire
@@ -1121,13 +1569,36 @@ python3 exemple_choix.py
 
 **Tu sais que c’est bon quand :** « poire » affiche « fruit choisi : poire », « kiwi » affiche « inconnu : kiwi », et sans argument le programme prend la valeur par défaut.
 
-*Indice si tu bloques :* sys.argv[0] est le nom du script ; le premier vrai argument est sys.argv[1]. Teste d’abord la longueur de la liste pour ne pas planter quand l’argument manque.
+**Indices progressifs**
+
+Depuis le terminal dans `cyberatelier`, `python3 atelier.py indice` révèle un niveau à la fois. Ouvre seulement le niveau nécessaire.
+
+<details>
+<summary>Indice 1</summary>
+
+Les arguments de la commande sont du texte ; un chemin autorisé doit être choisi sans rendre l’origine HTTP configurable.
+
+</details>
+
+<details>
+<summary>Indice 2</summary>
+
+Lis les arguments avec la méthode prévue et accepte seulement les quatre chemins du labo, en documentant le défaut éventuel.
+
+</details>
+
+<details>
+<summary>Indice 3</summary>
+
+Une commande qui reçoit '/durci' sélectionne un chemin ; lui faire accepter 'http://ailleurs/' créerait une possibilité nouvelle hors contrat.
+
+</details>
 
 #### Palier 3 — Relier le client et les règles (10 min)
 
 Écrire une fonction qui enchaîne les étapes dans le bon ordre : vérifier, demander, classer.
 
-**Où tu travailles :** headerscope.py
+**Où tu travailles :** Mac · workspaces/headerscope · headerscope.py
 
 **Pour comprendre**
 
@@ -1144,7 +1615,7 @@ python3 exemple_choix.py
 
 **Terminal · Commande à lancer au moment indiqué**
 
-Terminal du parcours : reste à la racine du dépôt. Exécute ces lignes au moment demandé dans les actions, avec les modifications manuelles entre les blocs.
+Terminal du Mac, dans cyberatelier/workspaces/headerscope, venv Mac activé. Exécute chaque ligne au moment indiqué, avec les modifications manuelles entre les blocs.
 
 ```bash
 python3 -m py_compile headerscope.py
@@ -1165,13 +1636,36 @@ git commit -m "Relie le client, les règles et le classement dans executer_bilan
 
 **Tu sais que c’est bon quand :** py_compile ne signale aucune erreur, H1 à H9 passent, et git log --oneline montre le commit.
 
-*Indice si tu bloques :* Ne refais pas les règles ni le client dans executer_bilan : appelle les fonctions déjà écrites. Une seule fonction assemble les étapes, ce qui permet de tester chaque morceau séparément.
+**Indices progressifs**
+
+Depuis le terminal dans `cyberatelier`, `python3 atelier.py indice` révèle un niveau à la fois. Ouvre seulement le niveau nécessaire.
+
+<details>
+<summary>Indice 1</summary>
+
+L’orchestration transmet les données du client aux règles ; les rôles séparés évitent de recopier les contrôles.
+
+</details>
+
+<details>
+<summary>Indice 2</summary>
+
+Retrouve le moment où le code et les en-têtes sont disponibles, puis appelle classer_reponse pour la réponse reçue.
+
+</details>
+
+<details>
+<summary>Indice 3</summary>
+
+Un lecteur de facture peut lire les données puis appeler calculer_total ; remettre la lecture du fichier dans calculer_total mélangerait deux rôles.
+
+</details>
 
 #### Palier 4 — Un bilan lisible et quatre issues distinctes (10 min)
 
 Produire un texte de bilan avec statut, alertes et résumé, et séparer 404, 500, panne et délai.
 
-**Où tu travailles :** headerscope.py
+**Où tu travailles :** Mac · workspaces/headerscope · headerscope.py
 
 **Pour comprendre**
 
@@ -1180,7 +1674,7 @@ Produire un texte de bilan avec statut, alertes et résumé, et séparer 404, 50
 
 **Éditeur · Exemple Python à lire ou essayer**
 
-Éditeur : copie cet exemple dans exemple.py (jetable), enregistre-le, puis lance python3 exemple.py. Si plusieurs exemples sont proposés, essaie-les un par un en remplaçant le contenu du fichier. Retire ensuite les fichiers générés et le fichier d’exemple.
+VS Code sur le Mac : copie cet exemple dans exemple.py (jetable), enregistre-le, puis lance python3 exemple.py. Si plusieurs exemples sont proposés, essaie-les un par un en remplaçant le contenu du fichier. Retire ensuite les fichiers générés et le fichier d’exemple.
 
 ```python
 produits = [('pomme', 3), ('poire', 0)]
@@ -1197,7 +1691,7 @@ for nom, quantite in produits:
 
 **Terminal · Commande à lancer au moment indiqué**
 
-Terminal du parcours : reste à la racine du dépôt. Exécute ces lignes au moment demandé dans les actions, avec les modifications manuelles entre les blocs.
+Terminal du Mac, dans cyberatelier/workspaces/headerscope, venv Mac activé. Exécute chaque ligne au moment indiqué, avec les modifications manuelles entre les blocs.
 
 ```bash
 python3 -m py_compile headerscope.py
@@ -1212,13 +1706,36 @@ git commit -m "Affiche un bilan lisible et distingue les issues HTTP"
 
 **Tu sais que c’est bon quand :** Le bilan contient statut, alertes et résumé ; les quatre issues ont des libellés différents ; py_compile ne signale aucune erreur.
 
-*Indice si tu bloques :* Une f-string s’écrit f'{valeur}' et insère la valeur dans le texte. Pour une liste vide d’alertes, écris un texte explicite plutôt que de ne rien afficher.
+**Indices progressifs**
+
+Depuis le terminal dans `cyberatelier`, `python3 atelier.py indice` révèle un niveau à la fois. Ouvre seulement le niveau nécessaire.
+
+<details>
+<summary>Indice 1</summary>
+
+Le bilan distingue succès avec alertes, succès conforme, réponse HTTP d’erreur et panne sans code.
+
+</details>
+
+<details>
+<summary>Indice 2</summary>
+
+Prépare une forme d’affichage pour chaque issue et garde les alertes de politique uniquement dans le succès HTTP prévu.
+
+</details>
+
+<details>
+<summary>Indice 3</summary>
+
+« HTTP 200 : 3 alertes » et « HTTP 404 : ressource absente » ne signalent pas le même défaut ; un timeout ne doit pas être affiché comme 404.
+
+</details>
 
 #### Palier 5 — Vérifier que les tests n’ont pas besoin du laboratoire (10 min)
 
 Prouver que la CI reste verte sans laboratoire, en contrôlant que les tests ne touchent pas le réseau.
 
-**Où tu travailles :** verification.py ; laboratoire
+**Où tu travailles :** Mac · workspaces/headerscope · verification.py ; laboratoire
 
 **Pour comprendre**
 
@@ -1227,14 +1744,14 @@ Prouver que la CI reste verte sans laboratoire, en contrôlant que les tests ne 
 
 **Actions dans l’ordre**
 
-1. Arrête le labo avec son bouton ou Ctrl+C.
+1. Arrête le labo Mac avec Ctrl+C dans son terminal séparé.
 2. Lance verification.py : attends 0 avec des tests réellement exécutés.
 3. Relis les tests : aucun appel à demander ni urlopen. La recherche proposée doit être vide.
 4. Si un appel réel s’est glissé dans la suite, remplace-le par les données directes prévues par H8 et H9.
 
 **Terminal · Commande à lancer au moment indiqué**
 
-Terminal du parcours : reste à la racine du dépôt. Exécute ces lignes au moment demandé dans les actions, avec les modifications manuelles entre les blocs. Lance le programme et echo $? ensemble : le nombre affiché est le code du programme ; la console peut afficher code 0 pour echo lui-même.
+Terminal du Mac, dans cyberatelier/workspaces/headerscope, venv Mac activé. Exécute chaque ligne au moment indiqué, avec les modifications manuelles entre les blocs. Lis le code de sortie immédiatement après le programme, avant toute autre commande.
 
 ```bash
 python3 verification.py; echo $?
@@ -1242,7 +1759,7 @@ python3 verification.py; echo $?
 
 **Terminal · Commande à lancer au moment indiqué**
 
-Terminal du parcours : reste à la racine du dépôt. Exécute ces lignes au moment demandé dans les actions, avec les modifications manuelles entre les blocs.
+Terminal du Mac, dans cyberatelier/workspaces/headerscope, venv Mac activé. Exécute chaque ligne au moment indiqué, avec les modifications manuelles entre les blocs.
 
 ```bash
 grep -n 'urlopen\|demander' verification.py
@@ -1250,13 +1767,36 @@ grep -n 'urlopen\|demander' verification.py
 
 **Tu sais que c’est bon quand :** python3 verification.py se termine avec 0, et la commande grep ne trouve aucune ligne.
 
-*Indice si tu bloques :* Si grep trouve une ligne, un test touche au réseau : retire-le des tests, et garde ce contrôle pour la démonstration du palier 7. Le code de sortie doit rester 0 même laboratoire arrêté.
+**Indices progressifs**
+
+Depuis le terminal dans `cyberatelier`, `python3 atelier.py indice` révèle un niveau à la fois. Ouvre seulement le niveau nécessaire.
+
+<details>
+<summary>Indice 1</summary>
+
+Les tests de règles et de classement utilisent des entrées fournies ; ils doivent réussir labo arrêté.
+
+</details>
+
+<details>
+<summary>Indice 2</summary>
+
+Arrête le labo Mac avec Ctrl+C et relance verification.py ; si un test attend le réseau, remplace cette dépendance par les données attendues du test.
+
+</details>
+
+<details>
+<summary>Indice 3</summary>
+
+Un test qui appelle classer_reponse(200, {}) peut tourner sans serveur ; un test qui appelle urlopen pour obtenir {} dépend de sa disponibilité.
+
+</details>
 
 #### Palier 6 — README : périmètre, règles, délai et limites (10 min)
 
 Documenter ce que le programme fait, comment le lancer et ce qu’il ne prouve pas.
 
-**Où tu travailles :** README.md
+**Où tu travailles :** Mac · workspaces/headerscope · README.md
 
 **Pour comprendre**
 
@@ -1272,7 +1812,7 @@ Documenter ce que le programme fait, comment le lancer et ce qu’il ne prouve p
 
 **Terminal · Commande à lancer au moment indiqué**
 
-Terminal du parcours : reste à la racine du dépôt. Exécute ces lignes au moment demandé dans les actions, avec les modifications manuelles entre les blocs.
+Terminal du Mac, dans cyberatelier/workspaces/headerscope, venv Mac activé. Exécute chaque ligne au moment indiqué, avec les modifications manuelles entre les blocs.
 
 ```bash
 python3 verification.py
@@ -1293,13 +1833,36 @@ git commit -m "Documente le périmètre, les règles et les limites de HeaderSco
 
 **Tu sais que c’est bon quand :** README.md contient la commande des tests, le délai de 2 secondes, le périmètre et les limites ; git log --oneline montre le commit.
 
-*Indice si tu bloques :* Un bon README répond à trois questions : que fait le programme, comment le lancer, et qu’est-ce qu’il ne prouve pas. Relis-le comme si tu étais un autre étudiant qui n’a pas vu le cours.
+**Indices progressifs**
+
+Depuis le terminal dans `cyberatelier`, `python3 atelier.py indice` révèle un niveau à la fois. Ouvre seulement le niveau nécessaire.
+
+<details>
+<summary>Indice 1</summary>
+
+Le README rend le périmètre et les commandes reproductibles ; il doit expliquer la limite des contrôles d’en-tête.
+
+</details>
+
+<details>
+<summary>Indice 2</summary>
+
+Décris la cible 127.0.0.1:8000, les quatre chemins, les trois règles et le timeout de deux secondes avec tes commandes Mac vérifiées.
+
+</details>
+
+<details>
+<summary>Indice 3</summary>
+
+« trois en-têtes conformes » décrit le résultat observé ; cela ne prouve pas que toutes les parties d’un site sont sûres.
+
+</details>
 
 #### Palier 7 — Démonstration D1 à D3 (hors tests) (10 min)
 
 Vérifier le comportement réel du programme sur le laboratoire, sans le confondre avec les tests automatiques.
 
-**Où tu travailles :** Laboratoire local ; headerscope.py
+**Où tu travailles :** Mac · workspaces/headerscope · Laboratoire local ; headerscope.py
 
 **Pour comprendre**
 
@@ -1308,15 +1871,15 @@ Vérifier le comportement réel du programme sur le laboratoire, sans le confond
 
 **Actions dans l’ordre**
 
-1. Démarre le labo dans le même environnement que le client.
+1. Sur le Mac, ouvre un second terminal dans cyberatelier et lance python3 labs.py. Laisse-le ouvert pendant la démonstration ; le client continue dans le terminal du parcours avec son venv Mac.
 2. D1 : /fragile donne trois alertes.
 3. D2 : /durci donne zéro alerte.
 4. D3 : /absent puis /erreur donnent HTTP_ERREUR avec 404 puis 500, sans alerte de politique.
 5. Arrête le labo et relance : attends une panne distincte. Consigne les observations hors de verification.py.
 
-**Terminal · Option Mac : démarrer le laboratoire dans un autre terminal**
+**Terminal · Démarrer le laboratoire Mac dans un second terminal**
 
-Terminal séparé sur ton Mac, depuis le dossier cyberatelier. Laisse-le ouvert pendant la démonstration, puis arrête avec Ctrl+C. Dans Docker, utilise plutôt le bouton du laboratoire.
+Second terminal du Mac, dans cyberatelier. python3 labs.py démarre le labo sur 127.0.0.1:8000 du Mac ; garde ce terminal ouvert puis arrête avec Ctrl+C. Le labo interne de Docker est distinct.
 
 ```bash
 python3 labs.py
@@ -1324,7 +1887,7 @@ python3 labs.py
 
 **Terminal · Commande à lancer au moment indiqué**
 
-Terminal du parcours : reste à la racine du dépôt. Exécute ces lignes au moment demandé dans les actions, avec les modifications manuelles entre les blocs.
+Terminal du Mac, dans cyberatelier/workspaces/headerscope, venv Mac activé. Exécute chaque ligne au moment indiqué, avec les modifications manuelles entre les blocs.
 
 ```bash
 python3 headerscope.py /fragile
@@ -1350,13 +1913,36 @@ python3 headerscope.py /erreur
 
 **Tu sais que c’est bon quand :** D1 : trois alertes. D2 : zéro alerte. D3 : 404 et 500 identifiés comme erreurs HTTP, sans alerte de politique. Laboratoire arrêté : une panne.
 
-*Indice si tu bloques :* Si tu obtiens une panne au lieu d’une réponse, le laboratoire n’est pas actif : vérifie le bouton de Cyber Atelier ou relance python3 labs.py. Ne change pas de port.
+**Indices progressifs**
+
+Depuis le terminal dans `cyberatelier`, `python3 atelier.py indice` révèle un niveau à la fois. Ouvre seulement le niveau nécessaire.
+
+<details>
+<summary>Indice 1</summary>
+
+D1/D2/D3 montrent les voies réelles ; le labo utilisé doit tourner dans le même environnement que le client.
+
+</details>
+
+<details>
+<summary>Indice 2</summary>
+
+Avec le client Mac, démarre labs.py sur le Mac puis observe /fragile, /durci, /absent et /erreur avant la panne labo arrêté.
+
+</details>
+
+<details>
+<summary>Indice 3</summary>
+
+/fragile donne 3 alertes, /durci 0 ; après Ctrl+C, aucune réponse n’arrive et le bilan doit perdre le code HTTP plutôt qu’inventer 500.
+
+</details>
 
 #### Palier 8 — Livrer la MR3 et fermer le bilan (10 min)
 
 Pousser la dernière branche, vérifier le pipeline du dernier commit, puis fusionner seulement si le pipeline est vert.
 
-**Où tu travailles :** MR GitLab
+**Où tu travailles :** Mac · workspaces/headerscope · MR GitLab
 
 **Pour comprendre**
 
@@ -1376,7 +1962,7 @@ Pousser la dernière branche, vérifier le pipeline du dernier commit, puis fusi
 
 **Terminal · Relire l’état du dépôt**
 
-Terminal du parcours : reste à la racine du dépôt. Exécute ces lignes au moment demandé dans les actions, avec les modifications manuelles entre les blocs.
+Terminal du Mac, dans cyberatelier/workspaces/headerscope, venv Mac activé. Exécute chaque ligne au moment indiqué, avec les modifications manuelles entre les blocs.
 
 ```bash
 git status
@@ -1403,11 +1989,34 @@ git pull --ff-only
 
 **Tu sais que c’est bon quand :** Le pipeline du dernier commit est vert dans GitLab, la merge request ne contient que les fichiers attendus, et main local contient la fusion (git log --oneline).
 
-*Indice si tu bloques :* Un pipeline vert ne prouve pas que les démonstrations D1 à D3 ont réussi : elles sont séparées. Ne fusionne jamais sur un pipeline rouge ou absent.
+**Indices progressifs**
+
+Depuis le terminal dans `cyberatelier`, `python3 atelier.py indice` révèle un niveau à la fois. Ouvre seulement le niveau nécessaire.
+
+<details>
+<summary>Indice 1</summary>
+
+Le bilan final distingue ce que prouve la CI de ce que montre la démonstration locale.
+
+</details>
+
+<details>
+<summary>Indice 2</summary>
+
+Relance la suite hors labo, relis le README et les fichiers de la MR, puis fusionne la dernière version réellement testée.
+
+</details>
+
+<details>
+<summary>Indice 3</summary>
+
+Une phrase « H1 à H9 verts ; quatre chemins observés sur le labo Mac » conserve deux preuves précises au lieu d’annoncer une validation générale du réseau.
+
+</details>
 
 **Démonstrations manuelles (hors CI)**
 
-Ces essais utilisent le laboratoire ou les outils réels. Ils sont séparés des tests obligatoires.
+Ces essais lisent des fichiers locaux ou utilisent le labo et les outils réels, selon le parcours. Ils sont séparés des tests obligatoires.
 
 **D1 — Résultat fragile**
 - Entrée : Réponse locale du chemin /fragile
@@ -1444,7 +2053,7 @@ Préparation GitLab et lecture : 30 min. MR1 règles et tests : 85 min. MR2 clie
 
 ## Livrables et limites
 
-Le dossier HeaderScope est vide au départ. Depuis son terminal, clone le dépôt directement dans le dossier courant avec git clone <URL_DU_DEPOT> . avant de créer les fichiers. Le point signifie « ici ». Les commandes du terminal web repartent chacune du dossier courant explicite ; un cd seul ne persiste pas. Pour Git interactif, utilise docker compose exec atelier bash depuis le dossier Cyber Atelier.
+Le dossier HeaderScope est vide au départ. Depuis son terminal, clone le dépôt directement dans le dossier courant avec git clone <URL_DU_DEPOT> . avant de créer les fichiers. Le point signifie « ici ». Fais le clone dans le terminal du Mac, depuis workspaces/headerscope, uniquement si le dépôt n’existe pas encore. Le terminal conserve son cd et son activation de venv ; reste dans le dépôt du parcours pour Git et les tests.
 
 Livre un programme, une suite de tests locale utile, une configuration CI, un README clair, trois MR successives et un bilan honnête de ce que la CI et la démonstration valident. Les tests de règles sont autonomes et réalisables sur un runner ordinaire. La démonstration des quatre chemins utilise le laboratoire local de Cyber Atelier quand il est démarré explicitement.
 

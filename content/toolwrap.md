@@ -14,7 +14,7 @@ Le framework appellera des outils différents, avec des sorties différentes (XM
 
 ## Périmètre et règles
 
-- Outils : nmap, installé dans le conteneur, utilisé seulement en démonstration sur 127.0.0.1:8000 ; adsim, simulateur FICTIF du domaine LAB.LOCAL, lancé par `python /app/tools/adsim.py <sujet> [options]`.
+- Outils : nmap, installé dans le conteneur, utilisé seulement en démonstration sur 127.0.0.1:8000 ; adsim, simulateur FICTIF du domaine LAB.LOCAL, lancé dans Docker depuis le terminal Mac avec `docker compose exec -T atelier python3 /app/tools/adsim.py <sujet> [options]` (depuis `cyberatelier`).
 - Cible réseau : 127.0.0.1 uniquement. Aucune cible externe, aucune plage, aucun exploit.
 - Tests obligatoires : unittest, avec unittest.mock sur subprocess.run et des fixtures locales. Aucun processus réel, aucun nmap, aucun réseau dans ces tests.
 - Bibliothèque standard uniquement. Pas de pip.
@@ -24,20 +24,13 @@ Le framework appellera des outils différents, avec des sorties différentes (XM
 
 - Le Socle : unittest, fichiers, JSON, exceptions, Git de base (branche, commit, diff).
 - Idéalement PortPilot et HeaderScope.
-- Python 3 et Git dans le conteneur Cyber Atelier.
+- Python 3 et Git disponibles pour les exercices ; le mode principal utilise ceux du Mac et les outils réels fournis dans Docker.
 
 ## Mise en place
 
-Dans la console du parcours, dans l’ordre :
+Dans le terminal du Mac, depuis `workspaces/toolwrap`, vérifie Python et Git, configure ton identité Git et clone ton dépôt seulement s’il n’existe pas encore. Remplace l’URL d’exemple par l’URL autorisée avant exécution. Crée et active `.venv`, puis copie les fixtures depuis `../../fixtures/nmap` et `../../fixtures/adsim` vers ton dossier `fixtures/`. La section « Préparation sur le Mac » donne chaque commande dans l’ordre. La mission MR1 crée ensuite `feat/subprocess`.
 
-1. `python3 --version` et `git --version` pour vérifier les outils.
-2. `git config --global --get user.name && git config --global --get user.email` pour vérifier ton identité Git. Si une valeur manque, reprends la configuration des parcours précédents.
-3. Clone interactif, dans `docker compose exec atelier bash` depuis le dossier Cyber Atelier : `git clone <URL_DU_DEPOT> .`, puis `cd /workspaces/toolwrap`.
-4. Copie des fixtures nmap : `mkdir -p fixtures && cp -r /app/fixtures/nmap/. fixtures/nmap/ && chmod -R u+w fixtures/nmap`.
-5. Copie des fixtures adsim : `mkdir -p fixtures && cp -r /app/fixtures/adsim/. fixtures/adsim/ && chmod -R u+w fixtures/adsim`.
-6. Création de la première branche : `git switch -c feat/subprocess`.
-
-Les originaux sont en lecture seule. Tes copies sont modifiables, mais les tests ne doivent pas dépendre de modifications manuelles.
+Écris le code dans VS Code et enregistre-le avant les tests du terminal. Les copies des fixtures sont modifiables ; les tests ne doivent pas dépendre de modifications manuelles. Pour les observations d’outils réels, un second terminal Mac placé dans `cyberatelier` lance les appels Docker. `/app/tools` existe seulement dans le conteneur.
 
 ## Contrat du programme
 
@@ -69,17 +62,94 @@ Ces exercices sont ton entraînement. Chaque palier explique les notions utiles,
 2. Les cartes de tests donnent l’entrée et le résultat attendu. Écris les tests correspondants dans le fichier indiqué ; cocher un palier ne les exécute pas. Avec unittest, « Ran 0 tests » signifie qu’aucun test n’a été exécuté : ce n’est pas une validation. Un cas décrit peut contenir plusieurs valeurs ; le nombre de méthodes Python n’est donc pas forcément le nombre d’identifiants.
 3. Suis les actions numérotées, une à la fois. Les exemples servent à apprendre une notion ; tu écris toi-même la solution de l’exercice. Les blocs Terminal donnent les commandes à lancer au moment indiqué.
 4. Vérifie le résultat indiqué avant de poursuivre. Un échec attendu (phase rouge, argument refusé ou conflit volontaire) est expliqué dans le palier.
-5. Si tu bloques, lis la dernière ligne de l’erreur, compare l’entrée et l’attendu, puis ouvre l’indice. Fais un petit changement et relance.
+5. Si tu bloques, lis la dernière ligne de l’erreur, compare entrée et attendu, puis demande un seul indice à la fois avec python3 atelier.py indice depuis cyberatelier. Les trois niveaux vont du rappel à un petit exemple ; ils ne donnent pas une fonction corrigée.
 
 ### Le bon endroit pour chaque action
 
-Sur ton Mac, ouvre `workspaces/toolwrap` dans VS Code. Dans Cyber Atelier, utilise l’éditeur et la console de **Coder**, avec `cwd` sur `.` (la racine du dépôt). Fais la préparation de **Environnement** avant MR1 ; la mission crée ensuite sa branche.
+Ouvre `workspaces/toolwrap` dans VS Code et un terminal du Mac dans ce même dossier. Tu écris et testes le code ici, dans le dépôt Git de l’exercice. Ouvre un second terminal dans `cyberatelier` pour lire les consignes avec `python3 atelier.py voir` et piloter Docker. Le site reste disponible pour la lecture ; l’onglet Coder est facultatif.
 
-Le code Python se place dans l’éditeur. Les commandes `docker compose ...` se lancent sur ton Mac depuis `cyberatelier` ; `/app/...` existe dans le conteneur. Le laboratoire interrogé doit tourner dans le même environnement que ton programme.
+Depuis `cyberatelier`, `mkdir -p workspaces/toolwrap` puis `cd workspaces/toolwrap` permet de rejoindre le dossier du parcours. S’il contient déjà ton exercice, garde ses fichiers, sa branche et son dépôt : ne le reclone pas. La préparation ci-dessous se fait une fois ; la mission crée ensuite sa branche.
 
-La console web repart à neuf à chaque exécution : un `cd`, une activation de venv ou `echo $?` ne se transmet pas à la commande suivante. Lance le programme et `echo $?` ensemble quand le palier le demande. Le nombre affiché par echo est celui du programme ; la console peut afficher code 0 pour echo lui-même.
+Le code Python se place dans VS Code et doit être enregistré avant les tests. Les commandes `docker compose ...` et `python3 atelier.py ...` se lancent depuis `cyberatelier`. Leurs appels Docker entrent dans le conteneur ; `/app/fixtures`, `/app/tools` et `/workspaces` sont des chemins internes à celui-ci. Depuis le dépôt d’exercice sur le Mac, les fixtures fournies sont dans `../../fixtures`.
 
-Un venv créé sur le Mac ne fonctionne pas dans le conteneur : utilise `python3` dans ce dernier. Remplace `main` par `master` si nécessaire. Si une branche existe déjà, reprends-la avec `git switch NOM` sans `-c`. Après chaque fusion, actualise la branche principale avant la mission suivante.
+Le terminal du Mac conserve son `cd` et son activation de venv. Active `.venv` dans chaque nouveau terminal d’exercice ; `python3` utilise alors ce venv, ou appelle `.venv/bin/python` explicitement. Lis `echo $?` immédiatement après le programme dont tu veux le code, avant toute autre commande. Ajoute `.venv/` à `.gitignore` avant `git add`.
+
+PortPilot et HeaderScope exécutés sur le Mac : lance `python3 labs.py` depuis `cyberatelier` dans un autre terminal et garde-le ouvert ; Ctrl+C arrête ce labo Mac. Les outils ToolWrap et les démos ReconWrap tournent dans Docker : `python3 atelier.py labo demarrer`, `labo arreter` et `labo statut` depuis `cyberatelier` pilotent uniquement le labo Docker. Le même numéro 8000 ne relie pas automatiquement les deux environnements.
+
+Un venv créé sur le Mac ne fonctionne pas dans Docker : les démos dans le conteneur utilisent son `python3`. Le dossier hôte `workspaces` doit être monté dans Docker pour que les démos ReconWrap lisent ton code ; conserve le `compose.override.yaml` du mode VS Code. Remplace `main` par `master` si nécessaire. Si une branche existe, reprends-la avec `git switch NOM` sans `-c`. Après chaque fusion, actualise la principale dans le dépôt du parcours avant la mission suivante.
+
+### Préparation sur le Mac
+
+**Vérifier Python**
+
+Terminal du Mac, dans cyberatelier/workspaces/toolwrap.
+
+```bash
+python3 --version
+```
+
+Python 3 doit être installé sur ton Mac. Ce parcours utilise seulement sa bibliothèque standard ; aucun pip install n’est demandé.
+
+**Vérifier Git**
+
+Terminal du Mac, dans cyberatelier/workspaces/toolwrap.
+
+```bash
+git --version
+```
+
+Vérifie Git sur ton Mac. Les commandes du parcours agissent sur ce dépôt d’exercice, distinct du dépôt cyberatelier.
+
+**Vérifier ton identité Git**
+
+Terminal du Mac, dans cyberatelier/workspaces/toolwrap.
+
+```bash
+git config --global --get user.name && git config --global --get user.email
+```
+
+Si l’une des deux valeurs est vide, reprends la configuration des parcours précédents avec le nom et l’adresse de ton compte scolaire. Sans identité, git commit refuse de créer le commit.
+
+**Cloner le dépôt**
+
+Terminal du Mac, dans cyberatelier/workspaces/toolwrap.
+
+```bash
+git clone <URL_DU_DEPOT> .
+```
+
+Depuis le terminal du Mac dans workspaces/toolwrap, clone seulement si le dossier est vide et n’a pas encore de dépôt. Remplace <URL_DU_DEPOT> par l’URL autorisée réelle avant exécution ; le point signifie « ici ». Si ton exercice existe déjà, garde-le et passe directement à git status. HTTPS ou SSH peut demander une saisie dans ce terminal.
+
+**Créer le venv**
+
+Terminal du Mac, dans cyberatelier/workspaces/toolwrap.
+
+```bash
+python3 -m venv .venv
+source .venv/bin/activate
+```
+
+Après le clone, crée ce venv sur le Mac une seule fois ; s’il existe, active-le simplement. L’activation reste valable dans ce terminal. Dans un nouveau terminal, réactive-le ou appelle .venv/bin/python. Ajoute .venv/ à .gitignore avant git add. Aucun paquet pip n’est nécessaire.
+
+**Copier les fixtures nmap**
+
+Terminal du Mac, dans cyberatelier/workspaces/toolwrap.
+
+```bash
+mkdir -p fixtures/nmap && cp -r ../../fixtures/nmap/. fixtures/nmap/ && chmod -R u+w fixtures/nmap
+```
+
+Copies modifiables des sorties XML fictives (open_8000.xml, closed_8000.xml, mixed.xml, broken.xml). Les originaux restent en lecture seule. La source est dans le dépôt cyberatelier sur ton Mac ; /app/fixtures est réservée au conteneur.
+
+**Copier les fixtures adsim**
+
+Terminal du Mac, dans cyberatelier/workspaces/toolwrap.
+
+```bash
+mkdir -p fixtures/adsim && cp -r ../../fixtures/adsim/. fixtures/adsim/ && chmod -R u+w fixtures/adsim
+```
+
+Sorties fictives d’adsim (users.json, users.txt, groups.json, computers.json, broken.json). Le simulateur est fictif : il ne se connecte à aucun annuaire. La source est dans le dépôt cyberatelier sur ton Mac ; /app/fixtures est réservée au conteneur.
 
 ### Les mots utiles
 
@@ -150,7 +220,7 @@ Le wrapper sera appelé par la CLI en MR2, puis ses sorties seront analysées en
 
 Travailler sur une branche dédiée à la MR1 et savoir où tu te trouves avant d’écrire une ligne.
 
-**Où tu travailles :** Dépôt
+**Où tu travailles :** Mac · workspaces/toolwrap · Dépôt
 
 **Pour comprendre**
 
@@ -159,15 +229,15 @@ Travailler sur une branche dédiée à la MR1 et savoir où tu te trouves avant 
 
 **Actions dans l’ordre**
 
-1. Ouvre workspaces/toolwrap dans VS Code, ou Coder dans Cyber Atelier avec cwd sur « . ».
-2. Termine la préparation de l’onglet Environnement avant de commencer.
+1. Ouvre workspaces/toolwrap dans VS Code. Dans le terminal du Mac, place-toi dans ce même dossier et active son venv avec source .venv/bin/activate.
+2. Termine la préparation décrite au début du guide avant de commencer.
 3. Lis git status ; enregistre ton travail en cours avant de changer de branche.
 4. Reviens sur main avec git switch main, mets-la à jour avec git pull --ff-only, puis crée feat/subprocess. Remplace main par master si ton dépôt utilise ce nom.
 5. Vérifie le nom de ta branche avec git status. Si elle existe déjà, reprends-la avec git switch sans -c.
 
 **Terminal · Commande à lancer au moment indiqué**
 
-Terminal du parcours : reste à la racine du dépôt. Exécute ces lignes au moment demandé dans les actions, avec les modifications manuelles entre les blocs.
+Terminal du Mac, dans cyberatelier/workspaces/toolwrap, venv Mac activé. Exécute chaque ligne au moment indiqué, avec les modifications manuelles entre les blocs.
 
 ```bash
 python3 --version
@@ -195,13 +265,36 @@ git status
 
 **Tu sais que c’est bon quand :** git status affiche « On branch feat/subprocess » et « nothing to commit, working tree clean ».
 
-*Indice si tu bloques :* Si la branche existe déjà, utilise git switch feat/subprocess sans -c. Si git pull --ff-only refuse, ne force rien : regarde d’abord ce que contient ta branche avec git log --oneline.
+**Indices progressifs**
+
+Depuis le terminal dans `cyberatelier`, `python3 atelier.py indice` révèle un niveau à la fois. Ouvre seulement le niveau nécessaire.
+
+<details>
+<summary>Indice 1</summary>
+
+Le wrapper se développe sur le Mac dans workspaces/toolwrap ; les outils réels restent fournis par Docker.
+
+</details>
+
+<details>
+<summary>Indice 2</summary>
+
+Vérifie la branche feat/subprocess et distingue les commandes de tests dans le parcours des docker compose lancés deux dossiers plus haut.
+
+</details>
+
+<details>
+<summary>Indice 3</summary>
+
+pwd qui affiche cyberatelier/workspaces/toolwrap convient à unittest ; cyberatelier est le dossier qui contient compose.yaml pour piloter Docker.
+
+</details>
 
 #### Palier 2 — Lancer un programme sans shell (12 min)
 
 Comprendre pourquoi on passe une liste d’arguments à subprocess.run, et ce que le shell ferait sinon.
 
-**Où tu travailles :** Terminal : exemple subprocess
+**Où tu travailles :** Mac · workspaces/toolwrap · Terminal : exemple subprocess
 
 **Pour comprendre**
 
@@ -218,7 +311,7 @@ Comprendre pourquoi on passe une liste d’arguments à subprocess.run, et ce qu
 
 **Terminal · Commande à lancer au moment indiqué**
 
-Terminal du parcours : reste à la racine du dépôt. Exécute ces lignes au moment demandé dans les actions, avec les modifications manuelles entre les blocs.
+Terminal du Mac, dans cyberatelier/workspaces/toolwrap, venv Mac activé. Exécute chaque ligne au moment indiqué, avec les modifications manuelles entre les blocs.
 
 ```bash
 python3 -c "import subprocess; r = subprocess.run(['python3', '-c', 'print(2 + 3)'], capture_output=True, text=True); print(r.returncode, repr(r.stdout), repr(r.stderr))"
@@ -232,13 +325,36 @@ python3 -c "import subprocess; print(subprocess.run(['echo', 'Bonjour', 'Ana; ec
 
 **Tu sais que c’est bon quand :** La première commande affiche « 0 '5\n' '' ». La seconde affiche « Bonjour Ana; echo piraté » : le point-virgule reste dans l’argument, rien n’est exécuté en plus.
 
-*Indice si tu bloques :* Une liste s’écrit avec des crochets et des guillemets. Si Python répond par une erreur, lis la dernière ligne : elle dit ce qui ne va pas.
+**Indices progressifs**
+
+Depuis le terminal dans `cyberatelier`, `python3 atelier.py indice` révèle un niveau à la fois. Ouvre seulement le niveau nécessaire.
+
+<details>
+<summary>Indice 1</summary>
+
+subprocess.run reçoit une liste d’arguments sans shell ; chaque élément conserve sa place et son texte.
+
+</details>
+
+<details>
+<summary>Indice 2</summary>
+
+Lis l’exemple générique et distingue le programme, ses arguments, les sorties capturées et le délai avant d’écrire lancer_outil.
+
+</details>
+
+<details>
+<summary>Indice 3</summary>
+
+['python3', '-c', 'print(2 + 3)'] contient trois arguments ; la chaîne Python n’est pas une commande de shell à découper toi-même.
+
+</details>
 
 #### Palier 3 — Observer les codes de sortie d’adsim (12 min)
 
 Voir comment un outil signale le succès, l’échec simulé et l’erreur d’utilisation, par son code de retour et ses canaux.
 
-**Où tu travailles :** Outil adsim dans Docker
+**Où tu travailles :** Mac · cyberatelier pour appeler adsim dans Docker ; retour dans workspaces/toolwrap pour coder et tester
 
 **Pour comprendre**
 
@@ -247,15 +363,15 @@ Voir comment un outil signale le succès, l’échec simulé et l’erreur d’u
 
 **Actions dans l’ordre**
 
-1. Sur le Mac, place-toi dans cyberatelier pour les commandes docker compose. Dans la console du conteneur, utilise directement python3 /app/tools/adsim.py.
+1. Dans un second terminal du Mac, place-toi dans cyberatelier (le dossier de compose.yaml). Les commandes docker compose exec ci-dessous lancent seulement adsim dans le conteneur ; tu restes dans ton terminal Mac.
 2. Lance la commande normale et note le canal du résultat ainsi que le code 0.
 3. Lance avec --fail : observe l’erreur simulée et le code 3.
 4. Lance avec un argument inconnu : observe le message sur stderr et le code 2.
-5. Lis le code avec echo $? dans la même exécution et garde stderr visible.
+5. Lis le code avec echo $? immédiatement après l’appel Docker ; garde stdout et stderr visibles.
 
 **Terminal · Commande à lancer au moment indiqué**
 
-Terminal de ton Mac, depuis le dossier cyberatelier contenant compose.yaml. Cette commande entre dans le conteneur ; ne la lance pas depuis sa console web.
+Terminal du Mac, dans cyberatelier (le dossier de compose.yaml et atelier.py). Les commandes Docker visent le conteneur ; python3 labs.py vise le labo Mac. Exécute chaque ligne au moment indiqué.
 
 ```bash
 docker compose exec atelier python /app/tools/adsim.py users --format json; echo "code=$?"
@@ -275,13 +391,36 @@ docker compose exec atelier python /app/tools/adsim.py users --inconnu; echo "co
 
 **Tu sais que c’est bon quand :** Tu as noté 0 pour la première, 3 pour --fail, 2 pour l’argument inconnu, et tu sais dire quel canal porte le message d’erreur.
 
-*Indice si tu bloques :* Si docker compose répond « no such service », tu n’es pas dans le dossier du projet. Si le conteneur ne tourne pas, lance docker compose up -d.
+**Indices progressifs**
+
+Depuis le terminal dans `cyberatelier`, `python3 atelier.py indice` révèle un niveau à la fois. Ouvre seulement le niveau nécessaire.
+
+<details>
+<summary>Indice 1</summary>
+
+Le code de retour et les sorties texte sont trois informations séparées ; adsim fournit des cas réels reproductibles.
+
+</details>
+
+<details>
+<summary>Indice 2</summary>
+
+Depuis cyberatelier sur le Mac, observe users normal, --fail puis argument inconnu ; lis echo $? immédiatement après chaque appel Docker.
+
+</details>
+
+<details>
+<summary>Indice 3</summary>
+
+Une commande peut écrire son résultat sur stdout avec code 0, puis une autre écrire une erreur sur stderr avec code 3 ; la présence de texte ne suffit pas à classer le succès.
+
+</details>
 
 #### Palier 4 — Un exemple de mock : patcher le bon nom (12 min)
 
 Remplacer un appel réel par un faux pendant un test, pour que le test ne dépende ni du hasard ni de l’extérieur.
 
-**Où tu travailles :** de.py ; test_de.py (jetables)
+**Où tu travailles :** Mac · workspaces/toolwrap · de.py ; test_de.py (jetables)
 
 **Pour comprendre**
 
@@ -290,7 +429,7 @@ Remplacer un appel réel par un faux pendant un test, pour que le test ne dépen
 
 **Éditeur · Code d’exemple à placer dans de.py**
 
-Éditeur : crée de.py dans le dossier d’exemple jetable indiqué. Exécute-le au moment demandé ; ne colle pas ce code dans la console.
+VS Code sur le Mac : crée de.py dans le dossier d’exemple jetable indiqué. Exécute-le au moment demandé ; ne colle pas ce code dans le terminal.
 
 ```python
 # de.py
@@ -302,7 +441,7 @@ def lancer_de():
 
 **Éditeur · Code d’exemple à placer dans test_de.py**
 
-Éditeur : crée test_de.py dans le dossier d’exemple jetable indiqué. Exécute-le au moment demandé ; ne colle pas ce code dans la console.
+VS Code sur le Mac : crée test_de.py dans le dossier d’exemple jetable indiqué. Exécute-le au moment demandé ; ne colle pas ce code dans le terminal.
 
 ```python
 # test_de.py
@@ -329,7 +468,7 @@ if __name__ == '__main__':
 
 **Terminal · Commande à lancer au moment indiqué**
 
-Terminal du parcours : reste à la racine du dépôt. Exécute ces lignes au moment demandé dans les actions, avec les modifications manuelles entre les blocs.
+Terminal du Mac, dans cyberatelier/workspaces/toolwrap, venv Mac activé. Exécute chaque ligne au moment indiqué, avec les modifications manuelles entre les blocs.
 
 ```bash
 mkdir -p ~/exemple_mock && cd ~/exemple_mock
@@ -345,13 +484,36 @@ cd - && rm -r ~/exemple_mock
 
 **Tu sais que c’est bon quand :** Le test passe. Si tu remplaces return_value=6 par 2, il échoue : le faux impose bien la valeur.
 
-*Indice si tu bloques :* Si le patch n’a aucun effet, vérifie le nom : 'de.randint' fonctionne parce que de.py fait from random import randint ; 'random.randint' ne le toucherait pas.
+**Indices progressifs**
+
+Depuis le terminal dans `cyberatelier`, `python3 atelier.py indice` révèle un niveau à la fois. Ouvre seulement le niveau nécessaire.
+
+<details>
+<summary>Indice 1</summary>
+
+patch remplace le nom consulté par le module testé ; choisir le mauvais chemin laisse le véritable appel actif.
+
+</details>
+
+<details>
+<summary>Indice 2</summary>
+
+Repère comment ton fichier importe subprocess et patch le nom utilisé dans ce fichier ; observe assert_called_once_with dans l’exemple.
+
+</details>
+
+<details>
+<summary>Indice 3</summary>
+
+Si factures.py utilise import subprocess, un patch sur factures.subprocess.run vise son appel ; patcher une fonction imaginaire factures.run ne le remplace pas.
+
+</details>
 
 #### Palier 5 — Premier cas réussi : lancer_outil (W1) (12 min)
 
 Écrire le premier test, le voir échouer, puis écrire le minimum de lancer_outil pour le faire passer.
 
-**Où tu travailles :** toolwrap.py ; tests/test_toolwrap.py
+**Où tu travailles :** Mac · workspaces/toolwrap · toolwrap.py ; tests/test_toolwrap.py
 
 **Pour comprendre**
 
@@ -400,7 +562,7 @@ L’entrée est ce que tu donnes au code ; l’attendu est ce que ton test doit 
 
 **Terminal · Commande à lancer au moment indiqué**
 
-Terminal du parcours : reste à la racine du dépôt. Exécute ces lignes au moment demandé dans les actions, avec les modifications manuelles entre les blocs.
+Terminal du Mac, dans cyberatelier/workspaces/toolwrap, venv Mac activé. Exécute chaque ligne au moment indiqué, avec les modifications manuelles entre les blocs.
 
 ```bash
 python3 -m unittest discover -s tests -v
@@ -422,13 +584,36 @@ git commit -m "Ajoute lancer_outil et le cas de succès"
 
 **Tu sais que c’est bon quand :** python3 -m unittest discover -s tests -v affiche W1 en ok, et git log --oneline affiche ton nouveau commit.
 
-*Indice si tu bloques :* Le dictionnaire garde toujours les mêmes quatre clés. Le nom à patcher est celui que toolwrap.py utilise pour subprocess.run : même logique que l’exemple de mock.
+**Indices progressifs**
+
+Depuis le terminal dans `cyberatelier`, `python3 atelier.py indice` révèle un niveau à la fois. Ouvre seulement le niveau nécessaire.
+
+<details>
+<summary>Indice 1</summary>
+
+Un CompletedProcess mocké fournit code, stdout et stderr sans lancer de processus réel.
+
+</details>
+
+<details>
+<summary>Indice 2</summary>
+
+Écris W1 avec le faux résultat attendu et vérifie les arguments de run, y compris capture_output, text, timeout et check=False.
+
+</details>
+
+<details>
+<summary>Indice 3</summary>
+
+Un faux retour (code 0, texte 'bonjour', erreur '') doit permettre de vérifier la capture des deux sorties sans exécuter de programme.
+
+</details>
 
 #### Palier 6 — Délai dépassé et outil introuvable (W3, W4) (12 min)
 
 Traiter deux exceptions de subprocess.run sans les laisser remonter à l’appelant.
 
-**Où tu travailles :** toolwrap.py ; tests/test_toolwrap.py
+**Où tu travailles :** Mac · workspaces/toolwrap · toolwrap.py ; tests/test_toolwrap.py
 
 **Pour comprendre**
 
@@ -457,7 +642,7 @@ L’entrée est ce que tu donnes au code ; l’attendu est ce que ton test doit 
 
 **Terminal · Commande à lancer au moment indiqué**
 
-Terminal du parcours : reste à la racine du dépôt. Exécute ces lignes au moment demandé dans les actions, avec les modifications manuelles entre les blocs.
+Terminal du Mac, dans cyberatelier/workspaces/toolwrap, venv Mac activé. Exécute chaque ligne au moment indiqué, avec les modifications manuelles entre les blocs.
 
 ```bash
 python3 -c "import subprocess
@@ -489,13 +674,36 @@ git commit -m "Gère le délai dépassé et l’outil introuvable"
 
 **Tu sais que c’est bon quand :** W1, W3 et W4 passent. Dans ces cas, aucune exception ne sort de lancer_outil.
 
-*Indice si tu bloques :* Pour faire lever une exception à un faux, regarde le paramètre side_effect de mock.patch. Le message d’erreur doit être court et en français.
+**Indices progressifs**
+
+Depuis le terminal dans `cyberatelier`, `python3 atelier.py indice` révèle un niveau à la fois. Ouvre seulement le niveau nécessaire.
+
+<details>
+<summary>Indice 1</summary>
+
+Un timeout et un programme introuvable surviennent sans retour normal ; ils doivent devenir des erreurs du contrat.
+
+</details>
+
+<details>
+<summary>Indice 2</summary>
+
+Fais lever TimeoutExpired puis FileNotFoundError dans le mock et vérifie returncode=None avec message français, sans exception remontée.
+
+</details>
+
+<details>
+<summary>Indice 3</summary>
+
+Un programme qui dépasse son délai n’a pas un code de succès ; None signale qu’aucun code de fin normal n’a été obtenu.
+
+</details>
 
 #### Palier 7 — Code de retour non nul et liste intacte (W2, W5) (12 min)
 
 Distinguer un code de retour non nul d’une exception, et vérifier que la liste reçue arrive intacte.
 
-**Où tu travailles :** toolwrap.py ; tests/test_toolwrap.py
+**Où tu travailles :** Mac · workspaces/toolwrap · toolwrap.py ; tests/test_toolwrap.py
 
 **Pour comprendre**
 
@@ -523,7 +731,7 @@ L’entrée est ce que tu donnes au code ; l’attendu est ce que ton test doit 
 
 **Terminal · Commande à lancer au moment indiqué**
 
-Terminal du parcours : reste à la racine du dépôt. Exécute ces lignes au moment demandé dans les actions, avec les modifications manuelles entre les blocs.
+Terminal du Mac, dans cyberatelier/workspaces/toolwrap, venv Mac activé. Exécute chaque ligne au moment indiqué, avec les modifications manuelles entre les blocs.
 
 ```bash
 python3 -c "from unittest import mock
@@ -555,13 +763,36 @@ git commit -m "Gère le code de retour non nul et vérifie la liste d’argument
 
 **Tu sais que c’est bon quand :** python3 -m unittest discover -s tests -v affiche cinq tests OK (W1 à W5).
 
-*Indice si tu bloques :* Le code 0 ne doit pas remplir erreur. Pour W5, lis les arguments tels que le faux les a reçus, pas une version que tu reconstruis.
+**Indices progressifs**
+
+Depuis le terminal dans `cyberatelier`, `python3 atelier.py indice` révèle un niveau à la fois. Ouvre seulement le niveau nécessaire.
+
+<details>
+<summary>Indice 1</summary>
+
+Un code non nul doit être normalisé tout en conservant les sorties ; la liste d’arguments reçue reste intacte.
+
+</details>
+
+<details>
+<summary>Indice 2</summary>
+
+Écris W2 avec code 3 et W5 en comparant la liste avant/après ; ne supprime ni n’ajoute d’élément dans la liste de l’appelant.
+
+</details>
+
+<details>
+<summary>Indice 3</summary>
+
+Une liste ['outil', 'liste'] passée au wrapper doit encore valoir ['outil', 'liste'] après l’appel ; pop(0) changerait l’entrée de l’appelant.
+
+</details>
 
 #### Palier 8 — Pas de fichiers parasites : .gitignore et diff (10 min)
 
 Ne livrer que tes fichiers, et relire le diff avant chaque commit.
 
-**Où tu travailles :** .gitignore
+**Où tu travailles :** Mac · workspaces/toolwrap · .gitignore
 
 **Pour comprendre**
 
@@ -577,10 +808,10 @@ Ne livrer que tes fichiers, et relire le diff avant chaque commit.
 
 **Terminal · Commande à lancer au moment indiqué**
 
-Terminal du parcours : reste à la racine du dépôt. Exécute ces lignes au moment demandé dans les actions, avec les modifications manuelles entre les blocs.
+Terminal du Mac, dans cyberatelier/workspaces/toolwrap, venv Mac activé. Exécute chaque ligne au moment indiqué, avec les modifications manuelles entre les blocs.
 
 ```bash
-printf '__pycache__/\n' > .gitignore
+printf '__pycache__/\n.venv/\n' >> .gitignore
 ```
 
 **Terminal · Relire l’état du dépôt**
@@ -605,13 +836,36 @@ git log --oneline
 
 **Tu sais que c’est bon quand :** git status ne montre plus __pycache__, et git log --oneline montre les commits de la MR1 avec des messages clairs.
 
-*Indice si tu bloques :* Si __pycache__ apparaît encore, il a déjà été ajouté : git rm -r --cached __pycache__ le retire de l’index sans supprimer les fichiers sur disque.
+**Indices progressifs**
+
+Depuis le terminal dans `cyberatelier`, `python3 atelier.py indice` révèle un niveau à la fois. Ouvre seulement le niveau nécessaire.
+
+<details>
+<summary>Indice 1</summary>
+
+.gitignore évite les fichiers générés dans les prochains ajouts ; le diff montre ceux déjà choisis pour la MR.
+
+</details>
+
+<details>
+<summary>Indice 2</summary>
+
+Vérifie caches, fichiers d’essai et rapports avant git add, puis relis le diff staged et la liste de fichiers contre main.
+
+</details>
+
+<details>
+<summary>Indice 3</summary>
+
+Un fichier __pycache__/outil.pyc déjà suivi reste suivi après ajout d’un motif .gitignore ; git status et le diff révèlent sa présence.
+
+</details>
 
 #### Palier 9 — Livrer la MR1 : pull request et retour sur main (8 min)
 
 Relire ce que tu livres, le pousser et le fusionner après ta propre vérification.
 
-**Où tu travailles :** PR GitHub
+**Où tu travailles :** Mac · workspaces/toolwrap · PR GitHub
 
 **Pour comprendre**
 
@@ -630,7 +884,7 @@ Relire ce que tu livres, le pousser et le fusionner après ta propre vérificati
 
 **Terminal · Commande à lancer au moment indiqué**
 
-Terminal du parcours : reste à la racine du dépôt. Exécute ces lignes au moment demandé dans les actions, avec les modifications manuelles entre les blocs.
+Terminal du Mac, dans cyberatelier/workspaces/toolwrap, venv Mac activé. Exécute chaque ligne au moment indiqué, avec les modifications manuelles entre les blocs.
 
 ```bash
 python3 -m unittest discover -s tests -v
@@ -659,7 +913,30 @@ git pull --ff-only
 
 **Tu sais que c’est bon quand :** La pull request ne contient que toolwrap.py, tests/test_toolwrap.py et .gitignore. Après fusion, main est à jour sur ta machine.
 
-*Indice si tu bloques :* Si gh n’est pas disponible, ouvre la pull request depuis l’interface GitHub de ton dépôt. Si git push est refusé, vérifie le nom de la branche avec git branch.
+**Indices progressifs**
+
+Depuis le terminal dans `cyberatelier`, `python3 atelier.py indice` révèle un niveau à la fois. Ouvre seulement le niveau nécessaire.
+
+<details>
+<summary>Indice 1</summary>
+
+La première livraison doit montrer le wrapper et W1 à W5 ; les observations adsim restent des démos.
+
+</details>
+
+<details>
+<summary>Indice 2</summary>
+
+Lance la suite mockée, pousse feat/subprocess et relis la PR avant fusion et retour sur main.
+
+</details>
+
+<details>
+<summary>Indice 3</summary>
+
+« cinq cas mockés verts et trois codes adsim observés » distingue les vérifications automatisées du comportement réel de l’outil Docker.
+
+</details>
 
 **Avant de livrer**
 
@@ -683,7 +960,7 @@ Tu apprends à refuser une entrée avant tout lancement d’outil. Avance dans l
 
 Partir d’une main qui contient la MR1 fusionnée, sur une branche dédiée à la CLI.
 
-**Où tu travailles :** Dépôt
+**Où tu travailles :** Mac · workspaces/toolwrap · Dépôt
 
 **Pour comprendre**
 
@@ -692,7 +969,7 @@ Partir d’une main qui contient la MR1 fusionnée, sur une branche dédiée à 
 
 **Actions dans l’ordre**
 
-1. Ouvre workspaces/toolwrap dans VS Code, ou Coder dans Cyber Atelier avec cwd sur « . ».
+1. Ouvre workspaces/toolwrap dans VS Code. Dans le terminal du Mac, place-toi dans ce même dossier et active son venv avec source .venv/bin/activate.
 2. Vérifie que MR1 est fusionnée : toolwrap.py est présent et W1 à W5 passent.
 3. Lis git status ; enregistre ton travail en cours avant de changer de branche.
 4. Reviens sur main avec git switch main, mets-la à jour avec git pull --ff-only, puis crée feat/cli-perimetre. Remplace main par master si ton dépôt utilise ce nom.
@@ -700,7 +977,7 @@ Partir d’une main qui contient la MR1 fusionnée, sur une branche dédiée à 
 
 **Terminal · Commande à lancer au moment indiqué**
 
-Terminal du parcours : reste à la racine du dépôt. Exécute ces lignes au moment demandé dans les actions, avec les modifications manuelles entre les blocs.
+Terminal du Mac, dans cyberatelier/workspaces/toolwrap, venv Mac activé. Exécute chaque ligne au moment indiqué, avec les modifications manuelles entre les blocs.
 
 ```bash
 git switch main
@@ -717,13 +994,36 @@ ls toolwrap.py
 
 **Tu sais que c’est bon quand :** git status affiche « On branch feat/cli-perimetre » et toolwrap.py est présent.
 
-*Indice si tu bloques :* Si git pull --ff-only refuse, ta main locale a divergé. Ne tape rien d’autre : regarde d’abord git log --oneline --graph.
+**Indices progressifs**
+
+Depuis le terminal dans `cyberatelier`, `python3 atelier.py indice` révèle un niveau à la fois. Ouvre seulement le niveau nécessaire.
+
+<details>
+<summary>Indice 1</summary>
+
+La CLI utilise le wrapper fusionné ; sa branche part de main à jour sans perdre les tests existants.
+
+</details>
+
+<details>
+<summary>Indice 2</summary>
+
+Vérifie lancer_outil et W1 à W5, puis crée ou reprends feat/cli-perimetre dans le dépôt ToolWrap.
+
+</details>
+
+<details>
+<summary>Indice 3</summary>
+
+Une branche créée depuis un ancien commit peut manquer la gestion du timeout ; lancer la suite avant d’éditer révèle cette absence.
+
+</details>
 
 #### Palier 2 — Un exemple argparse : sous-commandes et aide (10 min)
 
 Comprendre comment argparse découpe une ligne de commande en sous-commandes, avec leurs propres options.
 
-**Où tu travailles :** calc.py (jetable)
+**Où tu travailles :** Mac · workspaces/toolwrap · calc.py (jetable)
 
 **Pour comprendre**
 
@@ -732,7 +1032,7 @@ Comprendre comment argparse découpe une ligne de commande en sous-commandes, av
 
 **Éditeur · Code d’exemple à placer dans calc.py**
 
-Éditeur : crée calc.py dans le dossier d’exemple jetable indiqué. Exécute-le au moment demandé ; ne colle pas ce code dans la console.
+VS Code sur le Mac : crée calc.py dans le dossier d’exemple jetable indiqué. Exécute-le au moment demandé ; ne colle pas ce code dans le terminal.
 
 ```python
 # calc.py
@@ -759,7 +1059,7 @@ if __name__ == '__main__':
 
 **Terminal · Commande à lancer au moment indiqué**
 
-Terminal du parcours : reste à la racine du dépôt. Exécute ces lignes au moment demandé dans les actions, avec les modifications manuelles entre les blocs.
+Terminal du Mac, dans cyberatelier/workspaces/toolwrap, venv Mac activé. Exécute chaque ligne au moment indiqué, avec les modifications manuelles entre les blocs.
 
 ```bash
 python3 calc.py --help
@@ -768,13 +1068,36 @@ python3 calc.py additionner 2 3
 
 **Tu sais que c’est bon quand :** python3 calc.py --help liste la sous-commande additionner. La seconde commande affiche un objet contenant commande='additionner'.
 
-*Indice si tu bloques :* Si argparse affiche une erreur, la dernière ligne dit quel argument manque. Une erreur d’usage fait sortir avec le code 2 par défaut.
+**Indices progressifs**
+
+Depuis le terminal dans `cyberatelier`, `python3 atelier.py indice` révèle un niveau à la fois. Ouvre seulement le niveau nécessaire.
+
+<details>
+<summary>Indice 1</summary>
+
+argparse organise options et sous-commandes ; --help décrit la forme attendue sans lancer l’outil.
+
+</details>
+
+<details>
+<summary>Indice 2</summary>
+
+Essaie le petit programme calc et compare l’aide générale à l’aide d’une sous-commande avant d’écrire ton parseur.
+
+</details>
+
+<details>
+<summary>Indice 3</summary>
+
+Une CLI « carnet ajouter --titre » peut avoir une aide différente de « carnet liste » ; chaque sous-commande reçoit ses propres arguments.
+
+</details>
 
 #### Palier 3 — Le parseur de cli.py : reseau et ad (W6, W7) (12 min)
 
 Construire les deux sous-commandes du programme et les tester sans lancer aucun processus.
 
-**Où tu travailles :** cli.py ; tests/test_cli.py
+**Où tu travailles :** Mac · workspaces/toolwrap · cli.py ; tests/test_cli.py
 
 **Pour comprendre**
 
@@ -804,7 +1127,7 @@ L’entrée est ce que tu donnes au code ; l’attendu est ce que ton test doit 
 
 **Terminal · Commande à lancer au moment indiqué**
 
-Terminal du parcours : reste à la racine du dépôt. Exécute ces lignes au moment demandé dans les actions, avec les modifications manuelles entre les blocs.
+Terminal du Mac, dans cyberatelier/workspaces/toolwrap, venv Mac activé. Exécute chaque ligne au moment indiqué, avec les modifications manuelles entre les blocs.
 
 ```bash
 python3 cli.py --help
@@ -832,13 +1155,36 @@ git commit -m "Ajoute les sous-commandes reseau et ad"
 
 **Tu sais que c’est bon quand :** W6 et W7 passent, et python3 cli.py --help mentionne reseau et ad.
 
-*Indice si tu bloques :* Pour W7, argparse écrit l’aide puis lève SystemExit. Si tu veux lire ce texte dans le test, contextlib.redirect_stdout capture ce qui est affiché.
+**Indices progressifs**
+
+Depuis le terminal dans `cyberatelier`, `python3 atelier.py indice` révèle un niveau à la fois. Ouvre seulement le niveau nécessaire.
+
+<details>
+<summary>Indice 1</summary>
+
+reseau et ad ont des arguments différents ; le parseur choisit la branche à partir de la sous-commande.
+
+</details>
+
+<details>
+<summary>Indice 2</summary>
+
+Écris W6/W7 sur le parseur seul, vérifie cible/port et sujet/format, puis traite les options invalides avec le comportement argparse.
+
+</details>
+
+<details>
+<summary>Indice 3</summary>
+
+Pour une CLI d’inventaire, « stock compter --type livre » ne doit pas recevoir un argument --destination réservé à « stock exporter ».
+
+</details>
 
 #### Palier 4 — Valider une cible avec ipaddress (W8) (12 min)
 
 Refuser toute cible qui n’est pas une adresse IP autorisée, sans jamais résoudre un nom.
 
-**Où tu travailles :** cli.py ; tests/test_cli.py
+**Où tu travailles :** Mac · workspaces/toolwrap · cli.py ; tests/test_cli.py
 
 **Pour comprendre**
 
@@ -862,7 +1208,7 @@ L’entrée est ce que tu donnes au code ; l’attendu est ce que ton test doit 
 
 **Terminal · Commande à lancer au moment indiqué**
 
-Terminal du parcours : reste à la racine du dépôt. Exécute ces lignes au moment demandé dans les actions, avec les modifications manuelles entre les blocs.
+Terminal du Mac, dans cyberatelier/workspaces/toolwrap, venv Mac activé. Exécute chaque ligne au moment indiqué, avec les modifications manuelles entre les blocs.
 
 ```bash
 python3 -c "import ipaddress; print(ipaddress.ip_address('192.168.1.10'))"
@@ -896,13 +1242,36 @@ git commit -m "Valide la cible avec ipaddress et une liste blanche"
 
 **Tu sais que c’est bon quand :** W8 passe : les cinq valeurs donnent exactement le résultat attendu.
 
-*Indice si tu bloques :* La première commande affiche une adresse, la seconde lève ValueError : c’est ce comportement que tu exploites pour refuser. Le message d’erreur ne doit contenir aucune résolution de nom.
+**Indices progressifs**
+
+Depuis le terminal dans `cyberatelier`, `python3 atelier.py indice` révèle un niveau à la fois. Ouvre seulement le niveau nécessaire.
+
+<details>
+<summary>Indice 1</summary>
+
+ipaddress vérifie la forme d’une adresse ; la liste blanche décide ensuite si cette adresse est autorisée.
+
+</details>
+
+<details>
+<summary>Indice 2</summary>
+
+Sépare adresse mal formée, adresse bien formée hors liste et 127.0.0.1 accepté ; localhost doit rester refusé sans résolution DNS.
+
+</details>
+
+<details>
+<summary>Indice 3</summary>
+
+192.0.2.10 est une adresse IP bien formée mais n’est pas dans la liste du labo ; syntaxe valide ne signifie pas cible autorisée.
+
+</details>
 
 #### Palier 5 — Refus sans lancement (W9) (12 min)
 
 Faire en sorte qu’une cible refusée ne lance jamais l’outil, et renvoyer le code 2.
 
-**Où tu travailles :** cli.py ; tests/test_cli.py
+**Où tu travailles :** Mac · workspaces/toolwrap · cli.py ; tests/test_cli.py
 
 **Pour comprendre**
 
@@ -926,7 +1295,7 @@ L’entrée est ce que tu donnes au code ; l’attendu est ce que ton test doit 
 
 **Terminal · Commande à lancer au moment indiqué**
 
-Terminal du parcours : reste à la racine du dépôt. Exécute ces lignes au moment demandé dans les actions, avec les modifications manuelles entre les blocs.
+Terminal du Mac, dans cyberatelier/workspaces/toolwrap, venv Mac activé. Exécute chaque ligne au moment indiqué, avec les modifications manuelles entre les blocs.
 
 ```bash
 python3 -c "import io, contextlib, sys
@@ -958,13 +1327,36 @@ git commit -m "Refuse une cible hors liste blanche avant tout lancement"
 
 **Tu sais que c’est bon quand :** W9 passe : main renvoie 2 et le faux n’a jamais été appelé.
 
-*Indice si tu bloques :* Vérifie l’absence d’appel avec assert_not_called(). Le patch vise le nom utilisé dans cli.py.
+**Indices progressifs**
+
+Depuis le terminal dans `cyberatelier`, `python3 atelier.py indice` révèle un niveau à la fois. Ouvre seulement le niveau nécessaire.
+
+<details>
+<summary>Indice 1</summary>
+
+Un refus de cible doit arriver avant tout appel du wrapper ; un mock peut prouver cette absence d’appel.
+
+</details>
+
+<details>
+<summary>Indice 2</summary>
+
+Écris W9 avec les valeurs refusées et assert_not_called sur lancer_outil, puis vérifie le code 2 et stderr.
+
+</details>
+
+<details>
+<summary>Indice 3</summary>
+
+Une commande refusée peut afficher un message correct tout en lançant l’outil par erreur ; assert_not_called vérifie ce comportement invisible.
+
+</details>
 
 #### Palier 6 — Codes de retour et logging (W10) (10 min)
 
 Traduire le résultat de l’outil en code 0 ou 1, et tracer la commande lancée sur stderr.
 
-**Où tu travailles :** cli.py ; tests/test_cli.py
+**Où tu travailles :** Mac · workspaces/toolwrap · cli.py ; tests/test_cli.py
 
 **Pour comprendre**
 
@@ -994,7 +1386,7 @@ L’entrée est ce que tu donnes au code ; l’attendu est ce que ton test doit 
 
 **Terminal · Commande à lancer au moment indiqué**
 
-Terminal du parcours : reste à la racine du dépôt. Exécute ces lignes au moment demandé dans les actions, avec les modifications manuelles entre les blocs.
+Terminal du Mac, dans cyberatelier/workspaces/toolwrap, venv Mac activé. Exécute chaque ligne au moment indiqué, avec les modifications manuelles entre les blocs.
 
 ```bash
 python3 -c "import logging, sys
@@ -1024,13 +1416,36 @@ git commit -m "Ajoute les codes de retour de main et le logging"
 
 **Tu sais que c’est bon quand :** W1 à W10 passent. Avec le faux, main(['ad', 'users']) renvoie 0 puis 1.
 
-*Indice si tu bloques :* Le dictionnaire renvoyé par lancer_outil a toujours quatre clés : c’est sur returncode et erreur que tu décides du code à renvoyer.
+**Indices progressifs**
+
+Depuis le terminal dans `cyberatelier`, `python3 atelier.py indice` révèle un niveau à la fois. Ouvre seulement le niveau nécessaire.
+
+<details>
+<summary>Indice 1</summary>
+
+La CLI traduit le résultat du wrapper en code de sortie ; logging rend les observations lisibles sans changer le résultat.
+
+</details>
+
+<details>
+<summary>Indice 2</summary>
+
+Écris W10 pour succès et échec normalisés, vérifie 0/1/2, puis garde le niveau ERROR pour les messages d’erreur.
+
+</details>
+
+<details>
+<summary>Indice 3</summary>
+
+Un dictionnaire avec erreur='délai dépassé' peut conduire au code 1 ; le journal ERROR décrit la panne, ce n’est pas le nombre retourné au shell.
+
+</details>
 
 #### Palier 7 — Conflit de fusion guidé (branches jetables) (12 min)
 
 Provoquer puis résoudre un conflit de fusion, dans des branches qui ne seront jamais livrées.
 
-**Où tu travailles :** README.md dans les branches essai/
+**Où tu travailles :** Mac · workspaces/toolwrap · README.md dans les branches essai/
 
 **Pour comprendre**
 
@@ -1048,7 +1463,7 @@ Provoquer puis résoudre un conflit de fusion, dans des branches qui ne seront j
 
 **Terminal · Commande à lancer au moment indiqué**
 
-Terminal du parcours : reste à la racine du dépôt. Exécute ces lignes au moment demandé dans les actions, avec les modifications manuelles entre les blocs.
+Terminal du Mac, dans cyberatelier/workspaces/toolwrap, venv Mac activé. Exécute chaque ligne au moment indiqué, avec les modifications manuelles entre les blocs.
 
 ```bash
 git switch main
@@ -1100,13 +1515,36 @@ git branch
 
 **Tu sais que c’est bon quand :** Avant de quitter la branche d’essai, git log --oneline --graph montre la fusion et README.md n’a plus de marqueurs. Après retour sur main et nettoyage, git branch ne montre plus les deux branches essai/conflit-*. Le résultat de l’exercice reste dans la branche jetable jusqu’à sa suppression.
 
-*Indice si tu bloques :* Si Git refuse la fusion avant le conflit, tu as sans doute des modifications non commitées : lance git status d’abord. Pour annuler une fusion en cours, git merge --abort revient à l’état d’avant.
+**Indices progressifs**
+
+Depuis le terminal dans `cyberatelier`, `python3 atelier.py indice` révèle un niveau à la fois. Ouvre seulement le niveau nécessaire.
+
+<details>
+<summary>Indice 1</summary>
+
+Un conflit d’essai se pratique dans des branches jetables ; les marqueurs montrent les versions opposées.
+
+</details>
+
+<details>
+<summary>Indice 2</summary>
+
+Commence avec status propre, crée les deux variantes au même endroit et résous le contenu avant le commit de fusion.
+
+</details>
+
+<details>
+<summary>Indice 3</summary>
+
+Deux branches qui changent la même phrase en « Aide courte » et « Aide longue » peuvent entrer en conflit ; garder les marqueurs produit un fichier cassé.
+
+</details>
 
 #### Palier 8 — Rebase guidé sur une base qui a avancé (12 min)
 
 Poser des commits au-dessus d’une base mise à jour, et lire l’historique avant de pousser.
 
-**Où tu travailles :** Historique dans les branches essai/
+**Où tu travailles :** Mac · workspaces/toolwrap · Historique dans les branches essai/
 
 **Pour comprendre**
 
@@ -1123,7 +1561,7 @@ Poser des commits au-dessus d’une base mise à jour, et lire l’historique av
 
 **Terminal · Relire l’état du dépôt**
 
-Terminal du parcours : reste à la racine du dépôt. Exécute ces lignes au moment demandé dans les actions, avec les modifications manuelles entre les blocs.
+Terminal du Mac, dans cyberatelier/workspaces/toolwrap, venv Mac activé. Exécute chaque ligne au moment indiqué, avec les modifications manuelles entre les blocs.
 
 ```bash
 git status
@@ -1148,7 +1586,7 @@ git rebase essai/base-evoluee
 
 **Terminal · Commande à lancer au moment indiqué**
 
-Terminal du parcours : reste à la racine du dépôt. Exécute ces lignes au moment demandé dans les actions, avec les modifications manuelles entre les blocs. Remplace CHEMIN_DU_FICHIER par le chemin indiqué par git status, avant de lancer git add.
+Terminal du Mac, dans cyberatelier/workspaces/toolwrap, venv Mac activé. Exécute chaque ligne au moment indiqué, avec les modifications manuelles entre les blocs. Remplace CHEMIN_DU_FICHIER par le nom montré par git status avant de lancer la commande.
 
 ```bash
 # en cas de conflit : corrige le fichier indiqué, puis
@@ -1158,7 +1596,7 @@ git rebase --continue
 
 **Terminal · Relire l’état du dépôt**
 
-Terminal du parcours : reste à la racine du dépôt. Exécute ces lignes au moment demandé dans les actions, avec les modifications manuelles entre les blocs.
+Terminal du Mac, dans cyberatelier/workspaces/toolwrap, venv Mac activé. Exécute chaque ligne au moment indiqué, avec les modifications manuelles entre les blocs.
 
 ```bash
 git log --oneline --graph
@@ -1185,13 +1623,36 @@ git rebase main
 
 **Tu sais que c’est bon quand :** git log --oneline --graph montre tes commits posés au-dessus de la base, les tests passent dans la copie, et les branches jetables ont disparu.
 
-*Indice si tu bloques :* Un rebase sans conflit est normal ici : lis quand même le graphe. Ne supprime une branche jetable qu’une fois la copie vérifiée.
+**Indices progressifs**
+
+Depuis le terminal dans `cyberatelier`, `python3 atelier.py indice` révèle un niveau à la fois. Ouvre seulement le niveau nécessaire.
+
+<details>
+<summary>Indice 1</summary>
+
+rebase rejoue une suite de commits sur une base avancée ; il exige un état de travail propre.
+
+</details>
+
+<details>
+<summary>Indice 2</summary>
+
+Lis le graphe avant et après l’essai, résous le fichier indiqué et reprends avec rebase --continue au moment prévu.
+
+</details>
+
+<details>
+<summary>Indice 3</summary>
+
+Deux commits de fonctionnalité rejoués après un nouveau commit de base auront de nouveaux identifiants ; le graphe aide à suivre leurs positions.
+
+</details>
 
 #### Palier 9 — Livrer la MR2 : README, PR et fusion (10 min)
 
 Documenter les codes, la liste blanche et les tests, puis livrer la MR après ta relecture.
 
-**Où tu travailles :** README.md ; PR GitHub
+**Où tu travailles :** Mac · workspaces/toolwrap · README.md ; PR GitHub
 
 **Pour comprendre**
 
@@ -1211,7 +1672,7 @@ Documenter les codes, la liste blanche et les tests, puis livrer la MR après ta
 
 **Terminal · Commande à lancer au moment indiqué**
 
-Terminal du parcours : reste à la racine du dépôt. Exécute ces lignes au moment demandé dans les actions, avec les modifications manuelles entre les blocs.
+Terminal du Mac, dans cyberatelier/workspaces/toolwrap, venv Mac activé. Exécute chaque ligne au moment indiqué, avec les modifications manuelles entre les blocs.
 
 ```bash
 python3 -m unittest discover -s tests -v
@@ -1248,7 +1709,30 @@ git pull --ff-only
 
 **Tu sais que c’est bon quand :** La pull request ne contient que cli.py, tests/test_cli.py et README.md. Après fusion, main est à jour sur ta machine.
 
-*Indice si tu bloques :* Si la PR contient une ligne « Titre : version » venue de l’exercice de conflit, elle a été commitée par erreur sur feat/cli-perimetre : git log --oneline te montrera le commit à retirer.
+**Indices progressifs**
+
+Depuis le terminal dans `cyberatelier`, `python3 atelier.py indice` révèle un niveau à la fois. Ouvre seulement le niveau nécessaire.
+
+<details>
+<summary>Indice 1</summary>
+
+Le README explique le périmètre de la CLI et les trois codes ; la livraison inclut les essais Git terminés.
+
+</details>
+
+<details>
+<summary>Indice 2</summary>
+
+Relance W1 à W10, vérifie la branche utile et documente la liste blanche avant PR et fusion.
+
+</details>
+
+<details>
+<summary>Indice 3</summary>
+
+Un README « reseau 127.0.0.1 --port 8000 » donne un usage précis ; mentionner une cible arbitraire élargirait le contrat du labo.
+
+</details>
 
 **Avant de livrer**
 
@@ -1272,7 +1756,7 @@ Tu transformes les sorties d’outils en données communes, puis fais les démon
 
 Préparer la branche de la MR3 et copier les fixtures : les originaux restent en lecture seule.
 
-**Où tu travailles :** Dépôt ; fixtures/
+**Où tu travailles :** Mac · workspaces/toolwrap · Dépôt ; fixtures/
 
 **Pour comprendre**
 
@@ -1281,7 +1765,7 @@ Préparer la branche de la MR3 et copier les fixtures : les originaux restent en
 
 **Actions dans l’ordre**
 
-1. Ouvre workspaces/toolwrap dans VS Code, ou Coder dans Cyber Atelier avec cwd sur « . ».
+1. Ouvre workspaces/toolwrap dans VS Code. Dans le terminal du Mac, place-toi dans ce même dossier et active son venv avec source .venv/bin/activate.
 2. Vérifie que MR2 est fusionnée et que W1 à W10 passent.
 3. Lis git status ; enregistre ton travail en cours avant de changer de branche.
 4. Reviens sur main avec git switch main, mets-la à jour avec git pull --ff-only, puis crée feat/parsing. Remplace main par master si ton dépôt utilise ce nom.
@@ -1290,7 +1774,7 @@ Préparer la branche de la MR3 et copier les fixtures : les originaux restent en
 
 **Terminal · Commande à lancer au moment indiqué**
 
-Terminal du parcours : reste à la racine du dépôt. Exécute ces lignes au moment demandé dans les actions, avec les modifications manuelles entre les blocs.
+Terminal du Mac, dans cyberatelier/workspaces/toolwrap, venv Mac activé. Exécute chaque ligne au moment indiqué, avec les modifications manuelles entre les blocs.
 
 ```bash
 git switch main
@@ -1300,7 +1784,7 @@ git switch -c feat/parsing
 
 **Terminal · Commande à lancer au moment indiqué**
 
-Terminal de ton Mac, depuis workspaces/toolwrap. Dans le conteneur, remplace ../../fixtures par /app/fixtures ; garde le reste de la commande. Les copies vont dans ton dépôt.
+Terminal du Mac, dans cyberatelier/workspaces/toolwrap, venv Mac activé. Exécute chaque ligne au moment indiqué, avec les modifications manuelles entre les blocs. ../../fixtures est la source sur le Mac ; les copies sont placées dans ton dépôt d’exercice.
 
 ```bash
 mkdir -p fixtures && cp -R ../../fixtures/nmap fixtures/ && cp -R ../../fixtures/adsim fixtures/ && chmod -R u+w fixtures
@@ -1308,7 +1792,7 @@ mkdir -p fixtures && cp -R ../../fixtures/nmap fixtures/ && cp -R ../../fixtures
 
 **Terminal · Relire l’état du dépôt**
 
-Terminal du parcours : reste à la racine du dépôt. Exécute ces lignes au moment demandé dans les actions, avec les modifications manuelles entre les blocs.
+Terminal du Mac, dans cyberatelier/workspaces/toolwrap, venv Mac activé. Exécute chaque ligne au moment indiqué, avec les modifications manuelles entre les blocs.
 
 ```bash
 git status
@@ -1316,13 +1800,36 @@ git status
 
 **Tu sais que c’est bon quand :** git status affiche « On branch feat/parsing » et les fichiers copiés apparaissent sous fixtures/.
 
-*Indice si tu bloques :* Depuis workspaces/toolwrap, le projet est deux dossiers plus haut : d’où ../... Les fixtures sont des données de test : tu les commiteras avec les tests.
+**Indices progressifs**
+
+Depuis le terminal dans `cyberatelier`, `python3 atelier.py indice` révèle un niveau à la fois. Ouvre seulement le niveau nécessaire.
+
+<details>
+<summary>Indice 1</summary>
+
+Les parseurs consomment des fixtures locales ; le chemin source Mac remonte à la racine Cyber Atelier.
+
+</details>
+
+<details>
+<summary>Indice 2</summary>
+
+Depuis workspaces/toolwrap, copie ../../fixtures/nmap et ../../fixtures/adsim dans fixtures/ avant d’écrire les tests.
+
+</details>
+
+<details>
+<summary>Indice 3</summary>
+
+/app/fixtures/nmap est un chemin Docker ; ../../fixtures/nmap est le chemin fourni au Mac depuis la racine du dépôt ToolWrap.
+
+</details>
 
 #### Palier 2 — Exemple ElementTree sans rapport (8 min)
 
 Lire un document XML : racine, enfants, attributs, et erreur de syntaxe.
 
-**Où tu travailles :** Terminal : exemple XML
+**Où tu travailles :** Mac · workspaces/toolwrap · Terminal : exemple XML
 
 **Pour comprendre**
 
@@ -1338,7 +1845,7 @@ Lire un document XML : racine, enfants, attributs, et erreur de syntaxe.
 
 **Terminal · Commande à lancer au moment indiqué**
 
-Terminal du parcours : reste à la racine du dépôt. Exécute ces lignes au moment demandé dans les actions, avec les modifications manuelles entre les blocs.
+Terminal du Mac, dans cyberatelier/workspaces/toolwrap, venv Mac activé. Exécute chaque ligne au moment indiqué, avec les modifications manuelles entre les blocs.
 
 ```bash
 python3 -c "import xml.etree.ElementTree as ET
@@ -1359,13 +1866,36 @@ except ET.ParseError as exc:
 
 **Tu sais que c’est bon quand :** Tu vois « pain 2 » puis « lait 1 », puis une ligne « erreur : ... » pour le XML cassé.
 
-*Indice si tu bloques :* Si findall ne trouve rien, vérifie le nom de la balise. Pour descendre plus bas dans l’arbre, la documentation d’ElementTree explique la syntaxe des chemins.
+**Indices progressifs**
+
+Depuis le terminal dans `cyberatelier`, `python3 atelier.py indice` révèle un niveau à la fois. Ouvre seulement le niveau nécessaire.
+
+<details>
+<summary>Indice 1</summary>
+
+ElementTree lit un XML en arbre ; les balises et attributs sont deux informations distinctes.
+
+</details>
+
+<details>
+<summary>Indice 2</summary>
+
+Essaie le petit XML de livres, puis repère le tag de la racine et les attributs d’un enfant avant d’ouvrir les fixtures nmap.
+
+</details>
+
+<details>
+<summary>Indice 3</summary>
+
+Dans <livre titre="Python"/>, le tag est livre et attrib['titre'] vaut Python ; l’attribut n’est pas un élément enfant.
+
+</details>
 
 #### Palier 3 — Un port ouvert dans le XML (W11) (8 min)
 
 Transformer un port de nmap en élément commun, en écrivant le test sur fixture avant le code.
 
-**Où tu travailles :** parsing.py ; tests/test_parsing.py
+**Où tu travailles :** Mac · workspaces/toolwrap · parsing.py ; tests/test_parsing.py
 
 **Pour comprendre**
 
@@ -1411,7 +1941,7 @@ L’entrée est ce que tu donnes au code ; l’attendu est ce que ton test doit 
 
 **Terminal · Commande à lancer au moment indiqué**
 
-Terminal du parcours : reste à la racine du dépôt. Exécute ces lignes au moment demandé dans les actions, avec les modifications manuelles entre les blocs.
+Terminal du Mac, dans cyberatelier/workspaces/toolwrap, venv Mac activé. Exécute chaque ligne au moment indiqué, avec les modifications manuelles entre les blocs.
 
 ```bash
 python3 -m unittest discover -s tests -v
@@ -1433,13 +1963,36 @@ git commit -m "Analyse le XML nmap pour un port ouvert"
 
 **Tu sais que c’est bon quand :** W11 passe, et le commit contient parsing.py et tests/test_parsing.py.
 
-*Indice si tu bloques :* Le statut se lit sur l’élément state de chaque port. La structure que tu as ouverte au premier palier est la meilleure documentation : relis-la si un nom ne sort pas.
+**Indices progressifs**
+
+Depuis le terminal dans `cyberatelier`, `python3 atelier.py indice` révèle un niveau à la fois. Ouvre seulement le niveau nécessaire.
+
+<details>
+<summary>Indice 1</summary>
+
+Un élément de port nmap fournit protocole, numéro et état ; le parseur rend le format commun demandé.
+
+</details>
+
+<details>
+<summary>Indice 2</summary>
+
+Écris W11 sur open_8000.xml sans appeler nmap, puis repère portid/protocol/state et conserve les cinq clés normalisées.
+
+</details>
+
+<details>
+<summary>Indice 3</summary>
+
+Pour une balise de produit <produit id="7" etat="stock"/>, les attributs fournissent les données ; le nom d’affichage peut être construit séparément.
+
+</details>
 
 #### Palier 4 — Ordre des ports et XML cassé (W12, W13) (8 min)
 
 Garder l’ordre du fichier, et ne jamais laisser une erreur d’analyse remonter.
 
-**Où tu travailles :** parsing.py ; tests/test_parsing.py
+**Où tu travailles :** Mac · workspaces/toolwrap · parsing.py ; tests/test_parsing.py
 
 **Pour comprendre**
 
@@ -1467,7 +2020,7 @@ L’entrée est ce que tu donnes au code ; l’attendu est ce que ton test doit 
 
 **Terminal · Commande à lancer au moment indiqué**
 
-Terminal du parcours : reste à la racine du dépôt. Exécute ces lignes au moment demandé dans les actions, avec les modifications manuelles entre les blocs.
+Terminal du Mac, dans cyberatelier/workspaces/toolwrap, venv Mac activé. Exécute chaque ligne au moment indiqué, avec les modifications manuelles entre les blocs.
 
 ```bash
 python3 -m unittest discover -s tests -v
@@ -1489,13 +2042,36 @@ git commit -m "Garde l’ordre des ports et gère le XML cassé"
 
 **Tu sais que c’est bon quand :** W11, W12 et W13 passent.
 
-*Indice si tu bloques :* Un XML mal formé lève ParseError dès l’analyse. Rattrape-la autour de l’analyse elle-même, et non dans la boucle qui lit les ports.
+**Indices progressifs**
+
+Depuis le terminal dans `cyberatelier`, `python3 atelier.py indice` révèle un niveau à la fois. Ouvre seulement le niveau nécessaire.
+
+<details>
+<summary>Indice 1</summary>
+
+L’ordre XML est celui des éléments rencontrés ; ParseError doit devenir une erreur normalisée.
+
+</details>
+
+<details>
+<summary>Indice 2</summary>
+
+Écris W12 sur mixed.xml et W13 sur broken.xml ; compare l’ordre complet et le résultat items vide en cas d’échec.
+
+</details>
+
+<details>
+<summary>Indice 3</summary>
+
+Une liste de livres A, C, B dans le document reste A, C, B si le contrat garde l’ordre ; trier silencieusement changerait la donnée reçue.
+
+</details>
 
 #### Palier 5 — JSON adsim et format commun (W14) (8 min)
 
 Lire un JSON avec json.loads, et définir un format commun pour nmap et adsim.
 
-**Où tu travailles :** parsing.py ; tests/test_parsing.py
+**Où tu travailles :** Mac · workspaces/toolwrap · parsing.py ; tests/test_parsing.py
 
 **Pour comprendre**
 
@@ -1526,7 +2102,7 @@ L’entrée est ce que tu donnes au code ; l’attendu est ce que ton test doit 
 
 **Terminal · Commande à lancer au moment indiqué**
 
-Terminal du parcours : reste à la racine du dépôt. Exécute ces lignes au moment demandé dans les actions, avec les modifications manuelles entre les blocs.
+Terminal du Mac, dans cyberatelier/workspaces/toolwrap, venv Mac activé. Exécute chaque ligne au moment indiqué, avec les modifications manuelles entre les blocs.
 
 ```bash
 python3 -c "import json
@@ -1549,13 +2125,36 @@ git commit -m "Analyse le JSON adsim des utilisateurs"
 
 **Tu sais que c’est bon quand :** W14 passe, et les éléments adsim ont les mêmes clés que les éléments nmap.
 
-*Indice si tu bloques :* Le nombre attendu est écrit dans le fichier (champ count) : ton test le compare à cette valeur, il ne la recalcule pas.
+**Indices progressifs**
+
+Depuis le terminal dans `cyberatelier`, `python3 atelier.py indice` révèle un niveau à la fois. Ouvre seulement le niveau nécessaire.
+
+<details>
+<summary>Indice 1</summary>
+
+JSON donne des objets Python ; enabled est un booléen qui sert à choisir actif ou inactif.
+
+</details>
+
+<details>
+<summary>Indice 2</summary>
+
+Écris W14 avec users.json et vérifie count, chaque nom, son statut et ses groupes dans details avant de préparer le rapport.
+
+</details>
+
+<details>
+<summary>Indice 3</summary>
+
+Un compte fictif avec enabled=false doit être inactif ; la chaîne 'false' serait du texte et ne doit pas remplacer le booléen JSON.
+
+</details>
 
 #### Palier 6 — JSON invalide (W15) et statuts documentés (8 min)
 
 Capturer une erreur de JSON et documenter les valeurs de statut.
 
-**Où tu travailles :** parsing.py ; tests/test_parsing.py
+**Où tu travailles :** Mac · workspaces/toolwrap · parsing.py ; tests/test_parsing.py
 
 **Pour comprendre**
 
@@ -1579,7 +2178,7 @@ L’entrée est ce que tu donnes au code ; l’attendu est ce que ton test doit 
 
 **Terminal · Commande à lancer au moment indiqué**
 
-Terminal du parcours : reste à la racine du dépôt. Exécute ces lignes au moment demandé dans les actions, avec les modifications manuelles entre les blocs.
+Terminal du Mac, dans cyberatelier/workspaces/toolwrap, venv Mac activé. Exécute chaque ligne au moment indiqué, avec les modifications manuelles entre les blocs.
 
 ```bash
 python3 -c "import json
@@ -1611,13 +2210,36 @@ git commit -m "Gère le JSON invalide et documente les statuts"
 
 **Tu sais que c’est bon quand :** W11 à W15 passent, et README.md contient la section Statuts.
 
-*Indice si tu bloques :* Rattrape JSONDecodeError autour de json.loads, pas autour de la lecture du reste du fichier.
+**Indices progressifs**
+
+Depuis le terminal dans `cyberatelier`, `python3 atelier.py indice` révèle un niveau à la fois. Ouvre seulement le niveau nécessaire.
+
+<details>
+<summary>Indice 1</summary>
+
+Un JSON cassé ne doit pas faire sortir une exception du parseur ; les statuts observés doivent être documentés.
+
+</details>
+
+<details>
+<summary>Indice 2</summary>
+
+Écris W15 sur broken.json, intercepte JSONDecodeError au bon endroit et retourne items vide avec une erreur non vide.
+
+</details>
+
+<details>
+<summary>Indice 3</summary>
+
+json.loads('{') lève JSONDecodeError ; ce n’est pas la même entrée que '{}' qui est un JSON valide mais sans les données requises.
+
+</details>
 
 #### Palier 7 — Rapport texte (W16) (8 min)
 
 Afficher une ligne par élément, des totaux cohérents, et un message clair pour une liste vide.
 
-**Où tu travailles :** parsing.py ; tests/test_parsing.py
+**Où tu travailles :** Mac · workspaces/toolwrap · parsing.py ; tests/test_parsing.py
 
 **Pour comprendre**
 
@@ -1642,7 +2264,7 @@ L’entrée est ce que tu donnes au code ; l’attendu est ce que ton test doit 
 
 **Terminal · Commande à lancer au moment indiqué**
 
-Terminal du parcours : reste à la racine du dépôt. Exécute ces lignes au moment demandé dans les actions, avec les modifications manuelles entre les blocs.
+Terminal du Mac, dans cyberatelier/workspaces/toolwrap, venv Mac activé. Exécute chaque ligne au moment indiqué, avec les modifications manuelles entre les blocs.
 
 ```bash
 python3 -c "items = [{'nom': 'a', 'statut': 'open'}, {'nom': 'b', 'statut': 'closed'}, {'nom': 'c', 'statut': 'open'}]
@@ -1667,13 +2289,36 @@ git commit -m "Ajoute le rapport texte"
 
 **Tu sais que c’est bon quand :** W1 à W16 passent : python3 -m unittest discover -s tests -v se termine par un total sans échec.
 
-*Indice si tu bloques :* Un message pour une liste vide est une phrase, pas une ligne vide. Vérifie que tes totaux sont calculés à partir de la liste et non écrits en dur.
+**Indices progressifs**
+
+Depuis le terminal dans `cyberatelier`, `python3 atelier.py indice` révèle un niveau à la fois. Ouvre seulement le niveau nécessaire.
+
+<details>
+<summary>Indice 1</summary>
+
+Le rapport texte reçoit les items normalisés ; il n’a pas besoin de connaître XML ou JSON.
+
+</details>
+
+<details>
+<summary>Indice 2</summary>
+
+Écris W16 avec les trois items donnés et vérifie un item par ligne ainsi que l’ordre d’entrée.
+
+</details>
+
+<details>
+<summary>Indice 3</summary>
+
+Un item source='catalogue', nom='livre', statut='disponible' peut être affiché sans relire le fichier qui l’a produit.
+
+</details>
 
 #### Palier 8 — Démonstrations réelles, hors tests (D1 à D3) (8 min)
 
 Passer les vraies sorties de nmap et d’adsim dans ton code, sans que ces démonstrations entrent dans les tests.
 
-**Où tu travailles :** Outils réels dans Docker
+**Où tu travailles :** Mac · cyberatelier pour les démos Docker via ton wrapper ; workspaces/toolwrap pour les tests
 
 **Pour comprendre**
 
@@ -1683,47 +2328,90 @@ Passer les vraies sorties de nmap et d’adsim dans ton code, sans que ces démo
 **Actions dans l’ordre**
 
 1. Les commandes proposées se lancent sur le Mac depuis cyberatelier, qui contient compose.yaml et workspaces/toolwrap. Elles utilisent Docker pour l’outil réel et ton wrapper du Mac pour le pilotage.
-2. D1 : active le labo dans Docker. Lance nmap via lancer_outil sur 127.0.0.1:8000 seulement, puis parse sa sortie XML. Attends open ; compare avec le labo arrêté.
+2. D1 : depuis cyberatelier, démarre le labo Docker avec python3 atelier.py labo demarrer. Lance nmap via lancer_outil dans Docker sur 127.0.0.1:8000 seulement, puis parse sa sortie XML. Attends open ; compare après python3 atelier.py labo arreter, puis redémarre ce labo.
 3. D2 : lance adsim users en JSON via lancer_outil et parse sa sortie ; le nombre d’éléments égale count.
 4. D3 : lance adsim avec --fail et observe l’erreur normalisée pour le code 3.
 5. Pour le timeout de D3, utilise --delay 1 avec un délai de 0,01 seconde ; attends une erreur de délai, sans trace Python.
 6. Garde ces appels hors des tests et note les résultats dans le bilan.
 
-**Terminal · D1 : nmap via ton wrapper**
+**Terminal · D1 : démarrer le labo Docker**
 
-Terminal du Mac, depuis cyberatelier (le dossier de compose.yaml). Le wrapper est importé depuis workspaces/toolwrap ; l’outil réel est exécuté dans Docker. Fais les observations demandées entre les commandes.
+Terminal du Mac dans cyberatelier. Cette commande démarre le labo interne du conteneur, interrogé par nmap dans Docker.
 
 ```bash
-python3 -c "import sys; sys.path.insert(0, 'workspaces/toolwrap'); from toolwrap import lancer_outil; print(lancer_outil(['docker', 'compose', 'exec', '-T', 'atelier', 'nmap', '-sT', '-p', '8000', '-oX', '-', '127.0.0.1'], 30))"
+python3 atelier.py labo demarrer
+```
+
+**Terminal · D1 : nmap via ton wrapper**
+
+Terminal du Mac dans cyberatelier. Le Python du venv ToolWrap importe ton wrapper depuis workspaces/toolwrap ; docker compose exec -T lance seulement l’outil dans le conteneur. Le labo utilisé par nmap est celui de Docker.
+
+```bash
+workspaces/toolwrap/.venv/bin/python -c "import sys; sys.path.insert(0, 'workspaces/toolwrap'); from toolwrap import lancer_outil; print(lancer_outil(['docker', 'compose', 'exec', '-T', 'atelier', 'nmap', '-sT', '-p', '8000', '-oX', '-', '127.0.0.1'], 30))"
+```
+
+**Terminal · D1 : arrêter puis reprendre le labo Docker**
+
+Terminal du Mac dans cyberatelier. Le labo Docker est arrêté, la commande nmap via ton wrapper est répétée pour observer closed, puis le labo est redémarré.
+
+```bash
+python3 atelier.py labo arreter
+workspaces/toolwrap/.venv/bin/python -c "import sys; sys.path.insert(0, 'workspaces/toolwrap'); from toolwrap import lancer_outil; print(lancer_outil(['docker', 'compose', 'exec', '-T', 'atelier', 'nmap', '-sT', '-p', '8000', '-oX', '-', '127.0.0.1'], 30))"
+python3 atelier.py labo demarrer
 ```
 
 **Terminal · D2 : adsim en JSON via ton wrapper**
 
+Terminal du Mac dans cyberatelier. Le Python du venv ToolWrap importe ton wrapper depuis workspaces/toolwrap ; docker compose exec -T lance seulement l’outil dans le conteneur. Le labo utilisé par nmap est celui de Docker.
+
 ```bash
-python3 -c "import sys; sys.path.insert(0, 'workspaces/toolwrap'); from toolwrap import lancer_outil; print(lancer_outil(['docker', 'compose', 'exec', '-T', 'atelier', 'python', '/app/tools/adsim.py', 'users', '--format', 'json'], 30))"
+workspaces/toolwrap/.venv/bin/python -c "import sys; sys.path.insert(0, 'workspaces/toolwrap'); from toolwrap import lancer_outil; print(lancer_outil(['docker', 'compose', 'exec', '-T', 'atelier', 'python', '/app/tools/adsim.py', 'users', '--format', 'json'], 30))"
 ```
 
 **Terminal · D3 : échec simulé avec --fail**
 
 ```bash
-python3 -c "import sys; sys.path.insert(0, 'workspaces/toolwrap'); from toolwrap import lancer_outil; print(lancer_outil(['docker', 'compose', 'exec', '-T', 'atelier', 'python', '/app/tools/adsim.py', 'users', '--fail'], 30))"
+workspaces/toolwrap/.venv/bin/python -c "import sys; sys.path.insert(0, 'workspaces/toolwrap'); from toolwrap import lancer_outil; print(lancer_outil(['docker', 'compose', 'exec', '-T', 'atelier', 'python', '/app/tools/adsim.py', 'users', '--fail'], 30))"
 ```
 
 **Terminal · D3 : délai d’une seconde, timeout de 0,01 seconde**
 
 ```bash
-python3 -c "import sys; sys.path.insert(0, 'workspaces/toolwrap'); from toolwrap import lancer_outil; print(lancer_outil(['docker', 'compose', 'exec', '-T', 'atelier', 'python', '/app/tools/adsim.py', 'users', '--delay', '1'], 0.01))"
+workspaces/toolwrap/.venv/bin/python -c "import sys; sys.path.insert(0, 'workspaces/toolwrap'); from toolwrap import lancer_outil; print(lancer_outil(['docker', 'compose', 'exec', '-T', 'atelier', 'python', '/app/tools/adsim.py', 'users', '--delay', '1'], 0.01))"
 ```
 
 **Tu sais que c’est bon quand :** D1 donne le port 8000 en open quand le labo tourne. D2 donne un nombre d’éléments égal à count. D3 donne une erreur normalisée pour le code 3 et une erreur de timeout, sans trace Python.
 
-*Indice si tu bloques :* Commande vide ou « no such service » : vérifie depuis le dossier du projet avec docker compose ps. Port closed : démarre le labo depuis l’interface. Les démonstrations n’ajoutent rien aux tests : garde-les dans le bilan.
+**Indices progressifs**
+
+Depuis le terminal dans `cyberatelier`, `python3 atelier.py indice` révèle un niveau à la fois. Ouvre seulement le niveau nécessaire.
+
+<details>
+<summary>Indice 1</summary>
+
+Les démos pilotent des outils Docker depuis le Mac ; le labo Docker doit tourner pour nmap lancé dans le conteneur.
+
+</details>
+
+<details>
+<summary>Indice 2</summary>
+
+Depuis cyberatelier, utilise atelier.py labo demarrer, observe D1/D2 puis --fail et --delay 1 avec timeout 0,01 ; conserve ces appels hors CI.
+
+</details>
+
+<details>
+<summary>Indice 3</summary>
+
+Un timeout de 0,01 seconde face à --delay 1 doit signaler le délai ; un code 3 après --fail signale une autre cause, même si les deux échouent.
+
+</details>
 
 #### Palier 9 — Bilan du README et livraison de la MR3 (8 min)
 
 Finir le README avec un bilan honnête, puis livrer la MR3 sans y mettre les fichiers de démonstration.
 
-**Où tu travailles :** README.md ; PR GitHub
+**Où tu travailles :** Mac · workspaces/toolwrap · README.md ; PR GitHub
 
 **Pour comprendre**
 
@@ -1743,7 +2431,7 @@ Finir le README avec un bilan honnête, puis livrer la MR3 sans y mettre les fic
 
 **Terminal · Commande à lancer au moment indiqué**
 
-Terminal du parcours : reste à la racine du dépôt. Exécute ces lignes au moment demandé dans les actions, avec les modifications manuelles entre les blocs.
+Terminal du Mac, dans cyberatelier/workspaces/toolwrap, venv Mac activé. Exécute chaque ligne au moment indiqué, avec les modifications manuelles entre les blocs.
 
 ```bash
 python3 -m unittest discover -s tests -v
@@ -1779,11 +2467,36 @@ git pull --ff-only
 
 **Tu sais que c’est bon quand :** La pull request ne contient ni demo_reel.xml ni demo_users.json. Le README distingue les tests, les démonstrations et les limites.
 
-*Indice si tu bloques :* Si git status montre les fichiers demo_*, c’est normal : ils restent hors commit. Tu peux les ajouter au .gitignore si ça te gêne.
+**Indices progressifs**
+
+Depuis le terminal dans `cyberatelier`, `python3 atelier.py indice` révèle un niveau à la fois. Ouvre seulement le niveau nécessaire.
+
+<details>
+<summary>Indice 1</summary>
+
+Le bilan final distingue logique mockée, parsing de fixtures et comportements réels observés.
+
+</details>
+
+<details>
+<summary>Indice 2</summary>
+
+Relance W1 à W16, documente les statuts et limites, puis vérifie le dernier diff de feat/parsing avant livraison.
+
+</details>
+
+<details>
+<summary>Indice 3</summary>
+
+« XML mixte testé par fixture ; port 8000 observé open dans Docker » décrit deux preuves différentes et ne promet rien sur un vrai réseau.
+
+</details>
 
 **Démonstrations manuelles (hors CI)**
 
-Ces essais utilisent le laboratoire ou les outils réels. Ils sont séparés des tests obligatoires.
+Ces essais lisent des fichiers locaux ou utilisent le labo et les outils réels, selon le parcours. Ils sont séparés des tests obligatoires.
+
+Les cartes ci-dessous conservent le contrat de démonstration initial. Depuis le terminal Mac dans `cyberatelier`, les mentions du « bouton du labo » se réalisent avec `python3 atelier.py labo demarrer` ou `python3 atelier.py labo arreter`. Utilise les commandes Docker du palier de démonstration pour exécuter les outils dans le bon environnement.
 
 **D1 — nmap réel sur le labo**
 - Entrée : Labo HTTP démarré avec son bouton sur 127.0.0.1:8000 ; lancer_outil sur nmap -sT -p 8000 -oX - 127.0.0.1, puis sortie XML passée au parseur
