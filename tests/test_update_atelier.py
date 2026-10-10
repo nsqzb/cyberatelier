@@ -1,5 +1,5 @@
 import copy
-from contextlib import contextmanager
+from contextlib import contextmanager, redirect_stderr
 import fcntl
 import io
 import json
@@ -14,6 +14,7 @@ from unittest.mock import patch
 
 import atelier_version
 from scripts.update_atelier import ROOT, CommandRunner, Updater, UpdateError
+from scripts import update_atelier
 
 
 OLD = "a" * 40
@@ -350,6 +351,73 @@ class UpdateTests(unittest.TestCase):
                 self.updater.execute()
         self.assertFalse(self.calls(["git", "switch"]))
         self.assertFalse(list((self.root / "backups").glob("*.tar.gz")))
+
+    def test_build_timeout_keeps_completed_backup_and_reports_it_without_restart(self):
+        original = self.commands.run
+        def run(args, **kwargs):
+            if args[:3] == ["docker", "compose", "build"]:
+                return CommandRunner(self.root).run(args, **kwargs)
+            return original(args, **kwargs)
+        self.commands.run = run
+        error = subprocess.TimeoutExpired(["docker", "compose", "build", "atelier"], 900)
+        stderr = io.StringIO()
+        with patch.object(update_atelier, "Updater", return_value=self.updater), \
+                patch.object(update_atelier.subprocess, "run", side_effect=error), redirect_stderr(stderr):
+            self.assertEqual(update_atelier.main([]), 1)
+        self.assertTrue(self.updater.backup_path.is_file())
+        self.assertIn(str(self.updater.backup_path), stderr.getvalue())
+        self.assertIn("OrbStack", stderr.getvalue())
+        self.assertIn("Aucune restauration automatique", stderr.getvalue())
+        self.assertFalse(any("--detach" in args for args in self.calls(["docker", "compose", "up"])))
+        self.assert_learner_unchanged()
+
+    def test_backup_timeout_removes_partial_archive_and_does_not_checkout(self):
+        original = self.commands.run
+        def run(args, **kwargs):
+            if "tar" in args:
+                return CommandRunner(self.root).run(args, **kwargs)
+            return original(args, **kwargs)
+        self.commands.run = run
+        error = subprocess.TimeoutExpired(["docker", "compose", "exec"], 900)
+        with patch.object(update_atelier.subprocess, "run", side_effect=error):
+            with self.assertRaisesRegex(UpdateError, "900 secondes"):
+                self.updater.execute()
+        self.assertIsNone(self.updater.backup_path)
+        self.assertFalse(self.calls(["git", "switch"]))
+        self.assertEqual(list((self.root / "backups").glob("*.tar*")), [])
+        self.assertEqual(list((self.root / "backups").glob(".volumes-*")), [])
+        self.assert_learner_unchanged()
+
+
+class CommandTimeoutTests(unittest.TestCase):
+    def test_every_operation_has_a_bounded_and_appropriate_subprocess_timeout(self):
+        cases = [
+            (["git", "fetch", "origin"], 30),
+            (["git", "status"], 30),
+            (["docker", "compose", "config", "--format", "json"], 30),
+            (["docker", "compose", "ps", "--all", "--quiet", "atelier"], 30),
+            (["docker", "inspect", "--format", "{{.State.Running}}", "container"], 30),
+            (["docker", "volume", "inspect", "data"], 30),
+            (["docker", "compose", "exec", "-T", "atelier", "python", "-c", "print('version')"], 30),
+            (["docker", "compose", "build", "atelier"], 900),
+            (["docker", "compose", "exec", "-T", "atelier", "tar", "-cf", "-"], 900),
+            (["docker", "compose", "run", "--rm", "--entrypoint", "tar", "atelier", "-cf", "-"], 900),
+            (["docker", "compose", "up", "--detach", "--no-build", "--wait", "--wait-timeout", "120", "atelier"], 180),
+        ]
+        for args, expected in cases:
+            with self.subTest(args=args), patch.object(update_atelier.subprocess, "run", return_value=subprocess.CompletedProcess(args, 0, "", "")) as run:
+                CommandRunner(Path("/application")).run(args)
+                self.assertEqual(run.call_args.kwargs["timeout"], expected)
+
+    def test_timeout_messages_explain_docker_or_network_without_leaking_output(self):
+        for args, advice in ((["docker", "compose", "ps"], "OrbStack"), (["git", "fetch", "origin"], "connexion à GitHub")):
+            error = subprocess.TimeoutExpired(args, 30, output=b"secret-output", stderr=b"secret-stderr")
+            with self.subTest(args=args), patch.object(update_atelier.subprocess, "run", side_effect=error):
+                with self.assertRaises(UpdateError) as caught:
+                    CommandRunner(Path("/application")).run(args)
+            self.assertIn("30 secondes", str(caught.exception))
+            self.assertIn(advice, str(caught.exception))
+            self.assertNotIn("secret", str(caught.exception))
 
 
 class RealGitProtectionTests(unittest.TestCase):

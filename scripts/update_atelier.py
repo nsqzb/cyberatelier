@@ -23,6 +23,9 @@ import uuid
 ROOT = Path(__file__).resolve().parents[1]
 BUILD_FILE = ".atelier-build.json"
 COMPOSE = ["docker", "compose"]
+COMMAND_TIMEOUT = 30
+TRANSFER_TIMEOUT = 15 * 60
+HEALTH_TIMEOUT = 180
 
 
 class UpdateError(Exception):
@@ -33,14 +36,34 @@ class CommandRunner:
     def __init__(self, root: Path):
         self.root = root
 
+    @staticmethod
+    def timeout_for(args):
+        if args[:3] == COMPOSE + ["build"]:
+            return TRANSFER_TIMEOUT
+        if args[:2] == COMPOSE and len(args) > 2 and args[2] in ("exec", "run") and "tar" in args:
+            return TRANSFER_TIMEOUT
+        if args[:3] == COMPOSE + ["up"] and "--wait" in args:
+            # Compose dispose de 120 s pour la santé ; laisser aussi son démarrage finir.
+            return HEALTH_TIMEOUT
+        return COMMAND_TIMEOUT
+
     def run(self, args, *, check=True, stdout=None, capture=True):
+        timeout = self.timeout_for(args)
         try:
             result = subprocess.run(
                 args, cwd=self.root, check=False,
                 text=stdout is None,
                 stdout=stdout if stdout is not None else (subprocess.PIPE if capture else None),
                 stderr=subprocess.PIPE if capture else None,
+                timeout=timeout,
             )
+        except subprocess.TimeoutExpired as error:
+            if args[0] == "docker":
+                advice = "Vérifie que Docker Desktop ou OrbStack est lancé et répond, puis relance la mise à jour."
+            else:
+                advice = "Vérifie ta connexion à GitHub et l'accès au dépôt, puis relance la mise à jour."
+            # Ne pas afficher output/stderr : Git peut y inclure des identifiants.
+            raise UpdateError(f"{args[0]} n'a pas terminé après {timeout} secondes. {advice}") from error
         except OSError as error:
             raise UpdateError(f"Impossible de lancer {args[0]}. Vérifie son installation.") from error
         if check and result.returncode:
