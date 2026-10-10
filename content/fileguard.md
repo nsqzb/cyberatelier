@@ -27,17 +27,84 @@ Ces exercices sont ton entraînement. Chaque palier explique les notions utiles,
 2. Les cartes de tests donnent l’entrée et le résultat attendu. Écris les tests correspondants dans le fichier indiqué ; cocher un palier ne les exécute pas. Avec unittest, « Ran 0 tests » signifie qu’aucun test n’a été exécuté : ce n’est pas une validation. Un cas décrit peut contenir plusieurs valeurs ; le nombre de méthodes Python n’est donc pas forcément le nombre d’identifiants.
 3. Suis les actions numérotées, une à la fois. Les exemples servent à apprendre une notion ; tu écris toi-même la solution de l’exercice. Les blocs Terminal donnent les commandes à lancer au moment indiqué.
 4. Vérifie le résultat indiqué avant de poursuivre. Un échec attendu (phase rouge, argument refusé ou conflit volontaire) est expliqué dans le palier.
-5. Si tu bloques, lis la dernière ligne de l’erreur, compare l’entrée et l’attendu, puis ouvre l’indice. Fais un petit changement et relance.
+5. Si tu bloques, lis la dernière ligne de l’erreur, compare entrée et attendu, puis demande un seul indice à la fois avec python3 atelier.py indice depuis cyberatelier. Les trois niveaux vont du rappel à un petit exemple ; ils ne donnent pas une fonction corrigée.
 
 ### Le bon endroit pour chaque action
 
-Sur ton Mac, ouvre `workspaces/fileguard` dans VS Code. Dans Cyber Atelier, utilise l’éditeur et la console de **Coder**, avec `cwd` sur `.` (la racine du dépôt). Fais la préparation de **Environnement** avant MR1 ; la mission crée ensuite sa branche.
+Ouvre `workspaces/fileguard` dans VS Code et un terminal du Mac dans ce même dossier. Tu écris et testes le code ici, dans le dépôt Git de l’exercice. Ouvre un second terminal dans `cyberatelier` pour lire les consignes avec `python3 atelier.py voir` et piloter Docker. Le site reste disponible pour la lecture ; l’onglet Coder est facultatif.
 
-Le code Python se place dans l’éditeur. Les commandes `docker compose ...` se lancent sur ton Mac depuis `cyberatelier` ; `/app/...` existe dans le conteneur. Le laboratoire interrogé doit tourner dans le même environnement que ton programme.
+Depuis `cyberatelier`, `mkdir -p workspaces/fileguard` puis `cd workspaces/fileguard` permet de rejoindre le dossier du parcours. S’il contient déjà ton exercice, garde ses fichiers, sa branche et son dépôt : ne le reclone pas. La préparation ci-dessous se fait une fois ; la mission crée ensuite sa branche.
 
-La console web repart à neuf à chaque exécution : un `cd`, une activation de venv ou `echo $?` ne se transmet pas à la commande suivante. Lance le programme et `echo $?` ensemble quand le palier le demande. Le nombre affiché par echo est celui du programme ; la console peut afficher code 0 pour echo lui-même.
+Le code Python se place dans VS Code et doit être enregistré avant les tests. Les commandes `docker compose ...` et `python3 atelier.py ...` se lancent depuis `cyberatelier`. Leurs appels Docker entrent dans le conteneur ; `/app/fixtures`, `/app/tools` et `/workspaces` sont des chemins internes à celui-ci. Depuis le dépôt d’exercice sur le Mac, les fixtures fournies sont dans `../../fixtures`.
 
-Un venv créé sur le Mac ne fonctionne pas dans le conteneur : utilise `python3` dans ce dernier. Remplace `main` par `master` si nécessaire. Si une branche existe déjà, reprends-la avec `git switch NOM` sans `-c`. Après chaque fusion, actualise la branche principale avant la mission suivante.
+Le terminal du Mac conserve son `cd` et son activation de venv. Active `.venv` dans chaque nouveau terminal d’exercice ; `python3` utilise alors ce venv, ou appelle `.venv/bin/python` explicitement. Lis `echo $?` immédiatement après le programme dont tu veux le code, avant toute autre commande. Ajoute `.venv/` à `.gitignore` avant `git add`.
+
+PortPilot et HeaderScope exécutés sur le Mac : lance `python3 labs.py` depuis `cyberatelier` dans un autre terminal et garde-le ouvert ; Ctrl+C arrête ce labo Mac. Les outils ToolWrap et les démos ReconWrap tournent dans Docker : `python3 atelier.py labo demarrer`, `labo arreter` et `labo statut` depuis `cyberatelier` pilotent uniquement le labo Docker. Le même numéro 8000 ne relie pas automatiquement les deux environnements.
+
+Un venv créé sur le Mac ne fonctionne pas dans Docker : les démos dans le conteneur utilisent son `python3`. Le dossier hôte `workspaces` doit être monté dans Docker pour que les démos ReconWrap lisent ton code ; conserve le `compose.override.yaml` du mode VS Code. Remplace `main` par `master` si nécessaire. Si une branche existe, reprends-la avec `git switch NOM` sans `-c`. Après chaque fusion, actualise la principale dans le dépôt du parcours avant la mission suivante.
+
+### Préparation sur le Mac
+
+**Vérifier Python**
+
+Terminal du Mac, dans cyberatelier/workspaces/fileguard.
+
+```bash
+python3 --version
+```
+
+Python 3 doit être installé sur ton Mac. Ce parcours utilise seulement sa bibliothèque standard ; aucun pip install n’est demandé.
+
+**Vérifier Git**
+
+Terminal du Mac, dans cyberatelier/workspaces/fileguard.
+
+```bash
+git --version
+```
+
+Vérifie Git sur ton Mac. Les commandes du parcours agissent sur ce dépôt d’exercice, distinct du dépôt cyberatelier.
+
+**Configurer ton identité Git (une seule fois)**
+
+Terminal du Mac, dans cyberatelier/workspaces/fileguard.
+
+```bash
+git config --global user.name "Prénom Nom" && git config --global user.email "adresse@ecole.example"
+```
+
+Remplace les deux valeurs d’exemple par ton nom et l’adresse de ton compte scolaire. Cette configuration globale est enregistrée sur ton Mac ; sans identité, git commit refuse le commit.
+
+**Cloner le dépôt**
+
+Terminal du Mac, dans cyberatelier/workspaces/fileguard.
+
+```bash
+git clone <URL_DU_DEPOT> .
+```
+
+Depuis le terminal du Mac dans workspaces/fileguard, clone seulement si le dossier est vide et n’a pas encore de dépôt. Remplace <URL_DU_DEPOT> par l’URL autorisée réelle avant exécution ; le point signifie « ici ». Si ton exercice existe déjà, garde-le et passe directement à git status. HTTPS ou SSH peut demander une saisie dans ce terminal.
+
+**Créer le venv**
+
+Terminal du Mac, dans cyberatelier/workspaces/fileguard.
+
+```bash
+python3 -m venv .venv
+source .venv/bin/activate
+```
+
+Après le clone, crée ce venv sur le Mac une seule fois ; s’il existe, active-le simplement. L’activation reste valable dans ce terminal. Dans un nouveau terminal, réactive-le ou appelle .venv/bin/python. Ajoute .venv/ à .gitignore avant git add. Aucun paquet pip n’est nécessaire.
+
+**Copier les fixtures fictives (MR2)**
+
+Terminal du Mac, dans cyberatelier/workspaces/fileguard.
+
+```bash
+mkdir -p fixtures && cp ../../fixtures/integrity/* fixtures/ && chmod u+w fixtures/*
+```
+
+Les originaux sont fournis en lecture seule dans ../../fixtures/integrity ; chmod u+w rend tes copies modifiables, par exemple pour simuler un fichier modifié. Ce sont des données fictives : elles ne remplacent pas les tests sur fichiers temporaires. La source est dans le dépôt cyberatelier sur ton Mac ; /app/fixtures est réservée au conteneur.
 
 ### Les mots utiles
 
@@ -108,7 +175,7 @@ Une empreinte décrit les octets d’un fichier ; elle servira à construire le 
 
 Partir d’un dépôt propre, sur une branche dédiée à cette MR.
 
-**Où tu travailles :** Dépôt
+**Où tu travailles :** Mac · workspaces/fileguard · Dépôt
 
 **Pour comprendre**
 
@@ -117,15 +184,15 @@ Partir d’un dépôt propre, sur une branche dédiée à cette MR.
 
 **Actions dans l’ordre**
 
-1. Ouvre workspaces/fileguard dans VS Code, ou Coder dans Cyber Atelier avec cwd sur « . ».
-2. Si le dépôt n’est pas cloné, fais d’abord la préparation de l’onglet Environnement.
+1. Ouvre workspaces/fileguard dans VS Code. Dans le terminal du Mac, place-toi dans ce même dossier et active son venv avec source .venv/bin/activate.
+2. Si le dépôt n’est pas cloné, fais d’abord la préparation décrite au début du guide.
 3. Lis git status ; enregistre ton travail en cours avant de changer de branche.
 4. Reviens sur main avec git switch main, mets-la à jour avec git pull --ff-only, puis crée feat/empreinte. Remplace main par master si ton dépôt utilise ce nom.
 5. Vérifie le nom de ta branche avec git status. Si elle existe déjà, reprends-la avec git switch sans -c.
 
 **Terminal · Relire l’état du dépôt**
 
-Terminal du parcours : reste à la racine du dépôt. Exécute ces lignes au moment demandé dans les actions, avec les modifications manuelles entre les blocs.
+Terminal du Mac, dans cyberatelier/workspaces/fileguard, venv Mac activé. Exécute chaque ligne au moment indiqué, avec les modifications manuelles entre les blocs.
 
 ```bash
 git status
@@ -145,13 +212,36 @@ git status
 
 **Tu sais que c’est bon quand :** git status affiche « On branch feat/empreinte » et « nothing to commit ».
 
-*Indice si tu bloques :* Si Git répond « not a git repository », tu n’es pas dans le dossier du dépôt. Si la branche existe déjà, utilise git switch feat/empreinte, sans -c.
+**Indices progressifs**
+
+Depuis le terminal dans `cyberatelier`, `python3 atelier.py indice` révèle un niveau à la fois. Ouvre seulement le niveau nécessaire.
+
+<details>
+<summary>Indice 1</summary>
+
+Une empreinte se développe dans le dépôt FileGuard ; sa branche est indépendante de celle de Cyber Atelier.
+
+</details>
+
+<details>
+<summary>Indice 2</summary>
+
+Vérifie le clone, le dossier workspaces/fileguard et main à jour avant de créer feat/empreinte.
+
+</details>
+
+<details>
+<summary>Indice 3</summary>
+
+git status dans workspaces/fileguard décrit les fichiers de l’exercice ; le lancer deux dossiers plus haut décrit l’application.
+
+</details>
 
 #### Palier 2 — Des octets, pas du texte (10 min)
 
 Comprendre pourquoi on lit un fichier en mode binaire pour obtenir ses octets exacts.
 
-**Où tu travailles :** Terminal : exemple binaire
+**Où tu travailles :** Mac · workspaces/fileguard · Terminal : exemple binaire
 
 **Pour comprendre**
 
@@ -166,7 +256,7 @@ Comprendre pourquoi on lit un fichier en mode binaire pour obtenir ses octets ex
 
 **Terminal · Commande à lancer au moment indiqué**
 
-Terminal du parcours : reste à la racine du dépôt. Exécute ces lignes au moment demandé dans les actions, avec les modifications manuelles entre les blocs.
+Terminal du Mac, dans cyberatelier/workspaces/fileguard, venv Mac activé. Exécute chaque ligne au moment indiqué, avec les modifications manuelles entre les blocs.
 
 ```bash
 python3 -c "from pathlib import Path; from tempfile import TemporaryDirectory
@@ -179,13 +269,36 @@ with TemporaryDirectory() as dossier:
 
 **Tu sais que c’est bon quand :** Tu vois b'pomme' et le type <class 'bytes'>.
 
-*Indice si tu bloques :* Le préfixe b devant les guillemets désigne des octets. Une chaîne de texte (str) n’est pas acceptée par hashlib : il faut des octets.
+**Indices progressifs**
+
+Depuis le terminal dans `cyberatelier`, `python3 atelier.py indice` révèle un niveau à la fois. Ouvre seulement le niveau nécessaire.
+
+<details>
+<summary>Indice 1</summary>
+
+SHA-256 reçoit des octets ; décoder du texte ou ajouter un saut de ligne change les données calculées.
+
+</details>
+
+<details>
+<summary>Indice 2</summary>
+
+Observe bytes, lecture binaire et texte ; garde la lecture du fichier en mode binaire pour le calcul d’empreinte.
+
+</details>
+
+<details>
+<summary>Indice 3</summary>
+
+b'abc' contient 3 octets et b'abc\n' en contient 4 : le saut de ligne final est une donnée supplémentaire.
+
+</details>
 
 #### Palier 3 — Premier test rouge, puis premier code vert : F1 (14 min)
 
 Écrire le test avant la fonction, voir l’échec, puis faire passer le test avec le minimum de code.
 
-**Où tu travailles :** fileguard.py ; verification.py
+**Où tu travailles :** Mac · workspaces/fileguard · fileguard.py ; verification.py
 
 **Pour comprendre**
 
@@ -226,7 +339,7 @@ L’entrée est ce que tu donnes au code ; l’attendu est ce que ton test doit 
 
 **Terminal · Commande à lancer au moment indiqué**
 
-Terminal du parcours : reste à la racine du dépôt. Exécute ces lignes au moment demandé dans les actions, avec les modifications manuelles entre les blocs.
+Terminal du Mac, dans cyberatelier/workspaces/fileguard, venv Mac activé. Exécute chaque ligne au moment indiqué, avec les modifications manuelles entre les blocs.
 
 ```bash
 python3 -c "import tempfile, pathlib; d = tempfile.TemporaryDirectory(); p = pathlib.Path(d.name) / 'fruits.txt'; p.write_bytes(b'pomme'); print(p.read_bytes())"
@@ -247,13 +360,36 @@ git commit -m "Calcule l’empreinte SHA-256 du fichier vide"
 
 **Tu sais que c’est bon quand :** F1 passe ; python3 verification.py se termine sans erreur ; git log --oneline montre le nouveau commit.
 
-*Indice si tu bloques :* Phase rouge : une erreur du type ImportError ou NameError est l’échec attendu. Pour la phase verte, la documentation de hashlib et celle d’open donnent les deux outils dont tu as besoin ; l’oracle reste une constante du test.
+**Indices progressifs**
+
+Depuis le terminal dans `cyberatelier`, `python3 atelier.py indice` révèle un niveau à la fois. Ouvre seulement le niveau nécessaire.
+
+<details>
+<summary>Indice 1</summary>
+
+Le fichier vide possède une empreinte définie ; le test doit créer exactement zéro octet.
+
+</details>
+
+<details>
+<summary>Indice 2</summary>
+
+Écris F1 dans un dossier temporaire avant empreinte_fichier, puis compare l’hexadécimal complet à l’attendu.
+
+</details>
+
+<details>
+<summary>Indice 3</summary>
+
+Path('vide.bin').write_bytes(b'') crée un contenu vide ; écrire une ligne vide dans un éditeur peut créer un octet de saut de ligne.
+
+</details>
 
 #### Palier 4 — F2 : les trois octets abc, sans saut de ligne (14 min)
 
 Vérifier que l’empreinte dépend des octets exacts, sans fin de ligne ajoutée.
 
-**Où tu travailles :** fileguard.py ; verification.py
+**Où tu travailles :** Mac · workspaces/fileguard · fileguard.py ; verification.py
 
 **Pour comprendre**
 
@@ -277,7 +413,7 @@ L’entrée est ce que tu donnes au code ; l’attendu est ce que ton test doit 
 
 **Terminal · Commande à lancer au moment indiqué**
 
-Terminal du parcours : reste à la racine du dépôt. Exécute ces lignes au moment demandé dans les actions, avec les modifications manuelles entre les blocs.
+Terminal du Mac, dans cyberatelier/workspaces/fileguard, venv Mac activé. Exécute chaque ligne au moment indiqué, avec les modifications manuelles entre les blocs.
 
 ```bash
 python3 verification.py
@@ -292,13 +428,36 @@ git commit -m "Vérifie l’empreinte des trois octets abc"
 
 **Tu sais que c’est bon quand :** F1 et F2 passent, et le code n’a pas été modifié pour contourner une constante.
 
-*Indice si tu bloques :* Pour écrire exactement trois octets, utilise un littéral b suivi de guillemets, sans \n. Vérifie que le test lit les octets sans conversion de texte.
+**Indices progressifs**
+
+Depuis le terminal dans `cyberatelier`, `python3 atelier.py indice` révèle un niveau à la fois. Ouvre seulement le niveau nécessaire.
+
+<details>
+<summary>Indice 1</summary>
+
+F2 porte sur les trois octets abc ; l’outil de création du fichier ne doit pas ajouter de caractère.
+
+</details>
+
+<details>
+<summary>Indice 2</summary>
+
+Crée le contenu dans le test avec des octets explicites et vérifie la taille avant de comparer l’empreinte connue.
+
+</details>
+
+<details>
+<summary>Indice 3</summary>
+
+print('abc') ajoute généralement un retour à la ligne ; write_bytes(b'abc') écrit exactement les trois octets demandés.
+
+</details>
 
 #### Palier 5 — F3 : deux contenus identiques, deux empreintes identiques (14 min)
 
 Écrire un test qui crée lui-même ses fichiers et compare deux résultats.
 
-**Où tu travailles :** fileguard.py ; verification.py
+**Où tu travailles :** Mac · workspaces/fileguard · fileguard.py ; verification.py
 
 **Pour comprendre**
 
@@ -322,7 +481,7 @@ L’entrée est ce que tu donnes au code ; l’attendu est ce que ton test doit 
 
 **Terminal · Commande à lancer au moment indiqué**
 
-Terminal du parcours : reste à la racine du dépôt. Exécute ces lignes au moment demandé dans les actions, avec les modifications manuelles entre les blocs.
+Terminal du Mac, dans cyberatelier/workspaces/fileguard, venv Mac activé. Exécute chaque ligne au moment indiqué, avec les modifications manuelles entre les blocs.
 
 ```bash
 python3 verification.py
@@ -337,13 +496,36 @@ git commit -m "Vérifie que deux contenus identiques ont la même empreinte"
 
 **Tu sais que c’est bon quand :** F1, F2 et F3 passent ; git log --oneline montre le nouveau commit.
 
-*Indice si tu bloques :* Écris les mêmes octets dans deux noms différents, puis compare les deux résultats de ta fonction avec assertEqual.
+**Indices progressifs**
+
+Depuis le terminal dans `cyberatelier`, `python3 atelier.py indice` révèle un niveau à la fois. Ouvre seulement le niveau nécessaire.
+
+<details>
+<summary>Indice 1</summary>
+
+Deux fichiers de même contenu ont la même empreinte, même si leurs noms sont différents.
+
+</details>
+
+<details>
+<summary>Indice 2</summary>
+
+Écris F3 avec deux chemins distincts et des octets identiques ; compare les résultats sans inclure les noms dans le calcul.
+
+</details>
+
+<details>
+<summary>Indice 3</summary>
+
+note-a.bin et note-b.bin contenant tous deux b'bonjour' doivent avoir la même empreinte ; changer seulement le chemin ne change pas les octets.
+
+</details>
 
 #### Palier 6 — Faire tourner la même suite dans la CI (15 min)
 
 Comprendre ce que la CI exécute, et ce qu’elle ne prouve pas encore.
 
-**Où tu travailles :** .gitlab-ci.yml
+**Où tu travailles :** Mac · workspaces/fileguard · .gitlab-ci.yml
 
 **Pour comprendre**
 
@@ -352,7 +534,7 @@ Comprendre ce que la CI exécute, et ce qu’elle ne prouve pas encore.
 
 **Éditeur · Exemple YAML à lire**
 
-Éditeur : exemple de syntaxe, à adapter ; ce bloc ne se lance pas dans le terminal.
+VS Code sur le Mac : exemple de syntaxe, à adapter ; ce bloc ne se lance pas dans le terminal.
 
 ```yaml
 job-bonjour:
@@ -369,7 +551,7 @@ job-bonjour:
 
 **Terminal · Commande à lancer au moment indiqué**
 
-Terminal du parcours : reste à la racine du dépôt. Exécute ces lignes au moment demandé dans les actions, avec les modifications manuelles entre les blocs.
+Terminal du Mac, dans cyberatelier/workspaces/fileguard, venv Mac activé. Exécute chaque ligne au moment indiqué, avec les modifications manuelles entre les blocs.
 
 ```bash
 python3 verification.py
@@ -384,13 +566,36 @@ git commit -m "Ajoute la CI qui lance la suite locale"
 
 **Tu sais que c’est bon quand :** Le fichier est commité. Le pipeline n’est confirmé que lorsque GitLab affiche un job exécuté et vert pour ta branche.
 
-*Indice si tu bloques :* Si GitLab ne lance aucun pipeline, vérifie que le fichier est à la racine du dépôt, que la branche est poussée et que le runner de l’école est actif sur les branches non protégées.
+**Indices progressifs**
+
+Depuis le terminal dans `cyberatelier`, `python3 atelier.py indice` révèle un niveau à la fois. Ouvre seulement le niveau nécessaire.
+
+<details>
+<summary>Indice 1</summary>
+
+La CI doit recréer ses fichiers temporaires et exécuter la même suite ; les fixtures du Mac ne sont pas présentes par magie.
+
+</details>
+
+<details>
+<summary>Indice 2</summary>
+
+Rédige le job sur les MR, vérifie la commande de tests et ouvre son journal après push.
+
+</details>
+
+<details>
+<summary>Indice 3</summary>
+
+Un test utilisant /Users/tonnom/Desktop/exemple.bin échoue ailleurs ; un fichier créé dans TemporaryDirectory peut être recréé sur le runner.
+
+</details>
 
 #### Palier 7 — Livre la MR1 sans confondre test local et fusion (12 min)
 
 Relire le diff, pousser la branche, ouvrir la MR et ne fusionner que le dernier commit vert.
 
-**Où tu travailles :** MR GitLab
+**Où tu travailles :** Mac · workspaces/fileguard · MR GitLab
 
 **Pour comprendre**
 
@@ -409,7 +614,7 @@ Relire le diff, pousser la branche, ouvrir la MR et ne fusionner que le dernier 
 
 **Terminal · Relire l’état du dépôt**
 
-Terminal du parcours : reste à la racine du dépôt. Exécute ces lignes au moment demandé dans les actions, avec les modifications manuelles entre les blocs.
+Terminal du Mac, dans cyberatelier/workspaces/fileguard, venv Mac activé. Exécute chaque ligne au moment indiqué, avec les modifications manuelles entre les blocs.
 
 ```bash
 git status
@@ -436,7 +641,30 @@ git pull --ff-only
 
 **Tu sais que c’est bon quand :** La MR ne contient que les trois fichiers attendus, et ta branche main locale contient la fusion (git log --oneline).
 
-*Indice si tu bloques :* Si le push est refusé, vérifie le nom de la branche avec git branch. Ne fusionne pas avant d’avoir relu le diff et vu le pipeline.
+**Indices progressifs**
+
+Depuis le terminal dans `cyberatelier`, `python3 atelier.py indice` révèle un niveau à la fois. Ouvre seulement le niveau nécessaire.
+
+<details>
+<summary>Indice 1</summary>
+
+Tests locaux, pipeline et autorisation de fusion répondent à des questions différentes.
+
+</details>
+
+<details>
+<summary>Indice 2</summary>
+
+Relis les fichiers et le dernier commit vert de la MR, puis mets main à jour seulement après sa fusion.
+
+</details>
+
+<details>
+<summary>Indice 3</summary>
+
+Une suite locale verte peut accompagner une MR dont le runner est en attente ; écris cet état précis au lieu d’annoncer la CI réussie.
+
+</details>
 
 **Avant de livrer**
 
@@ -460,7 +688,7 @@ Le manifeste mémorise l’état de référence qui sera comparé au dossier en 
 
 Partir de la MR1 fusionnée, pas d’une branche ancienne.
 
-**Où tu travailles :** Dépôt
+**Où tu travailles :** Mac · workspaces/fileguard · Dépôt
 
 **Pour comprendre**
 
@@ -469,7 +697,7 @@ Partir de la MR1 fusionnée, pas d’une branche ancienne.
 
 **Actions dans l’ordre**
 
-1. Ouvre workspaces/fileguard dans VS Code, ou Coder dans Cyber Atelier avec cwd sur « . ».
+1. Ouvre workspaces/fileguard dans VS Code. Dans le terminal du Mac, place-toi dans ce même dossier et active son venv avec source .venv/bin/activate.
 2. Vérifie que MR1 est fusionnée et que F1 à F3 passent sur main.
 3. Lis git status ; enregistre ton travail en cours avant de changer de branche.
 4. Reviens sur main avec git switch main, mets-la à jour avec git pull --ff-only, puis crée feat/manifest. Remplace main par master si ton dépôt utilise ce nom.
@@ -477,7 +705,7 @@ Partir de la MR1 fusionnée, pas d’une branche ancienne.
 
 **Terminal · Après la fusion : actualiser la principale**
 
-Terminal du parcours : reste à la racine du dépôt. Exécute ces lignes au moment demandé dans les actions, avec les modifications manuelles entre les blocs.
+Terminal du Mac, dans cyberatelier/workspaces/fileguard, venv Mac activé. Exécute chaque ligne au moment indiqué, avec les modifications manuelles entre les blocs.
 
 ```bash
 git switch main
@@ -503,13 +731,36 @@ git status
 
 **Tu sais que c’est bon quand :** git status affiche « On branch feat/manifest » et « nothing to commit ».
 
-*Indice si tu bloques :* Si git pull --ff-only refuse, c’est que main a divergé : ne force rien, demande de l’aide avant de continuer.
+**Indices progressifs**
+
+Depuis le terminal dans `cyberatelier`, `python3 atelier.py indice` révèle un niveau à la fois. Ouvre seulement le niveau nécessaire.
+
+<details>
+<summary>Indice 1</summary>
+
+Le manifeste réutilise la fonction d’empreinte fusionnée ; MR2 part d’une base verte.
+
+</details>
+
+<details>
+<summary>Indice 2</summary>
+
+Actualise main, relance F1 à F3 et crée ou reprends feat/manifest avant d’éditer.
+
+</details>
+
+<details>
+<summary>Indice 3</summary>
+
+Si empreinte_fichier manque sur la principale, tu n’as pas encore récupéré la livraison de MR1 ; ajouter le manifeste ne corrige pas cette base.
+
+</details>
 
 #### Palier 2 — Copie les fixtures fictives dans ton dépôt (8 min)
 
 Disposer d’un petit dossier d’exemple, relisible, dans le dépôt.
 
-**Où tu travailles :** fixtures/
+**Où tu travailles :** Mac · workspaces/fileguard · fixtures/
 
 **Pour comprendre**
 
@@ -518,14 +769,14 @@ Disposer d’un petit dossier d’exemple, relisible, dans le dépôt.
 
 **Actions dans l’ordre**
 
-1. Sur le Mac, depuis workspaces/fileguard, copie ../../fixtures/integrity dans fixtures/. Dans le conteneur, utilise /app/fixtures/integrity.
+1. Sur le Mac, depuis workspaces/fileguard, copie ../../fixtures/integrity dans fixtures/. Les trois fichiers sont copiés directement dans fixtures/ ; /app/fixtures désigne uniquement Docker.
 2. Rends les copies modifiables avec chmod u+w.
 3. Vérifie README.txt, message.txt et settings.ini avec ls fixtures.
 4. Ajoute explicitement ces trois fichiers et commite les copies.
 
 **Terminal · Commande à lancer au moment indiqué**
 
-Terminal du parcours : reste à la racine du dépôt. Exécute ces lignes au moment demandé dans les actions, avec les modifications manuelles entre les blocs.
+Terminal du Mac, dans cyberatelier/workspaces/fileguard, venv Mac activé. Exécute chaque ligne au moment indiqué, avec les modifications manuelles entre les blocs.
 
 ```bash
 pwd
@@ -533,7 +784,7 @@ pwd
 
 **Terminal · Commande à lancer au moment indiqué**
 
-Terminal de ton Mac, depuis workspaces/fileguard. Dans le conteneur, remplace ../../fixtures par /app/fixtures ; garde le reste de la commande. Les copies vont dans ton dépôt.
+Terminal du Mac, dans cyberatelier/workspaces/fileguard, venv Mac activé. Exécute chaque ligne au moment indiqué, avec les modifications manuelles entre les blocs. ../../fixtures est la source sur le Mac ; les copies sont placées dans ton dépôt d’exercice.
 
 ```bash
 mkdir -p fixtures && cp ../../fixtures/integrity/* fixtures/ && chmod u+w fixtures/*
@@ -541,7 +792,7 @@ mkdir -p fixtures && cp ../../fixtures/integrity/* fixtures/ && chmod u+w fixtur
 
 **Terminal · Commande à lancer au moment indiqué**
 
-Terminal du parcours : reste à la racine du dépôt. Exécute ces lignes au moment demandé dans les actions, avec les modifications manuelles entre les blocs.
+Terminal du Mac, dans cyberatelier/workspaces/fileguard, venv Mac activé. Exécute chaque ligne au moment indiqué, avec les modifications manuelles entre les blocs.
 
 ```bash
 ls -l fixtures
@@ -556,13 +807,36 @@ git commit -m "Ajoute les fixtures fictives FileGuard"
 
 **Tu sais que c’est bon quand :** ls fixtures affiche README.txt, message.txt et settings.ini ; git log --oneline montre le commit.
 
-*Indice si tu bloques :* Si cp répond « No such file or directory », pwd te dit où tu es : la commande doit être lancée depuis workspaces/fileguard. Les fixtures ne sont pas présumées présentes sur le runner : les tests, eux, créent leurs propres fichiers.
+**Indices progressifs**
+
+Depuis le terminal dans `cyberatelier`, `python3 atelier.py indice` révèle un niveau à la fois. Ouvre seulement le niveau nécessaire.
+
+<details>
+<summary>Indice 1</summary>
+
+Une fixture est un exemple fictif copié dans ton dépôt ; sur le Mac son origine est ../../fixtures.
+
+</details>
+
+<details>
+<summary>Indice 2</summary>
+
+Depuis workspaces/fileguard, copie les trois fichiers de ../../fixtures/integrity dans fixtures/ et vérifie leurs noms sans utiliser le chemin Docker /app.
+
+</details>
+
+<details>
+<summary>Indice 3</summary>
+
+../../fixtures/integrity remonte de fileguard à workspaces puis à cyberatelier ; ls fixtures doit montrer README.txt, message.txt et settings.ini.
+
+</details>
 
 #### Palier 3 — Un JSON stable : la forme avant le code (10 min)
 
 Savoir écrire exactement le format du contrat, avec un ordre de clés et une fin de ligne stables.
 
-**Où tu travailles :** Forme de manifest.json
+**Où tu travailles :** Mac · workspaces/fileguard · Forme de manifest.json
 
 **Pour comprendre**
 
@@ -601,7 +875,7 @@ files reste une liste même quand elle est vide.
 
 **Terminal · Commande à lancer au moment indiqué**
 
-Terminal du parcours : reste à la racine du dépôt. Exécute ces lignes au moment demandé dans les actions, avec les modifications manuelles entre les blocs.
+Terminal du Mac, dans cyberatelier/workspaces/fileguard, venv Mac activé. Exécute chaque ligne au moment indiqué, avec les modifications manuelles entre les blocs.
 
 ```bash
 python3 -c "import json; print(json.dumps({'b': 1, 'a': 2}, indent=2))"
@@ -615,13 +889,36 @@ python3 -c "import json; print(json.dumps({'schema': 1, 'files': []}, indent=2))
 
 **Tu sais que c’est bon quand :** Tu sais dire pourquoi sort_keys=True n’est pas adapté ici : il réordonnerait schema et files, alors que le contrat impose schema puis files.
 
-*Indice si tu bloques :* Ne mets pas de chemin absolu dans le JSON. L’empreinte n’est pas encore calculée : ce palier ne sert qu’à fixer la forme.
+**Indices progressifs**
+
+Depuis le terminal dans `cyberatelier`, `python3 atelier.py indice` révèle un niveau à la fois. Ouvre seulement le niveau nécessaire.
+
+<details>
+<summary>Indice 1</summary>
+
+Un JSON stable impose un ordre, une indentation et une forme de données, pas seulement un texte lisible.
+
+</details>
+
+<details>
+<summary>Indice 2</summary>
+
+Dessine schema puis files et les deux clés de chaque entrée ; distingue la liste ordonnée des fichiers de l’objet JSON qui les contient.
+
+</details>
+
+<details>
+<summary>Indice 3</summary>
+
+{'schema': 1, 'files': []} représente un inventaire vide ; écrire un chemin absolu au lieu d’un simple name violerait la forme prévue.
+
+</details>
 
 #### Palier 4 — F4 : dossier vide, premier niveau seulement (14 min)
 
 Lister les fichiers réguliers du premier niveau avec pathlib, sans entrer dans les sous-dossiers.
 
-**Où tu travailles :** fileguard.py ; verification.py
+**Où tu travailles :** Mac · workspaces/fileguard · fileguard.py ; verification.py
 
 **Pour comprendre**
 
@@ -645,7 +942,7 @@ L’entrée est ce que tu donnes au code ; l’attendu est ce que ton test doit 
 
 **Terminal · Commande à lancer au moment indiqué**
 
-Terminal du parcours : reste à la racine du dépôt. Exécute ces lignes au moment demandé dans les actions, avec les modifications manuelles entre les blocs.
+Terminal du Mac, dans cyberatelier/workspaces/fileguard, venv Mac activé. Exécute chaque ligne au moment indiqué, avec les modifications manuelles entre les blocs.
 
 ```bash
 python3 -c "from pathlib import Path; [print(c.name, c.is_file()) for c in Path('.').iterdir()]"
@@ -666,13 +963,36 @@ git commit -m "Produit un manifeste vide pour un dossier vide"
 
 **Tu sais que c’est bon quand :** F1 à F4 passent ; git log --oneline montre le commit.
 
-*Indice si tu bloques :* Un sous-dossier apparaît dans iterdir() mais n’est pas un fichier régulier. Vérifie-le avant de l’ajouter à l’inventaire.
+**Indices progressifs**
+
+Depuis le terminal dans `cyberatelier`, `python3 atelier.py indice` révèle un niveau à la fois. Ouvre seulement le niveau nécessaire.
+
+<details>
+<summary>Indice 1</summary>
+
+Un dossier vide donne un inventaire vide ; premier niveau signifie qu’on ne descend pas dans les sous-dossiers.
+
+</details>
+
+<details>
+<summary>Indice 2</summary>
+
+Écris F4 avec un dossier temporaire neuf et vérifie la structure entière du manifeste, pas seulement son existence.
+
+</details>
+
+<details>
+<summary>Indice 3</summary>
+
+Un dossier qui ne contient qu’un sous-dossier sans fichier régulier au premier niveau garde files=[] dans ce périmètre non récursif.
+
+</details>
 
 #### Palier 5 — F5 : trier les noms et écrire le fichier (15 min)
 
 Obtenir le même fichier quel que soit l’ordre de création des fichiers.
 
-**Où tu travailles :** fileguard.py ; verification.py
+**Où tu travailles :** Mac · workspaces/fileguard · fileguard.py ; verification.py
 
 **Pour comprendre**
 
@@ -697,7 +1017,7 @@ L’entrée est ce que tu donnes au code ; l’attendu est ce que ton test doit 
 
 **Terminal · Commande à lancer au moment indiqué**
 
-Terminal du parcours : reste à la racine du dépôt. Exécute ces lignes au moment demandé dans les actions, avec les modifications manuelles entre les blocs.
+Terminal du Mac, dans cyberatelier/workspaces/fileguard, venv Mac activé. Exécute chaque ligne au moment indiqué, avec les modifications manuelles entre les blocs.
 
 ```bash
 python3 -c "print(sorted(['zeta.txt', 'alpha.txt']))"
@@ -718,13 +1038,36 @@ git commit -m "Trie les entrées du manifeste par nom"
 
 **Tu sais que c’est bon quand :** F1 à F5 passent ; le contenu du manifeste est identique d’un lancement à l’autre sur le même dossier.
 
-*Indice si tu bloques :* Trie les noms, pas les empreintes. json.dump n’écrit pas de saut de ligne final : ajoute-le toi-même.
+**Indices progressifs**
+
+Depuis le terminal dans `cyberatelier`, `python3 atelier.py indice` révèle un niveau à la fois. Ouvre seulement le niveau nécessaire.
+
+<details>
+<summary>Indice 1</summary>
+
+Le tri se fait par nom avant l’écriture ; deux parcours du même dossier doivent produire les mêmes octets.
+
+</details>
+
+<details>
+<summary>Indice 2</summary>
+
+Écris F5 avec les trois noms fournis dans un ordre de création différent, puis vérifie l’ordre final et le saut de ligne demandé.
+
+</details>
+
+<details>
+<summary>Indice 3</summary>
+
+Créer z.txt avant a.txt ne doit pas donner un manifeste commençant par z.txt si le contrat impose un tri par nom.
+
+</details>
 
 #### Palier 6 — F6 : le manifeste ne se compte pas lui-même (12 min)
 
 Exclure le manifeste de son propre inventaire, même quand il se trouve dans le dossier examiné.
 
-**Où tu travailles :** fileguard.py ; verification.py
+**Où tu travailles :** Mac · workspaces/fileguard · fileguard.py ; verification.py
 
 **Pour comprendre**
 
@@ -748,7 +1091,7 @@ L’entrée est ce que tu donnes au code ; l’attendu est ce que ton test doit 
 
 **Terminal · Commande à lancer au moment indiqué**
 
-Terminal du parcours : reste à la racine du dépôt. Exécute ces lignes au moment demandé dans les actions, avec les modifications manuelles entre les blocs.
+Terminal du Mac, dans cyberatelier/workspaces/fileguard, venv Mac activé. Exécute chaque ligne au moment indiqué, avec les modifications manuelles entre les blocs.
 
 ```bash
 python3 -c "from pathlib import Path; print(Path('dossier/manifest.json').name)"
@@ -769,13 +1112,36 @@ git commit -m "Exclut le manifeste de son propre inventaire"
 
 **Tu sais que c’est bon quand :** F1 à F6 passent ; manifest.json n’apparaît jamais dans les entrées.
 
-*Indice si tu bloques :* Le nom simple d’un fichier est accessible via l’attribut name d’un Path. Compare-le à la constante du nom du manifeste.
+**Indices progressifs**
+
+Depuis le terminal dans `cyberatelier`, `python3 atelier.py indice` révèle un niveau à la fois. Ouvre seulement le niveau nécessaire.
+
+<details>
+<summary>Indice 1</summary>
+
+Un manifeste écrit dans le dossier observé ne doit pas calculer sa propre empreinte.
+
+</details>
+
+<details>
+<summary>Indice 2</summary>
+
+Écris F6 après avoir créé manifest.json parmi les données ; vérifie son absence dans files et sa stabilité au second passage.
+
+</details>
+
+<details>
+<summary>Indice 3</summary>
+
+Si un catalogue inclut son propre fichier catalogue.json, réécrire celui-ci modifie sa propre empreinte et crée un changement artificiel.
+
+</details>
 
 #### Palier 7 — F7 : refuser les liens symboliques (12 min)
 
 Refuser clairement un lien symbolique, et tester ce refus quand le système permet d’en créer.
 
-**Où tu travailles :** fileguard.py ; verification.py
+**Où tu travailles :** Mac · workspaces/fileguard · fileguard.py ; verification.py
 
 **Pour comprendre**
 
@@ -799,7 +1165,7 @@ L’entrée est ce que tu donnes au code ; l’attendu est ce que ton test doit 
 
 **Terminal · Commande à lancer au moment indiqué**
 
-Terminal du parcours : reste à la racine du dépôt. Exécute ces lignes au moment demandé dans les actions, avec les modifications manuelles entre les blocs.
+Terminal du Mac, dans cyberatelier/workspaces/fileguard, venv Mac activé. Exécute chaque ligne au moment indiqué, avec les modifications manuelles entre les blocs.
 
 ```bash
 python3 -c "import os, tempfile, pathlib; d = tempfile.mkdtemp(); os.symlink(pathlib.Path(d) / 'a', pathlib.Path(d) / 'lien'); print(pathlib.Path(d, 'lien').is_symlink())"
@@ -820,13 +1186,36 @@ git commit -m "Refuse les liens symboliques dans l’inventaire"
 
 **Tu sais que c’est bon quand :** F1 à F7 passent ; la sortie de l’exemple est True pour le lien.
 
-*Indice si tu bloques :* Vérifie is_symlink() avant is_file() : is_file() suit le lien et répondrait sur la cible. Un test qui ne peut pas créer de lien doit être ignoré avec un message, pas réussir silencieusement.
+**Indices progressifs**
+
+Depuis le terminal dans `cyberatelier`, `python3 atelier.py indice` révèle un niveau à la fois. Ouvre seulement le niveau nécessaire.
+
+<details>
+<summary>Indice 1</summary>
+
+Un lien symbolique pointe vers une autre entrée ; le refuser évite de suivre un contenu hors périmètre.
+
+</details>
+
+<details>
+<summary>Indice 2</summary>
+
+Crée un lien dans le test temporaire et vérifie le refus explicite avant le calcul de son empreinte.
+
+</details>
+
+<details>
+<summary>Indice 3</summary>
+
+Path('raccourci').is_symlink() permet de distinguer un lien d’un fichier régulier ; suivre sa cible silencieusement changerait le périmètre.
+
+</details>
 
 #### Palier 8 — Livre la MR2 (8 min)
 
 Relire le diff, pousser feat/manifest, ouvrir la MR et ne pas livrer de fichiers générés.
 
-**Où tu travailles :** MR GitLab
+**Où tu travailles :** Mac · workspaces/fileguard · MR GitLab
 
 **Pour comprendre**
 
@@ -846,7 +1235,7 @@ Relire le diff, pousser feat/manifest, ouvrir la MR et ne pas livrer de fichiers
 
 **Terminal · Relire l’état du dépôt**
 
-Terminal du parcours : reste à la racine du dépôt. Exécute ces lignes au moment demandé dans les actions, avec les modifications manuelles entre les blocs.
+Terminal du Mac, dans cyberatelier/workspaces/fileguard, venv Mac activé. Exécute chaque ligne au moment indiqué, avec les modifications manuelles entre les blocs.
 
 ```bash
 git status
@@ -873,7 +1262,30 @@ git pull --ff-only
 
 **Tu sais que c’est bon quand :** git status ne montre aucun manifest.json non suivi à commiter ; la MR contient les fichiers attendus ; main locale contient la fusion.
 
-*Indice si tu bloques :* Si git status montre manifest.json, ajoute-le à .gitignore plutôt que de le commiter, ou supprime-le avant le commit.
+**Indices progressifs**
+
+Depuis le terminal dans `cyberatelier`, `python3 atelier.py indice` révèle un niveau à la fois. Ouvre seulement le niveau nécessaire.
+
+<details>
+<summary>Indice 1</summary>
+
+MR2 livre le manifeste et ses tests sans transformer la démonstration en dépendance du runner.
+
+</details>
+
+<details>
+<summary>Indice 2</summary>
+
+Relance F1 à F7 avec leurs dossiers temporaires, relis les fixtures copiées et vérifie le pipeline du dernier commit.
+
+</details>
+
+<details>
+<summary>Indice 3</summary>
+
+Un runner peut passer F4 sur un dossier vide temporaire même sans fixtures/integrity ; ce test ne doit pas chercher ton dossier local.
+
+</details>
 
 **Avant de livrer**
 
@@ -897,7 +1309,7 @@ Tu distingues inchangé, modifié, supprimé et ajouté puis vérifies le résul
 
 Partir de la MR2 fusionnée, pour que la comparaison s’appuie sur le bon code.
 
-**Où tu travailles :** Dépôt
+**Où tu travailles :** Mac · workspaces/fileguard · Dépôt
 
 **Pour comprendre**
 
@@ -906,7 +1318,7 @@ Partir de la MR2 fusionnée, pour que la comparaison s’appuie sur le bon code.
 
 **Actions dans l’ordre**
 
-1. Ouvre workspaces/fileguard dans VS Code, ou Coder dans Cyber Atelier avec cwd sur « . ».
+1. Ouvre workspaces/fileguard dans VS Code. Dans le terminal du Mac, place-toi dans ce même dossier et active son venv avec source .venv/bin/activate.
 2. Vérifie que MR2 est fusionnée et que F1 à F7 passent sur main.
 3. Lis git status ; enregistre ton travail en cours avant de changer de branche.
 4. Reviens sur main avec git switch main, mets-la à jour avec git pull --ff-only, puis crée feat/comparaison. Remplace main par master si ton dépôt utilise ce nom.
@@ -914,7 +1326,7 @@ Partir de la MR2 fusionnée, pour que la comparaison s’appuie sur le bon code.
 
 **Terminal · Après la fusion : actualiser la principale**
 
-Terminal du parcours : reste à la racine du dépôt. Exécute ces lignes au moment demandé dans les actions, avec les modifications manuelles entre les blocs.
+Terminal du Mac, dans cyberatelier/workspaces/fileguard, venv Mac activé. Exécute chaque ligne au moment indiqué, avec les modifications manuelles entre les blocs.
 
 ```bash
 git switch main
@@ -940,13 +1352,36 @@ git status
 
 **Tu sais que c’est bon quand :** git status affiche « On branch feat/comparaison » et « nothing to commit ».
 
-*Indice si tu bloques :* Si la branche existe déjà, utilise git switch feat/comparaison, sans -c. Vérifie d’abord que MR2 apparaît bien dans git log.
+**Indices progressifs**
+
+Depuis le terminal dans `cyberatelier`, `python3 atelier.py indice` révèle un niveau à la fois. Ouvre seulement le niveau nécessaire.
+
+<details>
+<summary>Indice 1</summary>
+
+La comparaison s’ajoute au manifeste fusionné ; feat/comparaison doit partir de main à jour.
+
+</details>
+
+<details>
+<summary>Indice 2</summary>
+
+Vérifie F1 à F7 avant la nouvelle branche et retrouve la forme schema/files utilisée en MR2.
+
+</details>
+
+<details>
+<summary>Indice 3</summary>
+
+Une comparaison qui lit un autre format de manifeste ne teste pas la continuité du projet ; garde le même contrat de fichier.
+
+</details>
 
 #### Palier 2 — Comparer des ensembles de noms (8 min)
 
 Séparer présence et absence des noms, puis comparer les empreintes nom par nom.
 
-**Où tu travailles :** Contrat de comparer
+**Où tu travailles :** Mac · workspaces/fileguard · Contrat de comparer
 
 **Pour comprendre**
 
@@ -971,7 +1406,7 @@ Séparer présence et absence des noms, puis comparer les empreintes nom par nom
 
 **Terminal · Commande à lancer au moment indiqué**
 
-Terminal du parcours : reste à la racine du dépôt. Exécute ces lignes au moment demandé dans les actions, avec les modifications manuelles entre les blocs.
+Terminal du Mac, dans cyberatelier/workspaces/fileguard, venv Mac activé. Exécute chaque ligne au moment indiqué, avec les modifications manuelles entre les blocs.
 
 ```bash
 python3 -c "a = {'pomme', 'poire'}; b = {'poire', 'kiwi'}; print(a - b, b - a, a & b)"
@@ -979,13 +1414,36 @@ python3 -c "a = {'pomme', 'poire'}; b = {'poire', 'kiwi'}; print(a - b, b - a, a
 
 **Tu sais que c’est bon quand :** Tu sais dire, pour un nom, s’il est absent d’un côté, ou présent des deux côtés avec des empreintes différentes.
 
-*Indice si tu bloques :* Garde deux vues séparées : l’ensemble des noms d’un côté, un dictionnaire nom vers empreinte de l’autre. Compare les empreintes seulement pour les noms présents des deux côtés.
+**Indices progressifs**
+
+Depuis le terminal dans `cyberatelier`, `python3 atelier.py indice` révèle un niveau à la fois. Ouvre seulement le niveau nécessaire.
+
+<details>
+<summary>Indice 1</summary>
+
+Les ensembles permettent de distinguer noms communs, nouveaux et absents ; les empreintes servent ensuite aux noms communs.
+
+</details>
+
+<details>
+<summary>Indice 2</summary>
+
+Dessine deux colonnes, référence et dossier actuel, puis classe les noms avant de comparer leur contenu.
+
+</details>
+
+<details>
+<summary>Indice 3</summary>
+
+Référence {a,b} et actuel {b,c} donnent a absent, c nouveau et b commun ; seule l’empreinte de b décidera s’il est modifié.
+
+</details>
 
 #### Palier 3 — F8 : aucun changement (10 min)
 
 Écrire le premier cas de comparaison : tout est inchangé.
 
-**Où tu travailles :** fileguard.py ; verification.py
+**Où tu travailles :** Mac · workspaces/fileguard · fileguard.py ; verification.py
 
 **Pour comprendre**
 
@@ -1009,7 +1467,7 @@ L’entrée est ce que tu donnes au code ; l’attendu est ce que ton test doit 
 
 **Terminal · Commande à lancer au moment indiqué**
 
-Terminal du parcours : reste à la racine du dépôt. Exécute ces lignes au moment demandé dans les actions, avec les modifications manuelles entre les blocs.
+Terminal du Mac, dans cyberatelier/workspaces/fileguard, venv Mac activé. Exécute chaque ligne au moment indiqué, avec les modifications manuelles entre les blocs.
 
 ```bash
 python3 verification.py
@@ -1024,13 +1482,36 @@ git commit -m "Compare un dossier identique à son manifeste"
 
 **Tu sais que c’est bon quand :** F1 à F8 passent ; git log --oneline montre le commit.
 
-*Indice si tu bloques :* Crée le manifeste avec ta fonction de MR2 dans le dossier temporaire, puis compare : tu n’as pas besoin d’écrire les empreintes à la main.
+**Indices progressifs**
+
+Depuis le terminal dans `cyberatelier`, `python3 atelier.py indice` révèle un niveau à la fois. Ouvre seulement le niveau nécessaire.
+
+<details>
+<summary>Indice 1</summary>
+
+Un fichier commun avec la même empreinte est inchangé ; le résultat doit contenir les autres catégories aussi.
+
+</details>
+
+<details>
+<summary>Indice 2</summary>
+
+Écris F8 sans modifier le dossier entre création et vérification, puis vérifie les quatre catégories et leurs listes attendues.
+
+</details>
+
+<details>
+<summary>Indice 3</summary>
+
+Une référence note.txt avec empreinte X et un fichier actuel note.txt avec empreinte X donnent un inchangé et aucune autre catégorie.
+
+</details>
 
 #### Palier 4 — F9 et F10 : modifié et supprimé (10 min)
 
 Distinguer un fichier dont le contenu a changé d’un fichier qui a disparu.
 
-**Où tu travailles :** fileguard.py ; verification.py
+**Où tu travailles :** Mac · workspaces/fileguard · fileguard.py ; verification.py
 
 **Pour comprendre**
 
@@ -1058,7 +1539,7 @@ L’entrée est ce que tu donnes au code ; l’attendu est ce que ton test doit 
 
 **Terminal · Commande à lancer au moment indiqué**
 
-Terminal du parcours : reste à la racine du dépôt. Exécute ces lignes au moment demandé dans les actions, avec les modifications manuelles entre les blocs.
+Terminal du Mac, dans cyberatelier/workspaces/fileguard, venv Mac activé. Exécute chaque ligne au moment indiqué, avec les modifications manuelles entre les blocs.
 
 ```bash
 python3 verification.py
@@ -1073,13 +1554,36 @@ git commit -m "Classe les fichiers modifiés et supprimés"
 
 **Tu sais que c’est bon quand :** F1 à F10 passent.
 
-*Indice si tu bloques :* Pour F10, le manifeste garde le nom du fichier supprimé : l’inventaire courant, lui, ne le contient plus. Compare les deux ensembles de noms avant de comparer les empreintes.
+**Indices progressifs**
+
+Depuis le terminal dans `cyberatelier`, `python3 atelier.py indice` révèle un niveau à la fois. Ouvre seulement le niveau nécessaire.
+
+<details>
+<summary>Indice 1</summary>
+
+Modifié signifie nom présent et empreinte différente ; supprimé signifie nom de référence absent du dossier courant.
+
+</details>
+
+<details>
+<summary>Indice 2</summary>
+
+Écris F9 et F10 dans deux scénarios temporaires séparés pour observer chaque cause sans mélange.
+
+</details>
+
+<details>
+<summary>Indice 3</summary>
+
+note.txt passé d’empreinte X à Y est modifié ; note.txt introuvable est supprimé, même si un autre fichier contient les anciens octets.
+
+</details>
 
 #### Palier 5 — F11 et F12 : ajouté, puis plusieurs catégories (10 min)
 
 Gérer les nouveaux fichiers, puis vérifier que les quatre catégories restent exactes quand elles coexistent.
 
-**Où tu travailles :** fileguard.py ; verification.py
+**Où tu travailles :** Mac · workspaces/fileguard · fileguard.py ; verification.py
 
 **Pour comprendre**
 
@@ -1107,7 +1611,7 @@ L’entrée est ce que tu donnes au code ; l’attendu est ce que ton test doit 
 
 **Terminal · Commande à lancer au moment indiqué**
 
-Terminal du parcours : reste à la racine du dépôt. Exécute ces lignes au moment demandé dans les actions, avec les modifications manuelles entre les blocs.
+Terminal du Mac, dans cyberatelier/workspaces/fileguard, venv Mac activé. Exécute chaque ligne au moment indiqué, avec les modifications manuelles entre les blocs.
 
 ```bash
 python3 verification.py
@@ -1122,13 +1626,36 @@ git commit -m "Classe les fichiers ajoutés et les cas mêlés"
 
 **Tu sais que c’est bon quand :** F1 à F12 passent.
 
-*Indice si tu bloques :* Un nom ne doit jamais apparaître dans deux catégories à la fois. Vérifie-le dans F12 avec un assertEqual sur chaque liste.
+**Indices progressifs**
+
+Depuis le terminal dans `cyberatelier`, `python3 atelier.py indice` révèle un niveau à la fois. Ouvre seulement le niveau nécessaire.
+
+<details>
+<summary>Indice 1</summary>
+
+Un fichier nouveau est ajouté même si son contenu ressemble à un autre ; plusieurs catégories peuvent coexister.
+
+</details>
+
+<details>
+<summary>Indice 2</summary>
+
+Écris F11 puis le scénario mixte F12 ; compare chaque liste au lieu de vérifier seulement le nombre total.
+
+</details>
+
+<details>
+<summary>Indice 3</summary>
+
+Référence a/b et actuel a changé/c donnent a modifié, b supprimé, c ajouté ; aucun nom ne doit apparaître dans deux catégories incompatibles.
+
+</details>
 
 #### Palier 6 — F13 et F14 : manifeste vide et manifeste exclu (8 min)
 
 Vérifier les cas limites : un manifeste sans entrée, et un manifeste conservé à côté des données.
 
-**Où tu travailles :** fileguard.py ; verification.py
+**Où tu travailles :** Mac · workspaces/fileguard · fileguard.py ; verification.py
 
 **Pour comprendre**
 
@@ -1156,7 +1683,7 @@ L’entrée est ce que tu donnes au code ; l’attendu est ce que ton test doit 
 
 **Terminal · Commande à lancer au moment indiqué**
 
-Terminal du parcours : reste à la racine du dépôt. Exécute ces lignes au moment demandé dans les actions, avec les modifications manuelles entre les blocs.
+Terminal du Mac, dans cyberatelier/workspaces/fileguard, venv Mac activé. Exécute chaque ligne au moment indiqué, avec les modifications manuelles entre les blocs.
 
 ```bash
 python3 verification.py
@@ -1171,13 +1698,36 @@ git commit -m "Gère le manifeste vide et le manifeste exclu"
 
 **Tu sais que c’est bon quand :** F1 à F14 passent : les quatorze tests sont verts.
 
-*Indice si tu bloques :* Pour F14, l’exclusion doit s’appliquer à l’inventaire courant avant toute comparaison, pas seulement à l’affichage.
+**Indices progressifs**
+
+Depuis le terminal dans `cyberatelier`, `python3 atelier.py indice` révèle un niveau à la fois. Ouvre seulement le niveau nécessaire.
+
+<details>
+<summary>Indice 1</summary>
+
+Le manifeste vide reste un point de comparaison valide ; son propre fichier demeure exclu.
+
+</details>
+
+<details>
+<summary>Indice 2</summary>
+
+Écris F13 avec files=[] et F14 avec manifest.json présent, puis vérifie que seuls les vrais fichiers de données deviennent ajoutés.
+
+</details>
+
+<details>
+<summary>Indice 3</summary>
+
+Un dossier avec seulement manifest.json et une référence vide doit rester sans fichier ajouté ; le manifeste n’est pas une donnée surveillée.
+
+</details>
 
 #### Palier 7 — Commandes simples et affichage par catégorie (8 min)
 
 Relier la création et la vérification à une ligne de commande, sans parcourir le disque.
 
-**Où tu travailles :** fileguard.py
+**Où tu travailles :** Mac · workspaces/fileguard · fileguard.py
 
 **Pour comprendre**
 
@@ -1193,7 +1743,7 @@ Relier la création et la vérification à une ligne de commande, sans parcourir
 
 **Terminal · Commande à lancer au moment indiqué**
 
-Terminal du parcours : reste à la racine du dépôt. Exécute ces lignes au moment demandé dans les actions, avec les modifications manuelles entre les blocs.
+Terminal du Mac, dans cyberatelier/workspaces/fileguard, venv Mac activé. Exécute chaque ligne au moment indiqué, avec les modifications manuelles entre les blocs.
 
 ```bash
 python3 -c "import sys; print(sys.argv)" creer dossier
@@ -1220,13 +1770,36 @@ git commit -m "Ajoute les commandes creer et verifier"
 
 **Tu sais que c’est bon quand :** Les deux commandes s’exécutent sur le dossier donné et affichent les quatre catégories.
 
-*Indice si tu bloques :* Lis sys.argv[1] pour le nom de la commande, puis sys.argv[2] pour le dossier. Vérifie l’existence du dossier avant de rien écrire.
+**Indices progressifs**
+
+Depuis le terminal dans `cyberatelier`, `python3 atelier.py indice` révèle un niveau à la fois. Ouvre seulement le niveau nécessaire.
+
+<details>
+<summary>Indice 1</summary>
+
+Une commande de création et une commande de vérification ont deux effets différents ; l’affichage reprend les catégories calculées.
+
+</details>
+
+<details>
+<summary>Indice 2</summary>
+
+Relie les fonctions déjà testées aux commandes simples prévues et garde l’affichage distinct de la logique de comparaison.
+
+</details>
+
+<details>
+<summary>Indice 3</summary>
+
+Créer un inventaire enregistre une référence ; vérifier ensuite ne doit pas réécrire cette référence, sinon un changement serait effacé avant comparaison.
+
+</details>
 
 #### Palier 8 — Rédige le README (9 min)
 
 Expliquer le programme et ses limites à quelqu’un qui ne l’a pas écrit.
 
-**Où tu travailles :** README.md
+**Où tu travailles :** Mac · workspaces/fileguard · README.md
 
 **Pour comprendre**
 
@@ -1243,7 +1816,7 @@ Expliquer le programme et ses limites à quelqu’un qui ne l’a pas écrit.
 
 **Terminal · Enregistrer le travail vérifié**
 
-Terminal du parcours : reste à la racine du dépôt. Exécute ces lignes au moment demandé dans les actions, avec les modifications manuelles entre les blocs.
+Terminal du Mac, dans cyberatelier/workspaces/fileguard, venv Mac activé. Exécute chaque ligne au moment indiqué, avec les modifications manuelles entre les blocs.
 
 ```bash
 git add README.md
@@ -1252,13 +1825,36 @@ git commit -m "Documente FileGuard dans le README"
 
 **Tu sais que c’est bon quand :** Un lecteur qui ne connaît pas le projet sait lancer les commandes, lire le résultat et voir les limites.
 
-*Indice si tu bloques :* Relis le contrat du guide et vérifie que chaque point du README correspond à ce que ton code fait réellement.
+**Indices progressifs**
+
+Depuis le terminal dans `cyberatelier`, `python3 atelier.py indice` révèle un niveau à la fois. Ouvre seulement le niveau nécessaire.
+
+<details>
+<summary>Indice 1</summary>
+
+Le README précise la confiance dans le manifeste et les limites du premier niveau.
+
+</details>
+
+<details>
+<summary>Indice 2</summary>
+
+Donne tes commandes de création/vérification, les quatre catégories et le refus des liens, avec les chemins Mac testés.
+
+</details>
+
+<details>
+<summary>Indice 3</summary>
+
+Une empreinte constate une différence par rapport à la référence ; si quelqu’un change à la fois fichier et référence, cette comparaison peut ne rien signaler.
+
+</details>
 
 #### Palier 9 — Démonstration des quatre catégories, puis livraison (12 min)
 
 Montrer les quatre catégories sur un scénario, puis livrer la MR3 et fusionner le dernier commit vert.
 
-**Où tu travailles :** Dossier temporaire ; MR GitLab
+**Où tu travailles :** Mac · workspaces/fileguard · Dossier temporaire ; MR GitLab
 
 **Pour comprendre**
 
@@ -1278,7 +1874,7 @@ Montrer les quatre catégories sur un scénario, puis livrer la MR3 et fusionner
 
 **Terminal · Commande à lancer au moment indiqué**
 
-Terminal du parcours : reste à la racine du dépôt. Exécute ces lignes au moment demandé dans les actions, avec les modifications manuelles entre les blocs.
+Terminal du Mac, dans cyberatelier/workspaces/fileguard, venv Mac activé. Exécute chaque ligne au moment indiqué, avec les modifications manuelles entre les blocs.
 
 ```bash
 cp -r fixtures ~/demo_fileguard
@@ -1341,7 +1937,30 @@ git pull --ff-only
 
 **Tu sais que c’est bon quand :** La sortie de verifier range message.txt dans modifie, settings.ini dans supprime, nouveau.txt dans ajoute et README.txt dans inchange ; la MR3 est fusionnée après un pipeline vert.
 
-*Indice si tu bloques :* Si verifier ne trouve pas de manifeste, vérifie que creer a bien écrit manifest.json dans ~/demo_fileguard. Ne fusionne pas avant d’avoir relu le diff et vu le pipeline.
+**Indices progressifs**
+
+Depuis le terminal dans `cyberatelier`, `python3 atelier.py indice` révèle un niveau à la fois. Ouvre seulement le niveau nécessaire.
+
+<details>
+<summary>Indice 1</summary>
+
+La démonstration doit observer les quatre catégories avec des modifications explicites puis livrer une suite autonome.
+
+</details>
+
+<details>
+<summary>Indice 2</summary>
+
+Garde un fichier, modifie-en un, supprime-en un et ajoute-en un après la référence ; observe les catégories avant les tests et la MR.
+
+</details>
+
+<details>
+<summary>Indice 3</summary>
+
+Avec a inchangé, b modifié, c retiré et d créé, un bilan correct place chacun dans sa catégorie ; réécrire la référence trop tôt ferait disparaître ces différences.
+
+</details>
 
 **Avant de livrer**
 
@@ -1353,7 +1972,7 @@ git pull --ff-only
 
 ## Méthode GitLab
 
-Le dossier FileGuard est vide au départ. Clone le dépôt de l’école directement dans le dossier courant avec git clone <URL_DU_DEPOT> . avant de créer les fichiers. Le point signifie « ici ». Le terminal web repart du dossier courant explicite pour chaque commande ; un cd seul ne persiste pas. Pour Git interactif, utilise docker compose exec atelier bash depuis le dossier Cyber Atelier.
+Le dossier FileGuard est vide au départ. Clone le dépôt de l’école directement dans le dossier courant avec git clone <URL_DU_DEPOT> . avant de créer les fichiers. Le point signifie « ici ». Fais le clone dans le terminal du Mac, depuis workspaces/fileguard, uniquement si le dépôt n’existe pas encore. Le terminal conserve son cd et son activation de venv ; reste dans le dépôt du parcours pour Git et les tests.
 
 Utilise un dépôt autorisé par l’école, un runner actif sur les MR des branches non protégées et les droits convenus pour les règles de fusion. Pour chaque MR, crée la branche depuis la principale actualisée, exécute la même commande de tests localement et en CI, lis le diff, puis ouvre la MR. Fusionne uniquement le dernier commit vert. Après chaque fusion, actualise la principale avant l’étape suivante.
 

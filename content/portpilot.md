@@ -10,7 +10,7 @@ Le parcours complet et les définitions détaillées des fonctions et des huit t
 
 Utilise le dépôt autorisé par ton école, son URL et sa branche principale (main ou master). Il te faut Python 3, Git, un runner GitLab actif utilisable par les branches de MR et les droits nécessaires aux règles de fusion. Sans runner ou accès aux règles, tu peux développer et exécuter les tests localement, mais la CI bloquante reste non validée.
 
-Le dossier de cours dans Cyber Atelier est vide. Clone le dépôt de l’école directement dans ce dossier avant de créer tes fichiers, avec git clone <URL_DU_DEPOT> . (le point signifie « ici »). Ainsi, le dépôt ne se retrouve pas dans un sous-dossier. Le terminal web lance chaque commande dans le dossier courant explicite et ne garde pas un cd d’une commande à la suivante. Pour une session Git interactive, ouvre un terminal de ta machine et lance docker compose exec atelier bash depuis le dossier de Cyber Atelier. Initialise le dépôt avec README.md et .gitignore ; ce dernier exclut les caches Python et portpilot.zip. Protège la branche principale selon les règles de l’école : pas de push direct, force push désactivé, fusion après pipeline réussi et option pipeline ignoré comme réussi désactivée. Vérifie que le runner accepte les jobs de branches non protégées et les tags demandés.
+Depuis le terminal du Mac dans workspaces/portpilot, clone le dépôt de l’école seulement si ton exercice n’existe pas encore, avec git clone <URL_DU_DEPOT> . après remplacement de l’URL (le point signifie « ici »). Ainsi, le dépôt ne se retrouve pas dans un sous-dossier. Si tu as déjà commencé, conserve ton dépôt, ta branche et tes fichiers. Le terminal du Mac conserve son cd et l’activation du venv ; Git et les tests s’exécutent ici. Initialise le dépôt avec README.md et .gitignore ; ce dernier exclut .venv/, les caches Python et portpilot.zip. Protège la branche principale selon les règles de l’école : pas de push direct, force push désactivé, fusion après pipeline réussi et option pipeline ignoré comme réussi désactivée. Vérifie que le runner accepte les jobs de branches non protégées et les tags demandés.
 
 ## Contrats Python
 
@@ -33,17 +33,84 @@ Ces exercices sont ton entraînement. Chaque palier explique les notions utiles,
 2. Les cartes de tests donnent l’entrée et le résultat attendu. Écris les tests correspondants dans le fichier indiqué ; cocher un palier ne les exécute pas. Avec unittest, « Ran 0 tests » signifie qu’aucun test n’a été exécuté : ce n’est pas une validation. Un cas décrit peut contenir plusieurs valeurs ; le nombre de méthodes Python n’est donc pas forcément le nombre d’identifiants.
 3. Suis les actions numérotées, une à la fois. Les exemples servent à apprendre une notion ; tu écris toi-même la solution de l’exercice. Les blocs Terminal donnent les commandes à lancer au moment indiqué.
 4. Vérifie le résultat indiqué avant de poursuivre. Un échec attendu (phase rouge, argument refusé ou conflit volontaire) est expliqué dans le palier.
-5. Si tu bloques, lis la dernière ligne de l’erreur, compare l’entrée et l’attendu, puis ouvre l’indice. Fais un petit changement et relance.
+5. Si tu bloques, lis la dernière ligne de l’erreur, compare entrée et attendu, puis demande un seul indice à la fois avec python3 atelier.py indice depuis cyberatelier. Les trois niveaux vont du rappel à un petit exemple ; ils ne donnent pas une fonction corrigée.
 
 ### Le bon endroit pour chaque action
 
-Sur ton Mac, ouvre `workspaces/portpilot` dans VS Code. Dans Cyber Atelier, utilise l’éditeur et la console de **Coder**, avec `cwd` sur `.` (la racine du dépôt). Fais la préparation de **Environnement** avant MR1 ; la mission crée ensuite sa branche.
+Ouvre `workspaces/portpilot` dans VS Code et un terminal du Mac dans ce même dossier. Tu écris et testes le code ici, dans le dépôt Git de l’exercice. Ouvre un second terminal dans `cyberatelier` pour lire les consignes avec `python3 atelier.py voir` et piloter Docker. Le site reste disponible pour la lecture ; l’onglet Coder est facultatif.
 
-Le code Python se place dans l’éditeur. Les commandes `docker compose ...` se lancent sur ton Mac depuis `cyberatelier` ; `/app/...` existe dans le conteneur. Le laboratoire interrogé doit tourner dans le même environnement que ton programme.
+Depuis `cyberatelier`, `mkdir -p workspaces/portpilot` puis `cd workspaces/portpilot` permet de rejoindre le dossier du parcours. S’il contient déjà ton exercice, garde ses fichiers, sa branche et son dépôt : ne le reclone pas. La préparation ci-dessous se fait une fois ; la mission crée ensuite sa branche.
 
-La console web repart à neuf à chaque exécution : un `cd`, une activation de venv ou `echo $?` ne se transmet pas à la commande suivante. Lance le programme et `echo $?` ensemble quand le palier le demande. Le nombre affiché par echo est celui du programme ; la console peut afficher code 0 pour echo lui-même.
+Le code Python se place dans VS Code et doit être enregistré avant les tests. Les commandes `docker compose ...` et `python3 atelier.py ...` se lancent depuis `cyberatelier`. Leurs appels Docker entrent dans le conteneur ; `/app/fixtures`, `/app/tools` et `/workspaces` sont des chemins internes à celui-ci. Depuis le dépôt d’exercice sur le Mac, les fixtures fournies sont dans `../../fixtures`.
 
-Un venv créé sur le Mac ne fonctionne pas dans le conteneur : utilise `python3` dans ce dernier. Remplace `main` par `master` si nécessaire. Si une branche existe déjà, reprends-la avec `git switch NOM` sans `-c`. Après chaque fusion, actualise la branche principale avant la mission suivante.
+Le terminal du Mac conserve son `cd` et son activation de venv. Active `.venv` dans chaque nouveau terminal d’exercice ; `python3` utilise alors ce venv, ou appelle `.venv/bin/python` explicitement. Lis `echo $?` immédiatement après le programme dont tu veux le code, avant toute autre commande. Ajoute `.venv/` à `.gitignore` avant `git add`.
+
+PortPilot et HeaderScope exécutés sur le Mac : lance `python3 labs.py` depuis `cyberatelier` dans un autre terminal et garde-le ouvert ; Ctrl+C arrête ce labo Mac. Les outils ToolWrap et les démos ReconWrap tournent dans Docker : `python3 atelier.py labo demarrer`, `labo arreter` et `labo statut` depuis `cyberatelier` pilotent uniquement le labo Docker. Le même numéro 8000 ne relie pas automatiquement les deux environnements.
+
+Un venv créé sur le Mac ne fonctionne pas dans Docker : les démos dans le conteneur utilisent son `python3`. Le dossier hôte `workspaces` doit être monté dans Docker pour que les démos ReconWrap lisent ton code ; conserve le `compose.override.yaml` du mode VS Code. Remplace `main` par `master` si nécessaire. Si une branche existe, reprends-la avec `git switch NOM` sans `-c`. Après chaque fusion, actualise la principale dans le dépôt du parcours avant la mission suivante.
+
+### Préparation sur le Mac
+
+**Vérifier Python**
+
+Terminal du Mac, dans cyberatelier/workspaces/portpilot.
+
+```bash
+python3 --version
+```
+
+Python 3 doit être installé sur ton Mac. Ce parcours utilise seulement sa bibliothèque standard ; aucun pip install n’est demandé.
+
+**Vérifier Git**
+
+Terminal du Mac, dans cyberatelier/workspaces/portpilot.
+
+```bash
+git --version
+```
+
+Vérifie Git sur ton Mac. Les commandes du parcours agissent sur ce dépôt d’exercice, distinct du dépôt cyberatelier.
+
+**Configurer ton identité Git (une seule fois)**
+
+Terminal du Mac, dans cyberatelier/workspaces/portpilot.
+
+```bash
+git config --global user.name "Prénom Nom" && git config --global user.email "adresse@ecole.example"
+```
+
+Remplace les deux valeurs d’exemple par ton nom et l’adresse de ton compte scolaire. Cette configuration globale est enregistrée sur ton Mac ; sans identité, git commit refuse le commit.
+
+**Cloner le dépôt**
+
+Terminal du Mac, dans cyberatelier/workspaces/portpilot.
+
+```bash
+git clone <URL_DU_DEPOT> .
+```
+
+Depuis le terminal du Mac dans workspaces/portpilot, clone seulement si le dossier est vide et n’a pas encore de dépôt. Remplace <URL_DU_DEPOT> par l’URL autorisée réelle avant exécution ; le point signifie « ici ». Si ton exercice existe déjà, garde-le et passe directement à git status. HTTPS ou SSH peut demander une saisie dans ce terminal.
+
+**Créer le venv**
+
+Terminal du Mac, dans cyberatelier/workspaces/portpilot.
+
+```bash
+python3 -m venv .venv
+source .venv/bin/activate
+```
+
+Après le clone, crée ce venv sur le Mac une seule fois ; s’il existe, active-le simplement. L’activation reste valable dans ce terminal. Dans un nouveau terminal, réactive-le ou appelle .venv/bin/python. Ajoute .venv/ à .gitignore avant git add. Aucun paquet pip n’est nécessaire.
+
+**Vérifier le dépôt cloné**
+
+Terminal du Mac, dans cyberatelier/workspaces/portpilot.
+
+```bash
+git status
+```
+
+Après le clone, vérifie que tu es sur la branche principale (main ou master) et que le dépôt est propre.
 
 ### Les mots utiles
 
@@ -114,7 +181,7 @@ Tu prouves aussi qu’une régression rend le pipeline rouge et bloque la fusion
 
 Créer la branche de la MR depuis une branche principale à jour, sans rien emporter d’inutile.
 
-**Où tu travailles :** Dépôt
+**Où tu travailles :** Mac · workspaces/portpilot · Dépôt
 
 **Pour comprendre**
 
@@ -123,15 +190,15 @@ Créer la branche de la MR depuis une branche principale à jour, sans rien empo
 
 **Actions dans l’ordre**
 
-1. Ouvre workspaces/portpilot dans VS Code, ou Coder dans Cyber Atelier avec cwd sur « . ».
-2. Termine la préparation de l’onglet Environnement avant de commencer.
+1. Ouvre workspaces/portpilot dans VS Code. Dans le terminal du Mac, place-toi dans ce même dossier et active son venv avec source .venv/bin/activate.
+2. Termine la préparation décrite au début du guide avant de commencer.
 3. Lis git status ; enregistre ton travail en cours avant de changer de branche.
 4. Reviens sur main avec git switch main, mets-la à jour avec git pull --ff-only, puis crée feat/validation. Remplace main par master si ton dépôt utilise ce nom.
 5. Vérifie le nom de ta branche avec git status. Si elle existe déjà, reprends-la avec git switch sans -c.
 
 **Terminal · Relire l’état du dépôt**
 
-Terminal du parcours : reste à la racine du dépôt. Exécute ces lignes au moment demandé dans les actions, avec les modifications manuelles entre les blocs.
+Terminal du Mac, dans cyberatelier/workspaces/portpilot, venv Mac activé. Exécute chaque ligne au moment indiqué, avec les modifications manuelles entre les blocs.
 
 ```bash
 git status
@@ -163,13 +230,36 @@ git status
 
 **Tu sais que c’est bon quand :** git status affiche « On branch feat/validation » et « nothing to commit, working tree clean ».
 
-*Indice si tu bloques :* Si git pull --ff-only refuse, c’est que ta branche principale locale a des commits qui ne viennent pas du dépôt de l’école : ne force rien, demande de l’aide avant de continuer. Si git status signale des fichiers modifiés, lis-les avec git diff avant de décider quoi faire.
+**Indices progressifs**
+
+Depuis le terminal dans `cyberatelier`, `python3 atelier.py indice` révèle un niveau à la fois. Ouvre seulement le niveau nécessaire.
+
+<details>
+<summary>Indice 1</summary>
+
+La branche de validation appartient au dépôt PortPilot ; elle doit partir de la principale à jour.
+
+</details>
+
+<details>
+<summary>Indice 2</summary>
+
+Vérifie pwd, git status et l’absence de changement oublié avant de créer feat/validation.
+
+</details>
+
+<details>
+<summary>Indice 3</summary>
+
+Dans workspaces/portpilot, git branch --show-current doit montrer la branche de cet exercice ; celle du dossier cyberatelier est un autre dépôt.
+
+</details>
 
 #### Palier 2 — Premier test rouge : T1 (10 min)
 
 Écrire un test qui appelle valider_ports, le voir échouer, et comprendre ce qui fait échouer un test.
 
-**Où tu travailles :** verification.py
+**Où tu travailles :** Mac · workspaces/portpilot · verification.py
 
 **Pour comprendre**
 
@@ -178,7 +268,7 @@ git status
 
 **Éditeur · Exemple Python à lire ou essayer**
 
-Éditeur : copie cet exemple dans exemple.py (jetable), enregistre-le, puis lance python3 exemple.py. Si plusieurs exemples sont proposés, essaie-les un par un en remplaçant le contenu du fichier. Retire ensuite les fichiers générés et le fichier d’exemple.
+VS Code sur le Mac : copie cet exemple dans exemple.py (jetable), enregistre-le, puis lance python3 exemple.py. Si plusieurs exemples sont proposés, essaie-les un par un en remplaçant le contenu du fichier. Retire ensuite les fichiers générés et le fichier d’exemple.
 
 ```python
 def doubler(n):
@@ -205,7 +295,7 @@ L’entrée est ce que tu donnes au code ; l’attendu est ce que ton test doit 
 
 **Terminal · Commande à lancer au moment indiqué**
 
-Terminal du parcours : reste à la racine du dépôt. Exécute ces lignes au moment demandé dans les actions, avec les modifications manuelles entre les blocs.
+Terminal du Mac, dans cyberatelier/workspaces/portpilot, venv Mac activé. Exécute chaque ligne au moment indiqué, avec les modifications manuelles entre les blocs.
 
 ```bash
 python3 verification.py
@@ -213,13 +303,36 @@ python3 verification.py
 
 **Tu sais que c’est bon quand :** python3 verification.py se termine par une erreur (ModuleNotFoundError ou AssertionError). Tu sais dire pourquoi.
 
-*Indice si tu bloques :* Lis la dernière ligne du message d’erreur : elle indique le module manquant ou la valeur qui ne correspond pas. Pour l’exemple doubler, remplace 8 par 9 si tu veux voir un assert échouer, puis remets 8.
+**Indices progressifs**
+
+Depuis le terminal dans `cyberatelier`, `python3 atelier.py indice` révèle un niveau à la fois. Ouvre seulement le niveau nécessaire.
+
+<details>
+<summary>Indice 1</summary>
+
+Un premier test rouge doit échouer pour la cause prévue : une fonction pas encore implémentée.
+
+</details>
+
+<details>
+<summary>Indice 2</summary>
+
+Écris T1 avant valider_ports et lance explicitement la vérification ; lis l’échec pour distinguer fonction absente et erreur de syntaxe du test.
+
+</details>
+
+<details>
+<summary>Indice 3</summary>
+
+Un test de somme attend 5 pour [2, 3] ; un NameError sur somme montre la fonction absente, pas encore une mauvaise addition.
+
+</details>
 
 #### Palier 3 — T1 vert : le minimum de code (10 min)
 
 Écrire le minimum de code qui fait passer T1, puis faire ton premier commit de code.
 
-**Où tu travailles :** portpilot.py ; verification.py
+**Où tu travailles :** Mac · workspaces/portpilot · portpilot.py ; verification.py
 
 **Pour comprendre**
 
@@ -257,7 +370,7 @@ La validation ne trie pas la liste et ne transforme pas les éléments.
 
 **Terminal · Commande à lancer au moment indiqué**
 
-Terminal du parcours : reste à la racine du dépôt. Exécute ces lignes au moment demandé dans les actions, avec les modifications manuelles entre les blocs.
+Terminal du Mac, dans cyberatelier/workspaces/portpilot, venv Mac activé. Exécute chaque ligne au moment indiqué, avec les modifications manuelles entre les blocs.
 
 ```bash
 python3 verification.py
@@ -284,13 +397,36 @@ git log --oneline
 
 **Tu sais que c’est bon quand :** verification.py affiche T1 comme réussi, et git log --oneline montre ton commit « Ajoute valider_ports et le test T1 ».
 
-*Indice si tu bloques :* Le minimum de code n’est pas la solution finale : les règles suivantes arriveront palier après palier, chacune avec son test. Un commit par palier de code garde l’historique lisible.
+**Indices progressifs**
+
+Depuis le terminal dans `cyberatelier`, `python3 atelier.py indice` révèle un niveau à la fois. Ouvre seulement le niveau nécessaire.
+
+<details>
+<summary>Indice 1</summary>
+
+Une fonction pure rend une valeur sans ouvrir de connexion ; T1 ne demande encore que les valeurs valides.
+
+</details>
+
+<details>
+<summary>Indice 2</summary>
+
+Fais retourner la liste valide dans le même ordre, puis relance le test sans ajouter de connexion ni d’affichage.
+
+</details>
+
+<details>
+<summary>Indice 3</summary>
+
+Un validateur de tailles peut accepter [4, 2] et rendre [4, 2] ; les trier en [2, 4] changerait un contrat qui conserve l’ordre.
+
+</details>
 
 #### Palier 4 — Code de sortie et T2 : la liste vide (10 min)
 
 Comprendre pourquoi un processus doit rendre un code non nul en cas d’échec, puis écrire T2.
 
-**Où tu travailles :** portpilot.py ; verification.py
+**Où tu travailles :** Mac · workspaces/portpilot · portpilot.py ; verification.py
 
 **Pour comprendre**
 
@@ -299,7 +435,7 @@ Comprendre pourquoi un processus doit rendre un code non nul en cas d’échec, 
 
 **Éditeur · Exemple Python à lire ou essayer**
 
-Éditeur : copie cet exemple dans exemple.py (jetable), enregistre-le, puis lance python3 exemple.py. Si plusieurs exemples sont proposés, essaie-les un par un en remplaçant le contenu du fichier. Retire ensuite les fichiers générés et le fichier d’exemple.
+VS Code sur le Mac : copie cet exemple dans exemple.py (jetable), enregistre-le, puis lance python3 exemple.py. Si plusieurs exemples sont proposés, essaie-les un par un en remplaçant le contenu du fichier. Retire ensuite les fichiers générés et le fichier d’exemple.
 
 ```python
 import sys
@@ -341,7 +477,7 @@ L’entrée est ce que tu donnes au code ; l’attendu est ce que ton test doit 
 
 **Terminal · Commande à lancer au moment indiqué**
 
-Terminal du parcours : reste à la racine du dépôt. Exécute ces lignes au moment demandé dans les actions, avec les modifications manuelles entre les blocs. Lance le programme et echo $? ensemble : le nombre affiché est le code du programme ; la console peut afficher code 0 pour echo lui-même.
+Terminal du Mac, dans cyberatelier/workspaces/portpilot, venv Mac activé. Exécute chaque ligne au moment indiqué, avec les modifications manuelles entre les blocs. Lis le code de sortie immédiatement après le programme, avant toute autre commande.
 
 ```bash
 python3 exemple.py; echo $?
@@ -355,7 +491,7 @@ python3 verification.py; echo $?
 
 **Terminal · Enregistrer le travail vérifié**
 
-Terminal du parcours : reste à la racine du dépôt. Exécute ces lignes au moment demandé dans les actions, avec les modifications manuelles entre les blocs.
+Terminal du Mac, dans cyberatelier/workspaces/portpilot, venv Mac activé. Exécute chaque ligne au moment indiqué, avec les modifications manuelles entre les blocs.
 
 ```bash
 git add portpilot.py verification.py
@@ -364,13 +500,36 @@ git commit -m "Rejette la liste vide dans valider_ports"
 
 **Tu sais que c’est bon quand :** python3 verification.py; echo $? affiche 0 quand tout passe et une valeur non nulle quand une assertion est ratée. T2 passe.
 
-*Indice si tu bloques :* Pour savoir si une exception a bien été levée, un bloc try avec except ValueError ne suffit pas : il faut aussi traiter le cas où rien n’est levé. Le mot-clé else d’un try peut t’aider. Ne mets pas python -O : il désactive les assert.
+**Indices progressifs**
+
+Depuis le terminal dans `cyberatelier`, `python3 atelier.py indice` révèle un niveau à la fois. Ouvre seulement le niveau nécessaire.
+
+<details>
+<summary>Indice 1</summary>
+
+Le code de sortie informe le terminal de l’échec de la suite ; une exception attendue doit être réellement vérifiée.
+
+</details>
+
+<details>
+<summary>Indice 2</summary>
+
+Fais échouer volontairement une assertion pour vérifier le code non nul, puis teste que la liste vide lève ValueError et restaure le bon attendu.
+
+</details>
+
+<details>
+<summary>Indice 3</summary>
+
+Après python3 -c 'import sys; sys.exit(7)', echo $? affiche 7 si aucune autre commande n’est passée entre les deux.
+
+</details>
 
 #### Palier 5 — T3 et T5 : onze ports, doublon (10 min)
 
 Ajouter deux règles simples (limite de nombre et unicité), chacune avec son test.
 
-**Où tu travailles :** portpilot.py ; verification.py
+**Où tu travailles :** Mac · workspaces/portpilot · portpilot.py ; verification.py
 
 **Pour comprendre**
 
@@ -379,7 +538,7 @@ Ajouter deux règles simples (limite de nombre et unicité), chacune avec son te
 
 **Éditeur · Exemple Python à lire ou essayer**
 
-Éditeur : copie cet exemple dans exemple.py (jetable), enregistre-le, puis lance python3 exemple.py. Si plusieurs exemples sont proposés, essaie-les un par un en remplaçant le contenu du fichier. Retire ensuite les fichiers générés et le fichier d’exemple.
+VS Code sur le Mac : copie cet exemple dans exemple.py (jetable), enregistre-le, puis lance python3 exemple.py. Si plusieurs exemples sont proposés, essaie-les un par un en remplaçant le contenu du fichier. Retire ensuite les fichiers générés et le fichier d’exemple.
 
 ```python
 fruits = ["pomme", "poire", "pomme"]
@@ -409,7 +568,7 @@ L’entrée est ce que tu donnes au code ; l’attendu est ce que ton test doit 
 
 **Terminal · Commande à lancer au moment indiqué**
 
-Terminal du parcours : reste à la racine du dépôt. Exécute ces lignes au moment demandé dans les actions, avec les modifications manuelles entre les blocs.
+Terminal du Mac, dans cyberatelier/workspaces/portpilot, venv Mac activé. Exécute chaque ligne au moment indiqué, avec les modifications manuelles entre les blocs.
 
 ```bash
 python3 verification.py
@@ -424,13 +583,36 @@ git commit -m "Limite à dix ports et refuse les doublons"
 
 **Tu sais que c’est bon quand :** T1, T2, T3 et T5 passent, et python3 verification.py se termine avec le code 0.
 
-*Indice si tu bloques :* Compare la longueur de la liste à ce qui est autorisé avant de tester les doublons. Pour les doublons, compare le nombre d’éléments de la liste avec celui de la version en ensemble : c’est une idée, pas la fonction finale.
+**Indices progressifs**
+
+Depuis le terminal dans `cyberatelier`, `python3 atelier.py indice` révèle un niveau à la fois. Ouvre seulement le niveau nécessaire.
+
+<details>
+<summary>Indice 1</summary>
+
+Le nombre d’éléments et l’unicité sont deux règles distinctes ; un doublon compte quand même comme deux éléments reçus.
+
+</details>
+
+<details>
+<summary>Indice 2</summary>
+
+Écris séparément T3 avec onze ports et T5 avec deux occurrences du même port, sans remplacer la liste par un ensemble avant tous les contrôles.
+
+</details>
+
+<details>
+<summary>Indice 3</summary>
+
+[3, 3] contient deux valeurs mais un seul élément distinct ; len([3, 3]) vaut 2 et len(set([3, 3])) vaut 1.
+
+</details>
 
 #### Palier 6 — T4 : six valeurs invalides, testées séparément (10 min)
 
 Tester chaque valeur invalide dans sa propre liste, et comprendre pourquoi bool passe pour un entier.
 
-**Où tu travailles :** portpilot.py ; verification.py
+**Où tu travailles :** Mac · workspaces/portpilot · portpilot.py ; verification.py
 
 **Pour comprendre**
 
@@ -439,7 +621,7 @@ Tester chaque valeur invalide dans sa propre liste, et comprendre pourquoi bool 
 
 **Éditeur · Exemple Python à lire ou essayer**
 
-Éditeur : copie cet exemple dans exemple.py (jetable), enregistre-le, puis lance python3 exemple.py. Si plusieurs exemples sont proposés, essaie-les un par un en remplaçant le contenu du fichier. Retire ensuite les fichiers générés et le fichier d’exemple.
+VS Code sur le Mac : copie cet exemple dans exemple.py (jetable), enregistre-le, puis lance python3 exemple.py. Si plusieurs exemples sont proposés, essaie-les un par un en remplaçant le contenu du fichier. Retire ensuite les fichiers générés et le fichier d’exemple.
 
 ```python
 print(isinstance(3, int))
@@ -465,7 +647,7 @@ L’entrée est ce que tu donnes au code ; l’attendu est ce que ton test doit 
 
 **Terminal · Commande à lancer au moment indiqué**
 
-Terminal du parcours : reste à la racine du dépôt. Exécute ces lignes au moment demandé dans les actions, avec les modifications manuelles entre les blocs.
+Terminal du Mac, dans cyberatelier/workspaces/portpilot, venv Mac activé. Exécute chaque ligne au moment indiqué, avec les modifications manuelles entre les blocs.
 
 ```bash
 python3 verification.py
@@ -480,13 +662,36 @@ git commit -m "Refuse les valeurs invalides, booléens compris"
 
 **Tu sais que c’est bon quand :** Les six sous-cas de T4 passent séparément ; le nom d’un cas en échec serait affiché.
 
-*Indice si tu bloques :* Un booléen est une sorte d’entier pour Python. Refuse d’abord True et False avant d’accepter un entier. Pour le décimal, écris bien 80.5 en Python : 80,5 seul serait une liste de deux entiers.
+**Indices progressifs**
+
+Depuis le terminal dans `cyberatelier`, `python3 atelier.py indice` révèle un niveau à la fois. Ouvre seulement le niveau nécessaire.
+
+<details>
+<summary>Indice 1</summary>
+
+En Python, bool est un sous-type de int ; un contrôle de type trop large peut accepter True.
+
+</details>
+
+<details>
+<summary>Indice 2</summary>
+
+Prends chaque valeur de T4 dans une liste à un élément, puis distingue type incorrect et entier hors des bornes autorisées.
+
+</details>
+
+<details>
+<summary>Indice 3</summary>
+
+isinstance(True, int) vaut True ; un validateur de quantité qui veut des entiers ordinaires doit décider explicitement du sort des booléens.
+
+</details>
 
 #### Palier 7 — CI : fichier, MR et premier pipeline vert (10 min)
 
 Relier la même commande à GitLab : un job qui n’exécute que sur les merge requests, puis une première MR verte.
 
-**Où tu travailles :** .gitlab-ci.yml ; MR GitLab
+**Où tu travailles :** Mac · workspaces/portpilot · .gitlab-ci.yml ; MR GitLab
 
 **Pour comprendre**
 
@@ -504,7 +709,7 @@ Relier la même commande à GitLab : un job qui n’exécute que sur les merge r
 
 **Terminal · Enregistrer le travail vérifié**
 
-Terminal du parcours : reste à la racine du dépôt. Exécute ces lignes au moment demandé dans les actions, avec les modifications manuelles entre les blocs.
+Terminal du Mac, dans cyberatelier/workspaces/portpilot, venv Mac activé. Exécute chaque ligne au moment indiqué, avec les modifications manuelles entre les blocs.
 
 ```bash
 git add .gitlab-ci.yml
@@ -525,13 +730,36 @@ git log --oneline -1
 
 **Tu sais que c’est bon quand :** La MR existe, son pipeline tourne sur le dernier commit et le job verifier est vert. Ce vert est un résultat de pipeline, pas un test local.
 
-*Indice si tu bloques :* Si aucun pipeline ne se lance, vérifie la règle merge_request_event et que la MR est bien ouverte depuis feat/validation. Un test local réussi ne suffit pas : ce qui compte pour la fusion est le pipeline du dernier commit de la MR.
+**Indices progressifs**
+
+Depuis le terminal dans `cyberatelier`, `python3 atelier.py indice` révèle un niveau à la fois. Ouvre seulement le niveau nécessaire.
+
+<details>
+<summary>Indice 1</summary>
+
+La CI est une exécution sur le runner ; un YAML valide et un test local réussi ne prouvent pas que le job a tourné.
+
+</details>
+
+<details>
+<summary>Indice 2</summary>
+
+Choisis la commande de tests et les règles limitées aux MR, pousse la branche et ouvre les journaux du vrai job sur le dernier commit.
+
+</details>
+
+<details>
+<summary>Indice 3</summary>
+
+Un journal « commande introuvable » signifie que le runner a démarré le job mais n’a pas exécuté tes tests ; une icône de pipeline seule ne suffit pas.
+
+</details>
 
 #### Palier 8 — Régression, rouge bloquant, correction et fusion (10 min)
 
 Observer qu’un pipeline rouge bloque la fusion, corriger le code sans toucher aux tests, puis fusionner le dernier commit vert.
 
-**Où tu travailles :** portpilot.py ; MR GitLab
+**Où tu travailles :** Mac · workspaces/portpilot · portpilot.py ; MR GitLab
 
 **Pour comprendre**
 
@@ -549,7 +777,7 @@ Observer qu’un pipeline rouge bloque la fusion, corriger le code sans toucher 
 
 **Terminal · Relire l’état du dépôt**
 
-Terminal du parcours : reste à la racine du dépôt. Exécute ces lignes au moment demandé dans les actions, avec les modifications manuelles entre les blocs.
+Terminal du Mac, dans cyberatelier/workspaces/portpilot, venv Mac activé. Exécute chaque ligne au moment indiqué, avec les modifications manuelles entre les blocs.
 
 ```bash
 git diff
@@ -595,7 +823,30 @@ git pull --ff-only
 
 **Tu sais que c’est bon quand :** Tu as un pipeline rouge avec son lien et son motif, puis un pipeline vert sur le dernier commit, et la MR est fusionnée. Un rouge bloque la fusion ; un vert seul ne prouve pas qu’elle est autorisée.
 
-*Indice si tu bloques :* La régression doit venir du code, jamais des tests : si tu modifies un test pour le faire passer, tu affaiblis la vérification. Le message de blocage et la règle de fusion sont à lire dans l’interface GitLab de la MR.
+**Indices progressifs**
+
+Depuis le terminal dans `cyberatelier`, `python3 atelier.py indice` révèle un niveau à la fois. Ouvre seulement le niveau nécessaire.
+
+<details>
+<summary>Indice 1</summary>
+
+Le gate doit refuser une fusion à cause d’un pipeline échoué, puis autoriser la version corrigée.
+
+</details>
+
+<details>
+<summary>Indice 2</summary>
+
+Introduis la régression prévue, observe le motif de blocage avec les droits adaptés, corrige et vérifie le dernier commit vert avant fusion.
+
+</details>
+
+<details>
+<summary>Indice 3</summary>
+
+Une MR bloquée pour manque de droits resterait bloquée même avec des tests verts ; cette observation ne prouve pas le gate lié aux tests.
+
+</details>
 
 **Avant de livrer**
 
@@ -618,7 +869,7 @@ Cette fonction sera appelée pour chaque port en MR3. Avance dans l’ordre des 
 
 Créer la branche de la MR 2 depuis la branche principale qui contient déjà la MR 1 fusionnée.
 
-**Où tu travailles :** Dépôt
+**Où tu travailles :** Mac · workspaces/portpilot · Dépôt
 
 **Pour comprendre**
 
@@ -627,7 +878,7 @@ Créer la branche de la MR 2 depuis la branche principale qui contient déjà la
 
 **Actions dans l’ordre**
 
-1. Ouvre workspaces/portpilot dans VS Code, ou Coder dans Cyber Atelier avec cwd sur « . ».
+1. Ouvre workspaces/portpilot dans VS Code. Dans le terminal du Mac, place-toi dans ce même dossier et active son venv avec source .venv/bin/activate.
 2. Vérifie que MR1 est fusionnée.
 3. Lis git status ; enregistre ton travail en cours avant de changer de branche.
 4. Reviens sur main avec git switch main, mets-la à jour avec git pull --ff-only, puis crée feat/connexion. Remplace main par master si ton dépôt utilise ce nom.
@@ -636,7 +887,7 @@ Créer la branche de la MR 2 depuis la branche principale qui contient déjà la
 
 **Terminal · Relire l’état du dépôt**
 
-Terminal du parcours : reste à la racine du dépôt. Exécute ces lignes au moment demandé dans les actions, avec les modifications manuelles entre les blocs.
+Terminal du Mac, dans cyberatelier/workspaces/portpilot, venv Mac activé. Exécute chaque ligne au moment indiqué, avec les modifications manuelles entre les blocs.
 
 ```bash
 git status
@@ -662,7 +913,7 @@ git switch -c feat/connexion
 
 **Terminal · Commande à lancer au moment indiqué**
 
-Terminal du parcours : reste à la racine du dépôt. Exécute ces lignes au moment demandé dans les actions, avec les modifications manuelles entre les blocs. Lance le programme et echo $? ensemble : le nombre affiché est le code du programme ; la console peut afficher code 0 pour echo lui-même.
+Terminal du Mac, dans cyberatelier/workspaces/portpilot, venv Mac activé. Exécute chaque ligne au moment indiqué, avec les modifications manuelles entre les blocs. Lis le code de sortie immédiatement après le programme, avant toute autre commande.
 
 ```bash
 python3 verification.py; echo $?
@@ -670,13 +921,36 @@ python3 verification.py; echo $?
 
 **Tu sais que c’est bon quand :** git status affiche « On branch feat/connexion », le dépôt est propre, et verification.py se termine avec le code 0.
 
-*Indice si tu bloques :* Si ta branche principale n’a pas la fusion de la MR 1, git pull --ff-only ne peut pas le deviner : vérifie le graphe avec git log --oneline --graph.
+**Indices progressifs**
+
+Depuis le terminal dans `cyberatelier`, `python3 atelier.py indice` révèle un niveau à la fois. Ouvre seulement le niveau nécessaire.
+
+<details>
+<summary>Indice 1</summary>
+
+MR2 étend la version validée en MR1 ; la suite précédente doit rester verte.
+
+</details>
+
+<details>
+<summary>Indice 2</summary>
+
+Actualise main, lance T1 à T5, puis crée feat/connexion et vérifie que tu es dans workspaces/portpilot.
+
+</details>
+
+<details>
+<summary>Indice 3</summary>
+
+Un historique où la fusion de validation n’apparaît pas explique pourquoi une nouvelle branche ne possède pas encore valider_ports.
+
+</details>
 
 #### Palier 2 — Socket d’écoute et port 0 : T6 rouge (10 min)
 
 Comprendre une socket d’écoute locale, puis écrire T6 qui en ouvre une et appelle tester_port.
 
-**Où tu travailles :** verification.py
+**Où tu travailles :** Mac · workspaces/portpilot · verification.py
 
 **Pour comprendre**
 
@@ -685,7 +959,7 @@ Comprendre une socket d’écoute locale, puis écrire T6 qui en ouvre une et ap
 
 **Éditeur · Exemple Python à lire ou essayer**
 
-Éditeur : copie cet exemple dans exemple.py (jetable), enregistre-le, puis lance python3 exemple.py. Si plusieurs exemples sont proposés, essaie-les un par un en remplaçant le contenu du fichier. Retire ensuite les fichiers générés et le fichier d’exemple.
+VS Code sur le Mac : copie cet exemple dans exemple.py (jetable), enregistre-le, puis lance python3 exemple.py. Si plusieurs exemples sont proposés, essaie-les un par un en remplaçant le contenu du fichier. Retire ensuite les fichiers générés et le fichier d’exemple.
 
 ```python
 import socket
@@ -714,7 +988,7 @@ L’entrée est ce que tu donnes au code ; l’attendu est ce que ton test doit 
 
 **Terminal · Commande à lancer au moment indiqué**
 
-Terminal du parcours : reste à la racine du dépôt. Exécute ces lignes au moment demandé dans les actions, avec les modifications manuelles entre les blocs.
+Terminal du Mac, dans cyberatelier/workspaces/portpilot, venv Mac activé. Exécute chaque ligne au moment indiqué, avec les modifications manuelles entre les blocs.
 
 ```bash
 python3 verification.py
@@ -722,13 +996,36 @@ python3 verification.py
 
 **Tu sais que c’est bon quand :** verification.py échoue, et le message montre que tester_port n’est pas encore disponible.
 
-*Indice si tu bloques :* Le getsockname() d’une socket liée au port 0 donne un couple (adresse, port) : le port est le second élément. Pas de accept, pas de thread, pas de time.sleep dans ce test.
+**Indices progressifs**
+
+Depuis le terminal dans `cyberatelier`, `python3 atelier.py indice` révèle un niveau à la fois. Ouvre seulement le niveau nécessaire.
+
+<details>
+<summary>Indice 1</summary>
+
+Le port 0 demande au système un port libre ; une socket d’écoute locale peut fournir un test reproductible.
+
+</details>
+
+<details>
+<summary>Indice 2</summary>
+
+Crée la socket dans le test, lie-la à 127.0.0.1:0, mets-la en écoute et récupère le port choisi avant d’appeler tester_port.
+
+</details>
+
+<details>
+<summary>Indice 3</summary>
+
+getsockname() peut rendre ('127.0.0.1', 52341) après un bind sur le port 0 ; 52341 est un exemple variable, pas un port à coder en dur.
+
+</details>
 
 #### Palier 3 — tester_port minimal : T6 vert (10 min)
 
 Écrire tester_port avec l’hôte constant 127.0.0.1, le délai de 0,5 seconde et une seule tentative, puis faire passer T6.
 
-**Où tu travailles :** portpilot.py ; verification.py
+**Où tu travailles :** Mac · workspaces/portpilot · portpilot.py ; verification.py
 
 **Pour comprendre**
 
@@ -744,7 +1041,7 @@ python3 verification.py
 
 **Terminal · Commande à lancer au moment indiqué**
 
-Terminal du parcours : reste à la racine du dépôt. Exécute ces lignes au moment demandé dans les actions, avec les modifications manuelles entre les blocs.
+Terminal du Mac, dans cyberatelier/workspaces/portpilot, venv Mac activé. Exécute chaque ligne au moment indiqué, avec les modifications manuelles entre les blocs.
 
 ```bash
 python3 -c "import socket; help(socket.create_connection)"
@@ -752,7 +1049,7 @@ python3 -c "import socket; help(socket.create_connection)"
 
 **Terminal · Commande à lancer au moment indiqué**
 
-Terminal du parcours : reste à la racine du dépôt. Exécute ces lignes au moment demandé dans les actions, avec les modifications manuelles entre les blocs. Lance le programme et echo $? ensemble : le nombre affiché est le code du programme ; la console peut afficher code 0 pour echo lui-même.
+Terminal du Mac, dans cyberatelier/workspaces/portpilot, venv Mac activé. Exécute chaque ligne au moment indiqué, avec les modifications manuelles entre les blocs. Lis le code de sortie immédiatement après le programme, avant toute autre commande.
 
 ```bash
 python3 verification.py; echo $?
@@ -760,7 +1057,7 @@ python3 verification.py; echo $?
 
 **Terminal · Enregistrer le travail vérifié**
 
-Terminal du parcours : reste à la racine du dépôt. Exécute ces lignes au moment demandé dans les actions, avec les modifications manuelles entre les blocs.
+Terminal du Mac, dans cyberatelier/workspaces/portpilot, venv Mac activé. Exécute chaque ligne au moment indiqué, avec les modifications manuelles entre les blocs.
 
 ```bash
 git add portpilot.py verification.py
@@ -769,13 +1066,36 @@ git commit -m "Ajoute tester_port et le test T6"
 
 **Tu sais que c’est bon quand :** T1 à T6 passent et git log --oneline montre ton commit « Ajoute tester_port et le test T6 ».
 
-*Indice si tu bloques :* Une connexion qui réussit ne signifie que l’ouverture TCP. Ne lis pas d’autre donnée sur la socket : aucune donnée applicative n’est envoyée par PortPilot.
+**Indices progressifs**
+
+Depuis le terminal dans `cyberatelier`, `python3 atelier.py indice` révèle un niveau à la fois. Ouvre seulement le niveau nécessaire.
+
+<details>
+<summary>Indice 1</summary>
+
+Une connexion TCP réussie suffit pour l’état OUVERT ; aucun dialogue applicatif n’est demandé.
+
+</details>
+
+<details>
+<summary>Indice 2</summary>
+
+Consulte create_connection, garde l’hôte et le délai fixés par le contrat, puis ferme la connexion créée avant de rendre le succès.
+
+</details>
+
+<details>
+<summary>Indice 3</summary>
+
+Un serveur d’écoute local peut accepter une connexion TCP sans envoyer de page HTTP ; l’ouverture TCP seule n’identifie pas le service.
+
+</details>
 
 #### Palier 4 — Les autres états : REFUSE, TIMEOUT, ERREUR (10 min)
 
 Classer les exceptions réseau dans le bon état, avec le bon ordre des except.
 
-**Où tu travailles :** portpilot.py
+**Où tu travailles :** Mac · workspaces/portpilot · portpilot.py
 
 **Pour comprendre**
 
@@ -784,7 +1104,7 @@ Classer les exceptions réseau dans le bon état, avec le bon ordre des except.
 
 **Éditeur · Exemple Python à lire ou essayer**
 
-Éditeur : copie cet exemple dans exemple.py (jetable), enregistre-le, puis lance python3 exemple.py. Si plusieurs exemples sont proposés, essaie-les un par un en remplaçant le contenu du fichier. Retire ensuite les fichiers générés et le fichier d’exemple.
+VS Code sur le Mac : copie cet exemple dans exemple.py (jetable), enregistre-le, puis lance python3 exemple.py. Si plusieurs exemples sont proposés, essaie-les un par un en remplaçant le contenu du fichier. Retire ensuite les fichiers générés et le fichier d’exemple.
 
 ```python
 try:
@@ -812,7 +1132,7 @@ except OSError:
 
 **Terminal · Commande à lancer au moment indiqué**
 
-Terminal du parcours : reste à la racine du dépôt. Exécute ces lignes au moment demandé dans les actions, avec les modifications manuelles entre les blocs. Lance le programme et echo $? ensemble : le nombre affiché est le code du programme ; la console peut afficher code 0 pour echo lui-même.
+Terminal du Mac, dans cyberatelier/workspaces/portpilot, venv Mac activé. Exécute chaque ligne au moment indiqué, avec les modifications manuelles entre les blocs. Lis le code de sortie immédiatement après le programme, avant toute autre commande.
 
 ```bash
 python3 verification.py; echo $?
@@ -820,7 +1140,7 @@ python3 verification.py; echo $?
 
 **Terminal · Enregistrer le travail vérifié**
 
-Terminal du parcours : reste à la racine du dépôt. Exécute ces lignes au moment demandé dans les actions, avec les modifications manuelles entre les blocs.
+Terminal du Mac, dans cyberatelier/workspaces/portpilot, venv Mac activé. Exécute chaque ligne au moment indiqué, avec les modifications manuelles entre les blocs.
 
 ```bash
 git add portpilot.py
@@ -829,13 +1149,36 @@ git commit -m "Classe les erreurs de connexion en REFUSE, TIMEOUT et ERREUR"
 
 **Tu sais que c’est bon quand :** tester_port peut retourner les quatre états, dans cet ordre de traitement, et T1 à T6 passent toujours.
 
-*Indice si tu bloques :* Compte les exceptions de la plus précise à la plus générale. Pour TIMEOUT, vérifie dans l’aide de Python quelle exception correspond au dépassement du délai dans ta version de Python.
+**Indices progressifs**
+
+Depuis le terminal dans `cyberatelier`, `python3 atelier.py indice` révèle un niveau à la fois. Ouvre seulement le niveau nécessaire.
+
+<details>
+<summary>Indice 1</summary>
+
+Les exceptions précises doivent être traitées avant une exception générale dont elles héritent.
+
+</details>
+
+<details>
+<summary>Indice 2</summary>
+
+Range ConnectionRefusedError, timeout et OSError du plus précis au plus général, puis relis les quatre états possibles.
+
+</details>
+
+<details>
+<summary>Indice 3</summary>
+
+FileNotFoundError hérite d’OSError ; un except OSError placé en premier intercepte déjà l’erreur de fichier absent.
+
+</details>
 
 #### Palier 5 — Fermer la socket, même en cas d’erreur (10 min)
 
 Garantir la fermeture de toute socket créée, même quand une exception survient.
 
-**Où tu travailles :** portpilot.py
+**Où tu travailles :** Mac · workspaces/portpilot · portpilot.py
 
 **Pour comprendre**
 
@@ -844,7 +1187,7 @@ Garantir la fermeture de toute socket créée, même quand une exception survien
 
 **Éditeur · Exemple Python à lire ou essayer**
 
-Éditeur : copie cet exemple dans exemple.py (jetable), enregistre-le, puis lance python3 exemple.py. Si plusieurs exemples sont proposés, essaie-les un par un en remplaçant le contenu du fichier. Retire ensuite les fichiers générés et le fichier d’exemple.
+VS Code sur le Mac : copie cet exemple dans exemple.py (jetable), enregistre-le, puis lance python3 exemple.py. Si plusieurs exemples sont proposés, essaie-les un par un en remplaçant le contenu du fichier. Retire ensuite les fichiers générés et le fichier d’exemple.
 
 ```python
 def diviser(a, b):
@@ -866,7 +1209,7 @@ diviser(1, 0)
 
 **Terminal · Commande à lancer au moment indiqué**
 
-Terminal du parcours : reste à la racine du dépôt. Exécute ces lignes au moment demandé dans les actions, avec les modifications manuelles entre les blocs. Lance le programme et echo $? ensemble : le nombre affiché est le code du programme ; la console peut afficher code 0 pour echo lui-même.
+Terminal du Mac, dans cyberatelier/workspaces/portpilot, venv Mac activé. Exécute chaque ligne au moment indiqué, avec les modifications manuelles entre les blocs. Lis le code de sortie immédiatement après le programme, avant toute autre commande.
 
 ```bash
 python3 verification.py; echo $?
@@ -874,13 +1217,36 @@ python3 verification.py; echo $?
 
 **Tu sais que c’est bon quand :** Dans tester_port, chaque socket créée est fermée dans tous les cas, et verification.py passe toujours.
 
-*Indice si tu bloques :* Un bloc with n’a pas besoin de close() explicite. Si tu crées une socket en dehors d’un with, pense à finally pour la fermer.
+**Indices progressifs**
+
+Depuis le terminal dans `cyberatelier`, `python3 atelier.py indice` révèle un niveau à la fois. Ouvre seulement le niveau nécessaire.
+
+<details>
+<summary>Indice 1</summary>
+
+finally s’exécute même quand une exception survient ; with peut gérer automatiquement la fermeture d’une ressource.
+
+</details>
+
+<details>
+<summary>Indice 2</summary>
+
+Suis les chemins de succès et d’erreur après création de socket et assure-toi que chacun atteint le nettoyage.
+
+</details>
+
+<details>
+<summary>Indice 3</summary>
+
+Un fichier ouvert dans with est fermé à la sortie du bloc même si une conversion int('abc') échoue à l’intérieur.
+
+</details>
 
 #### Palier 6 — Relecture, commit et pipeline de MR (10 min)
 
 Livrer la connexion et son test dans une MR au pipeline vert.
 
-**Où tu travailles :** Branche feat/connexion ; MR GitLab
+**Où tu travailles :** Mac · workspaces/portpilot · Branche feat/connexion ; MR GitLab
 
 **Pour comprendre**
 
@@ -899,7 +1265,7 @@ Livrer la connexion et son test dans une MR au pipeline vert.
 
 **Terminal · Relire l’état du dépôt**
 
-Terminal du parcours : reste à la racine du dépôt. Exécute ces lignes au moment demandé dans les actions, avec les modifications manuelles entre les blocs.
+Terminal du Mac, dans cyberatelier/workspaces/portpilot, venv Mac activé. Exécute chaque ligne au moment indiqué, avec les modifications manuelles entre les blocs.
 
 ```bash
 git status
@@ -927,13 +1293,36 @@ git log --oneline -3
 
 **Tu sais que c’est bon quand :** La MR 2 existe, son pipeline sur le dernier commit est vert et il exécute T1 à T6.
 
-*Indice si tu bloques :* Un pipeline vert sur un commit précédent ne suffit pas : c’est le dernier commit de la MR qui doit être testé. Si la CI ne lance pas T6, regarde la commande de ton job.
+**Indices progressifs**
+
+Depuis le terminal dans `cyberatelier`, `python3 atelier.py indice` révèle un niveau à la fois. Ouvre seulement le niveau nécessaire.
+
+<details>
+<summary>Indice 1</summary>
+
+T6 doit fonctionner sur le runner sans service externe ; le pipeline doit exécuter le nouveau test aussi.
+
+</details>
+
+<details>
+<summary>Indice 2</summary>
+
+Relis l’écoute éphémère et la découverte des tests, puis compare le dernier commit poussé à celui du pipeline vert.
+
+</details>
+
+<details>
+<summary>Indice 3</summary>
+
+Un job qui ne lance que les tests de validation peut rester vert quand la connexion est cassée ; son journal doit montrer que T6 a tourné.
+
+</details>
 
 #### Palier 7 — Fusion et retour sur main (10 min)
 
 Fusionner la MR 2 après un pipeline vert, puis repartir d’une branche principale à jour pour la MR 3.
 
-**Où tu travailles :** MR GitLab ; branche principale
+**Où tu travailles :** Mac · workspaces/portpilot · MR GitLab ; branche principale
 
 **Pour comprendre**
 
@@ -949,7 +1338,7 @@ Fusionner la MR 2 après un pipeline vert, puis repartir d’une branche princip
 
 **Terminal · Après la fusion : actualiser la principale**
 
-Terminal du parcours : reste à la racine du dépôt. Exécute ces lignes au moment demandé dans les actions, avec les modifications manuelles entre les blocs.
+Terminal du Mac, dans cyberatelier/workspaces/portpilot, venv Mac activé. Exécute chaque ligne au moment indiqué, avec les modifications manuelles entre les blocs.
 
 ```bash
 git switch main
@@ -969,7 +1358,30 @@ git log --oneline -5
 
 **Tu sais que c’est bon quand :** La MR 2 est fusionnée après pipeline vert du dernier commit, et git log --oneline sur main montre le commit de fusion.
 
-*Indice si tu bloques :* Si GitLab refuse la fusion, lis le motif affiché dans la MR : il s’agit souvent d’un pipeline pas encore réussi ou d’une règle de fusion.
+**Indices progressifs**
+
+Depuis le terminal dans `cyberatelier`, `python3 atelier.py indice` révèle un niveau à la fois. Ouvre seulement le niveau nécessaire.
+
+<details>
+<summary>Indice 1</summary>
+
+La fusion et le retour sur main sont deux actions différentes ; pull récupère la fusion après sa publication.
+
+</details>
+
+<details>
+<summary>Indice 2</summary>
+
+Vérifie le diff et les règles de fusion, puis actualise main avant MR3 et relance la suite sur cette version.
+
+</details>
+
+<details>
+<summary>Indice 3</summary>
+
+git log --oneline peut montrer le commit de fusion localement après pull ; avant cette récupération, main peut encore représenter l’ancienne version.
+
+</details>
 
 **Avant de livrer**
 
@@ -992,7 +1404,7 @@ Tu assembles validation, connexion et bilan sans élargir le périmètre du scan
 
 Partir de la branche principale à jour et savoir exactement ce que la MR 3 doit livrer.
 
-**Où tu travailles :** Dépôt
+**Où tu travailles :** Mac · workspaces/portpilot · Dépôt
 
 **Pour comprendre**
 
@@ -1001,7 +1413,7 @@ Partir de la branche principale à jour et savoir exactement ce que la MR 3 doit
 
 **Actions dans l’ordre**
 
-1. Ouvre workspaces/portpilot dans VS Code, ou Coder dans Cyber Atelier avec cwd sur « . ».
+1. Ouvre workspaces/portpilot dans VS Code. Dans le terminal du Mac, place-toi dans ce même dossier et active son venv avec source .venv/bin/activate.
 2. Vérifie que MR2 est fusionnée.
 3. Lis git status ; enregistre ton travail en cours avant de changer de branche.
 4. Reviens sur main avec git switch main, mets-la à jour avec git pull --ff-only, puis crée feat/scan-bilan. Remplace main par master si ton dépôt utilise ce nom.
@@ -1010,7 +1422,7 @@ Partir de la branche principale à jour et savoir exactement ce que la MR 3 doit
 
 **Terminal · Relire l’état du dépôt**
 
-Terminal du parcours : reste à la racine du dépôt. Exécute ces lignes au moment demandé dans les actions, avec les modifications manuelles entre les blocs.
+Terminal du Mac, dans cyberatelier/workspaces/portpilot, venv Mac activé. Exécute chaque ligne au moment indiqué, avec les modifications manuelles entre les blocs.
 
 ```bash
 git status
@@ -1036,7 +1448,7 @@ git switch -c feat/scan-bilan
 
 **Terminal · Commande à lancer au moment indiqué**
 
-Terminal du parcours : reste à la racine du dépôt. Exécute ces lignes au moment demandé dans les actions, avec les modifications manuelles entre les blocs. Lance le programme et echo $? ensemble : le nombre affiché est le code du programme ; la console peut afficher code 0 pour echo lui-même.
+Terminal du Mac, dans cyberatelier/workspaces/portpilot, venv Mac activé. Exécute chaque ligne au moment indiqué, avec les modifications manuelles entre les blocs. Lis le code de sortie immédiatement après le programme, avant toute autre commande.
 
 ```bash
 python3 verification.py; echo $?
@@ -1044,13 +1456,36 @@ python3 verification.py; echo $?
 
 **Tu sais que c’est bon quand :** git status affiche « On branch feat/scan-bilan », le dépôt est propre, et verification.py se termine avec le code 0.
 
-*Indice si tu bloques :* Si T6 échoue sur la branche principale, ne continue pas : la MR 2 n’est pas stable. Compare avec git log --oneline.
+**Indices progressifs**
+
+Depuis le terminal dans `cyberatelier`, `python3 atelier.py indice` révèle un niveau à la fois. Ouvre seulement le niveau nécessaire.
+
+<details>
+<summary>Indice 1</summary>
+
+Les livrables finaux sont connus avant l’assemblage ; la nouvelle branche réutilise MR1 et MR2.
+
+</details>
+
+<details>
+<summary>Indice 2</summary>
+
+Lance T1 à T6 depuis main à jour et relis la différence entre les cinq fichiers du dépôt et les trois fichiers du ZIP.
+
+</details>
+
+<details>
+<summary>Indice 3</summary>
+
+Un dépôt peut contenir un fichier de CI utile au développement sans l’inclure dans une archive livrée à l’utilisateur.
+
+</details>
 
 #### Palier 2 — Valider toute la liste d’abord : T7 rouge (10 min)
 
 Comprendre pourquoi on valide l’ensemble avant d’agir, puis écrire T7 qui doit échouer.
 
-**Où tu travailles :** verification.py
+**Où tu travailles :** Mac · workspaces/portpilot · verification.py
 
 **Pour comprendre**
 
@@ -1059,7 +1494,7 @@ Comprendre pourquoi on valide l’ensemble avant d’agir, puis écrire T7 qui d
 
 **Éditeur · Exemple Python à lire ou essayer**
 
-Éditeur : copie cet exemple dans exemple.py (jetable), enregistre-le, puis lance python3 exemple.py. Si plusieurs exemples sont proposés, essaie-les un par un en remplaçant le contenu du fichier. Retire ensuite les fichiers générés et le fichier d’exemple.
+VS Code sur le Mac : copie cet exemple dans exemple.py (jetable), enregistre-le, puis lance python3 exemple.py. Si plusieurs exemples sont proposés, essaie-les un par un en remplaçant le contenu du fichier. Retire ensuite les fichiers générés et le fichier d’exemple.
 
 ```python
 articles = ["pain", "", "lait"]
@@ -1090,7 +1525,7 @@ L’entrée est ce que tu donnes au code ; l’attendu est ce que ton test doit 
 
 **Terminal · Commande à lancer au moment indiqué**
 
-Terminal du parcours : reste à la racine du dépôt. Exécute ces lignes au moment demandé dans les actions, avec les modifications manuelles entre les blocs.
+Terminal du Mac, dans cyberatelier/workspaces/portpilot, venv Mac activé. Exécute chaque ligne au moment indiqué, avec les modifications manuelles entre les blocs.
 
 ```bash
 python3 verification.py
@@ -1098,13 +1533,36 @@ python3 verification.py
 
 **Tu sais que c’est bon quand :** T7 est écrit, il échoue, et tu peux dire pourquoi.
 
-*Indice si tu bloques :* Le test doit garder les deux écoutes ouvertes tant que scanner_ports n’a pas fini. Un with imbriqué ou un try/finally peut garantir la fermeture des deux sockets.
+**Indices progressifs**
+
+Depuis le terminal dans `cyberatelier`, `python3 atelier.py indice` révèle un niveau à la fois. Ouvre seulement le niveau nécessaire.
+
+<details>
+<summary>Indice 1</summary>
+
+T7 doit observer l’ordre des deux ports ; un écouteur local fournit les ports sans serveur externe.
+
+</details>
+
+<details>
+<summary>Indice 2</summary>
+
+Écris la vérification avant scanner_ports en gardant les deux sockets et les deux ports choisis dans leur ordre d’entrée.
+
+</details>
+
+<details>
+<summary>Indice 3</summary>
+
+Pour des identifiants reçus [9, 4], un résultat [[9, 'OK'], [4, 'OK']] préserve l’ordre ; l’ordre numérique serait un autre contrat.
+
+</details>
 
 #### Palier 3 — scanner_ports : T7 vert et ordre conservé (10 min)
 
 Écrire scanner_ports qui valide la liste entière, fait une tentative par port dans l’ordre reçu, puis faire passer T7.
 
-**Où tu travailles :** portpilot.py ; verification.py
+**Où tu travailles :** Mac · workspaces/portpilot · portpilot.py ; verification.py
 
 **Pour comprendre**
 
@@ -1113,7 +1571,7 @@ python3 verification.py
 
 **Éditeur · Exemple Python à lire ou essayer**
 
-Éditeur : copie cet exemple dans exemple.py (jetable), enregistre-le, puis lance python3 exemple.py. Si plusieurs exemples sont proposés, essaie-les un par un en remplaçant le contenu du fichier. Retire ensuite les fichiers générés et le fichier d’exemple.
+VS Code sur le Mac : copie cet exemple dans exemple.py (jetable), enregistre-le, puis lance python3 exemple.py. Si plusieurs exemples sont proposés, essaie-les un par un en remplaçant le contenu du fichier. Retire ensuite les fichiers générés et le fichier d’exemple.
 
 ```python
 fruits = ["pomme", "poire"]
@@ -1148,7 +1606,7 @@ Ces nombres illustrent la forme ; T7 utilise les ports réellement attribués pa
 
 **Terminal · Commande à lancer au moment indiqué**
 
-Terminal du parcours : reste à la racine du dépôt. Exécute ces lignes au moment demandé dans les actions, avec les modifications manuelles entre les blocs. Lance le programme et echo $? ensemble : le nombre affiché est le code du programme ; la console peut afficher code 0 pour echo lui-même.
+Terminal du Mac, dans cyberatelier/workspaces/portpilot, venv Mac activé. Exécute chaque ligne au moment indiqué, avec les modifications manuelles entre les blocs. Lis le code de sortie immédiatement après le programme, avant toute autre commande.
 
 ```bash
 python3 verification.py; echo $?
@@ -1156,7 +1614,7 @@ python3 verification.py; echo $?
 
 **Terminal · Enregistrer le travail vérifié**
 
-Terminal du parcours : reste à la racine du dépôt. Exécute ces lignes au moment demandé dans les actions, avec les modifications manuelles entre les blocs.
+Terminal du Mac, dans cyberatelier/workspaces/portpilot, venv Mac activé. Exécute chaque ligne au moment indiqué, avec les modifications manuelles entre les blocs.
 
 ```bash
 git add portpilot.py verification.py
@@ -1165,13 +1623,36 @@ git commit -m "Ajoute scanner_ports et le test T7"
 
 **Tu sais que c’est bon quand :** T1 à T7 passent et git log --oneline montre ton commit « Ajoute scanner_ports et le test T7 ».
 
-*Indice si tu bloques :* scanner_ports ne doit pas réimplémenter la connexion : il réutilise tester_port. Un port invalide dans la liste doit faire échouer la validation avant la boucle de connexion.
+**Indices progressifs**
+
+Depuis le terminal dans `cyberatelier`, `python3 atelier.py indice` révèle un niveau à la fois. Ouvre seulement le niveau nécessaire.
+
+<details>
+<summary>Indice 1</summary>
+
+Valider toute la liste avant la boucle évite de commencer un scan sur une entrée partiellement invalide.
+
+</details>
+
+<details>
+<summary>Indice 2</summary>
+
+Réutilise valider_ports puis tester_port et garde les paires port/état dans l’ordre, avec une tentative par port.
+
+</details>
+
+<details>
+<summary>Indice 3</summary>
+
+Si une liste de fichiers contient un nom refusé en dernier, une validation globale avant traitement évite d’avoir déjà modifié les premiers fichiers.
+
+</details>
 
 #### Palier 4 — resumer et T8 : le bilan (10 min)
 
 Compter les états dans un dictionnaire à cinq compteurs, et écrire T8 pour vérifier le comptage.
 
-**Où tu travailles :** portpilot.py ; verification.py
+**Où tu travailles :** Mac · workspaces/portpilot · portpilot.py ; verification.py
 
 **Pour comprendre**
 
@@ -1180,7 +1661,7 @@ Compter les états dans un dictionnaire à cinq compteurs, et écrire T8 pour v�
 
 **Éditeur · Exemple Python à lire ou essayer**
 
-Éditeur : copie cet exemple dans exemple.py (jetable), enregistre-le, puis lance python3 exemple.py. Si plusieurs exemples sont proposés, essaie-les un par un en remplaçant le contenu du fichier. Retire ensuite les fichiers générés et le fichier d’exemple.
+VS Code sur le Mac : copie cet exemple dans exemple.py (jetable), enregistre-le, puis lance python3 exemple.py. Si plusieurs exemples sont proposés, essaie-les un par un en remplaçant le contenu du fichier. Retire ensuite les fichiers générés et le fichier d’exemple.
 
 ```python
 fruits = ["pomme", "poire", "pomme"]
@@ -1223,7 +1704,7 @@ L’entrée est ce que tu donnes au code ; l’attendu est ce que ton test doit 
 
 **Terminal · Commande à lancer au moment indiqué**
 
-Terminal du parcours : reste à la racine du dépôt. Exécute ces lignes au moment demandé dans les actions, avec les modifications manuelles entre les blocs. Lance le programme et echo $? ensemble : le nombre affiché est le code du programme ; la console peut afficher code 0 pour echo lui-même.
+Terminal du Mac, dans cyberatelier/workspaces/portpilot, venv Mac activé. Exécute chaque ligne au moment indiqué, avec les modifications manuelles entre les blocs. Lis le code de sortie immédiatement après le programme, avant toute autre commande.
 
 ```bash
 python3 verification.py; echo $?
@@ -1231,7 +1712,7 @@ python3 verification.py; echo $?
 
 **Terminal · Enregistrer le travail vérifié**
 
-Terminal du parcours : reste à la racine du dépôt. Exécute ces lignes au moment demandé dans les actions, avec les modifications manuelles entre les blocs.
+Terminal du Mac, dans cyberatelier/workspaces/portpilot, venv Mac activé. Exécute chaque ligne au moment indiqué, avec les modifications manuelles entre les blocs.
 
 ```bash
 git add portpilot.py verification.py
@@ -1240,13 +1721,36 @@ git commit -m "Ajoute resumer et le test T8"
 
 **Tu sais que c’est bon quand :** T1 à T8 passent, et tu peux expliquer pourquoi T8 ne prouve pas que les erreurs réseau se déclenchent.
 
-*Indice si tu bloques :* Commence par le cas de la liste vide : un dictionnaire ou des compteurs à zéro suffisent. Vérifie que la somme des catégories égale total dans ton test.
+**Indices progressifs**
+
+Depuis le terminal dans `cyberatelier`, `python3 atelier.py indice` révèle un niveau à la fois. Ouvre seulement le niveau nécessaire.
+
+<details>
+<summary>Indice 1</summary>
+
+Un bilan compte chaque état et le total ; la liste vide doit produire tous les compteurs à zéro.
+
+</details>
+
+<details>
+<summary>Indice 2</summary>
+
+Écris T8 sur le mélange demandé, puis sur [] ; vérifie la somme des quatre catégories contre total.
+
+</details>
+
+<details>
+<summary>Indice 3</summary>
+
+Pour trois colis, deux livrés et un perdu, total=3 doit égaler livres=2 + perdus=1 ; une catégorie absente conserve son compteur zéro.
+
+</details>
 
 #### Palier 5 — main : message clair et import sans lancement (10 min)
 
 Séparer le point d’entrée des fonctions, pour que l’import du module ne lance jamais le scan.
 
-**Où tu travailles :** portpilot.py
+**Où tu travailles :** Mac · workspaces/portpilot · portpilot.py
 
 **Pour comprendre**
 
@@ -1255,7 +1759,7 @@ Séparer le point d’entrée des fonctions, pour que l’import du module ne la
 
 **Éditeur · Exemple Python à lire ou essayer**
 
-Éditeur : copie cet exemple dans exemple.py (jetable), enregistre-le, puis lance python3 exemple.py. Si plusieurs exemples sont proposés, essaie-les un par un en remplaçant le contenu du fichier. Retire ensuite les fichiers générés et le fichier d’exemple.
+VS Code sur le Mac : copie cet exemple dans exemple.py (jetable), enregistre-le, puis lance python3 exemple.py. Si plusieurs exemples sont proposés, essaie-les un par un en remplaçant le contenu du fichier. Retire ensuite les fichiers générés et le fichier d’exemple.
 
 ```python
 def saluer():
@@ -1275,7 +1779,7 @@ if __name__ == "__main__":
 
 **Terminal · Commande à lancer au moment indiqué**
 
-Terminal du parcours : reste à la racine du dépôt. Exécute ces lignes au moment demandé dans les actions, avec les modifications manuelles entre les blocs.
+Terminal du Mac, dans cyberatelier/workspaces/portpilot, venv Mac activé. Exécute chaque ligne au moment indiqué, avec les modifications manuelles entre les blocs.
 
 ```bash
 python3 -c "import portpilot"
@@ -1283,7 +1787,7 @@ python3 -c "import portpilot"
 
 **Terminal · Commande à lancer au moment indiqué**
 
-Terminal du parcours : reste à la racine du dépôt. Exécute ces lignes au moment demandé dans les actions, avec les modifications manuelles entre les blocs. Lance le programme et echo $? ensemble : le nombre affiché est le code du programme ; la console peut afficher code 0 pour echo lui-même.
+Terminal du Mac, dans cyberatelier/workspaces/portpilot, venv Mac activé. Exécute chaque ligne au moment indiqué, avec les modifications manuelles entre les blocs. Lis le code de sortie immédiatement après le programme, avant toute autre commande.
 
 ```bash
 python3 verification.py; echo $?
@@ -1291,7 +1795,7 @@ python3 verification.py; echo $?
 
 **Terminal · Enregistrer le travail vérifié**
 
-Terminal du parcours : reste à la racine du dépôt. Exécute ces lignes au moment demandé dans les actions, avec les modifications manuelles entre les blocs.
+Terminal du Mac, dans cyberatelier/workspaces/portpilot, venv Mac activé. Exécute chaque ligne au moment indiqué, avec les modifications manuelles entre les blocs.
 
 ```bash
 git add portpilot.py verification.py
@@ -1300,13 +1804,36 @@ git commit -m "Ajoute main et le message de liste invalide"
 
 **Tu sais que c’est bon quand :** L’import de portpilot n’affiche rien, un lancement direct présente le bilan ou un message clair, et verification.py passe.
 
-*Indice si tu bloques :* Pour le message clair, attrape ValueError autour de la validation de la liste dans main et affiche le texte de l’erreur. Le fichier principal ne doit pas planter avec une trace inutile pour une liste invalide.
+**Indices progressifs**
+
+Depuis le terminal dans `cyberatelier`, `python3 atelier.py indice` révèle un niveau à la fois. Ouvre seulement le niveau nécessaire.
+
+<details>
+<summary>Indice 1</summary>
+
+La garde __main__ protège l’import ; main coordonne les fonctions sans dupliquer leurs calculs.
+
+</details>
+
+<details>
+<summary>Indice 2</summary>
+
+Essaie lancement direct et import du petit exemple, puis affiche une ligne par port et le bilan depuis les résultats obtenus.
+
+</details>
+
+<details>
+<summary>Indice 3</summary>
+
+import recettes doit charger les fonctions sans afficher le menu ; python3 recettes.py peut démarrer le menu sous sa garde de script.
+
+</details>
 
 #### Palier 6 — README final avant la CI (10 min)
 
 Décrire le projet et ses limites avant que la CI de livraison ne construise l’artefact.
 
-**Où tu travailles :** README.md
+**Où tu travailles :** Mac · workspaces/portpilot · README.md
 
 **Pour comprendre**
 
@@ -1322,7 +1849,7 @@ Décrire le projet et ses limites avant que la CI de livraison ne construise l�
 
 **Terminal · Relire l’état du dépôt**
 
-Terminal du parcours : reste à la racine du dépôt. Exécute ces lignes au moment demandé dans les actions, avec les modifications manuelles entre les blocs.
+Terminal du Mac, dans cyberatelier/workspaces/portpilot, venv Mac activé. Exécute chaque ligne au moment indiqué, avec les modifications manuelles entre les blocs.
 
 ```bash
 git status
@@ -1337,13 +1864,36 @@ git commit -m "Finalise le README de PortPilot"
 
 **Tu sais que c’est bon quand :** Le README contient les sections demandées, il est cohérent avec ce que fait le code et il est commité.
 
-*Indice si tu bloques :* Un README qui promet trop est une erreur : relis les limites dans le guide du parcours et écris-les avec tes mots. Un test local ou un pipeline vert ne prouve pas la sécurité du scan.
+**Indices progressifs**
+
+Depuis le terminal dans `cyberatelier`, `python3 atelier.py indice` révèle un niveau à la fois. Ouvre seulement le niveau nécessaire.
+
+<details>
+<summary>Indice 1</summary>
+
+Un README doit donner les commandes vérifiées, les états possibles et les limites réelles.
+
+</details>
+
+<details>
+<summary>Indice 2</summary>
+
+Décris les quatre états, le timeout de 0,5 seconde, la cible fixe et les tests avant d’écrire la CI de livraison.
+
+</details>
+
+<details>
+<summary>Indice 3</summary>
+
+Une connexion ouverte sur un service local montre une accessibilité TCP à cet instant ; écrire « aucune vulnérabilité » irait au-delà de cette observation.
+
+</details>
 
 #### Palier 7 — CI en deux stages et artefact ZIP (10 min)
 
 Ajouter une étape de livraison qui ne tourne qu’après les tests et produit un ZIP contrôlé.
 
-**Où tu travailles :** .gitlab-ci.yml ; portpilot.zip
+**Où tu travailles :** Mac · workspaces/portpilot · .gitlab-ci.yml ; portpilot.zip
 
 **Pour comprendre**
 
@@ -1352,7 +1902,7 @@ Ajouter une étape de livraison qui ne tourne qu’après les tests et produit u
 
 **Éditeur · Exemple Python à lire ou essayer**
 
-Éditeur : copie cet exemple dans exemple.py (jetable), enregistre-le, puis lance python3 exemple.py. Si plusieurs exemples sont proposés, essaie-les un par un en remplaçant le contenu du fichier. Retire ensuite les fichiers générés et le fichier d’exemple.
+VS Code sur le Mac : copie cet exemple dans exemple.py (jetable), enregistre-le, puis lance python3 exemple.py. Si plusieurs exemples sont proposés, essaie-les un par un en remplaçant le contenu du fichier. Retire ensuite les fichiers générés et le fichier d’exemple.
 
 ```python
 import zipfile
@@ -1373,7 +1923,7 @@ with zipfile.ZipFile("exemple.zip", "w") as archive:
 
 **Terminal · Commande à lancer au moment indiqué**
 
-Terminal du parcours : reste à la racine du dépôt. Exécute ces lignes au moment demandé dans les actions, avec les modifications manuelles entre les blocs.
+Terminal du Mac, dans cyberatelier/workspaces/portpilot, venv Mac activé. Exécute chaque ligne au moment indiqué, avec les modifications manuelles entre les blocs.
 
 ```bash
 python3 -m zipfile -l exemple.zip
@@ -1400,13 +1950,36 @@ git log --oneline -1
 
 **Tu sais que c’est bon quand :** Le pipeline du dernier commit affiche le stage test vert, puis la livraison, et l’artefact apparaît dans la page du pipeline.
 
-*Indice si tu bloques :* Les règles de livraison ne doivent pas contourner le stage test : la livraison suit les tests. Supprime les fichiers jetables de l’exemple (notes.txt, exemple.zip) avant de commiter.
+**Indices progressifs**
+
+Depuis le terminal dans `cyberatelier`, `python3 atelier.py indice` révèle un niveau à la fois. Ouvre seulement le niveau nécessaire.
+
+<details>
+<summary>Indice 1</summary>
+
+Un stage de livraison dépend du succès des tests ; un artefact conserve les fichiers produits par le job.
+
+</details>
+
+<details>
+<summary>Indice 2</summary>
+
+Rédige test puis livraison, limite l’archive aux trois fichiers prévus et vérifie que l’échec du test empêche la livraison.
+
+</details>
+
+<details>
+<summary>Indice 3</summary>
+
+Une archive catalogue.zip peut contenir catalogue.py, verification.py et README.md ; un listing du ZIP permet de repérer un cache ajouté par erreur.
+
+</details>
 
 #### Palier 8 — Démonstration locale, artefact et fusion (10 min)
 
 Constater le comportement du scan sur le labo, vérifier l’artefact du dernier pipeline vert, puis fusionner la MR 3.
 
-**Où tu travailles :** MR GitLab
+**Où tu travailles :** Mac · workspaces/portpilot · MR GitLab
 
 **Pour comprendre**
 
@@ -1415,16 +1988,16 @@ Constater le comportement du scan sur le labo, vérifier l’artefact du dernier
 
 **Actions dans l’ordre**
 
-1. Sur le Mac, lance python3 labs.py depuis cyberatelier dans un premier terminal. Dans Docker, utilise le bouton du labo à la place.
+1. Sur le Mac, ouvre un second terminal dans cyberatelier et lance python3 labs.py. Laisse-le ouvert pendant la démonstration ; le client continue dans le terminal du parcours avec son venv Mac.
 2. Dans le même environnement, configure 8000 dans la liste de PortPilot et lance le programme : attends OUVERT.
-3. Arrête le labo avec Ctrl+C ou son bouton, relance : attends REFUSE. Ne démarre pas un autre serveur sur ce port.
+3. Arrête le labo avec Ctrl+C dans le terminal du labo Mac, relance : attends REFUSE. Ne démarre pas un autre serveur sur ce port.
 4. Si tu as modifié la liste livrée, commite et pousse cette configuration, puis attends son pipeline.
 5. Télécharge le ZIP du dernier pipeline vert et vérifie ses trois fichiers.
 6. Relis la MR, fusionne lorsque les règles le permettent, puis mets main à jour.
 
-**Terminal · Option Mac : démarrer le laboratoire dans un autre terminal**
+**Terminal · Démarrer le laboratoire Mac dans un second terminal**
 
-Terminal séparé sur ton Mac, depuis le dossier cyberatelier. Laisse-le ouvert pendant la démonstration, puis arrête avec Ctrl+C. Dans Docker, utilise plutôt le bouton du laboratoire.
+Second terminal du Mac, dans cyberatelier. python3 labs.py démarre le labo sur 127.0.0.1:8000 du Mac ; garde ce terminal ouvert puis arrête avec Ctrl+C. Le labo interne de Docker est distinct.
 
 ```bash
 python3 labs.py
@@ -1432,7 +2005,7 @@ python3 labs.py
 
 **Terminal · Commande à lancer au moment indiqué**
 
-Terminal du parcours : reste à la racine du dépôt. Exécute ces lignes au moment demandé dans les actions, avec les modifications manuelles entre les blocs.
+Terminal du Mac, dans cyberatelier/workspaces/portpilot, venv Mac activé. Exécute chaque ligne au moment indiqué, avec les modifications manuelles entre les blocs.
 
 ```bash
 python3 portpilot.py
@@ -1464,7 +2037,30 @@ git log --oneline -5
 
 **Tu sais que c’est bon quand :** OUVERT pour 8000 pendant labs.py, REFUSE après Ctrl+C, l’artefact contient exactement trois fichiers, et la MR 3 est fusionnée après pipeline vert.
 
-*Indice si tu bloques :* Le succès du script local ne décide pas si GitLab autorise une fusion ; vérifie aussi le commit et la règle de fusion. Garde le lien du pipeline rouge de la MR 1 comme preuve.
+**Indices progressifs**
+
+Depuis le terminal dans `cyberatelier`, `python3 atelier.py indice` révèle un niveau à la fois. Ouvre seulement le niveau nécessaire.
+
+<details>
+<summary>Indice 1</summary>
+
+Le labo Mac et le labo Docker sont deux services séparés ; le programme Mac atteint seulement le premier sur son loopback.
+
+</details>
+
+<details>
+<summary>Indice 2</summary>
+
+Démarre python3 labs.py dans un autre terminal Mac depuis cyberatelier, observe OUVERT puis REFUSE après Ctrl+C, et contrôle l’artefact du dernier pipeline vert.
+
+</details>
+
+<details>
+<summary>Indice 3</summary>
+
+Quand le client tourne sur le Mac, 127.0.0.1:8000 vise le Mac ; activer un service interne à Docker sans port publié ne le rend pas joignable à cette adresse.
+
+</details>
 
 **Avant de livrer**
 
@@ -1479,7 +2075,7 @@ git log --oneline -5
 
 Pour chaque MR, développe et teste localement, lis git status et git diff, ajoute explicitement les fichiers nécessaires, crée des commits descriptifs et pousse sur la branche de la MR. Ouvre la MR vers la branche principale, vérifie le pipeline du dernier commit et relis le diff. Après chaque fusion, actualise la branche principale avant de créer la suivante. Une seule MR finale ne remplace pas les trois étapes.
 
-Commande locale depuis la racine : python verification.py. Adapte python en python3 si nécessaire. Une assertion échouée doit rester visible et rendre le processus non nul. Ne lance pas Python en mode optimisé. Les huit tests couvrent validation valide, liste vide, trop d’éléments, six cas invalides testés séparément dans des listes à un élément, doublons, connexion ouverte, scan de deux ports dans l’ordre et bilan mixte/vide.
+Commande locale depuis workspaces/portpilot, venv Mac activé : python3 verification.py. Une assertion échouée doit rester visible et rendre le processus non nul. Ne lance pas Python en mode optimisé. Les huit tests couvrent validation valide, liste vide, trop d’éléments, six cas invalides testés séparément dans des listes à un élément, doublons, connexion ouverte, scan de deux ports dans l’ordre et bilan mixte/vide.
 
 ## Livrables et limites
 

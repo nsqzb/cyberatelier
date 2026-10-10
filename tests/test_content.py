@@ -69,6 +69,10 @@ class CourseContentTests(unittest.TestCase):
                     self.assertCountEqual(used, known, "chaque test est demandé dans exactement un palier")
                     for p in paliers:
                         self.assertTrue(all(p.get(k) for k in ("title", "goal", "do", "check", "hint")), p["id"])
+                        self.assertEqual(len(p["hints"]), 3, p["id"])
+                        self.assertEqual(len(set(p["hints"])), 3, p["id"])
+                        self.assertTrue(all(isinstance(hint, str) and hint.strip()
+                                            for hint in p["hints"]), p["id"])
                         if "example" in p:
                             self.assertTrue(all(isinstance(p["example"].get(k), str) and
                                                 p["example"][k].strip()
@@ -91,7 +95,8 @@ class CourseContentTests(unittest.TestCase):
 
     def test_fileguard_fixtures_are_where_the_setup_says(self):
         commands = " ".join(item.get("command", "") for item in self.courses["fileguard"]["setup"])
-        self.assertIn("/app/fixtures/integrity", commands)
+        self.assertIn("../../fixtures/integrity", commands)
+        self.assertNotIn("/app/fixtures", commands)
         names = {p.name for p in (BASE / "fixtures" / "integrity").iterdir()}
         self.assertEqual(names, {"README.txt", "message.txt", "settings.ini"})
 
@@ -121,10 +126,31 @@ class CourseContentTests(unittest.TestCase):
                             self.assertTrue(all(block.get(key) for key in ("title", "context", "code")))
                             self.assertIn(block.get("placement", "after_actions"),
                                           ("before_actions", "after_actions"))
+                            if block["kind"] == "shell":
+                                self.assertIn(block["cwd"], ("application", "exercise"))
                             if block["kind"] == "python":
                                 ast.parse(block["code"])
                             else:
                                 self.assertFalse(block["code"].startswith("Exemple travaillé"))
+
+    def test_mac_and_docker_commands_keep_their_locations(self):
+        for course in self.courses.values():
+            with self.subTest(course=course["id"]):
+                setup_commands = "\n".join(i.get("command", "") for i in course["setup"])
+                self.assertIn("python3 -m venv .venv", setup_commands)
+                self.assertNotIn("/app/fixtures", setup_commands)
+            for step in course["steps"]:
+                for p in step["paliers"]:
+                    for b in p["blocks"]:
+                        if b["kind"] != "shell":
+                            continue
+                        with self.subTest(palier=p["id"], title=b["title"]):
+                            if "docker compose" in b["code"] or "atelier.py" in b["code"] or "labs.py" in b["code"]:
+                                self.assertEqual(b["cwd"], "application")
+                            if "/app/tools" in b["code"]:
+                                self.assertIn("docker", b["code"])
+                            if "../../fixtures" in b["code"]:
+                                self.assertEqual(b["cwd"], "exercise")
 
     def test_downloadable_missions_match_the_displayed_content(self):
         spec = importlib.util.spec_from_file_location("generate_exercises", BASE / "scripts" / "generate_exercises.py")
