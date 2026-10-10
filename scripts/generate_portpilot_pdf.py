@@ -23,7 +23,8 @@ def main():
         pdfmetrics.registerFont(TTFont(name,str(fonts/file)))
     pdfmetrics.registerFontFamily('Atelier',normal='Atelier',bold='AtelierBold',italic='AtelierItalic',boldItalic='AtelierBold')
     styles={
-      'body':ParagraphStyle('body',fontName='Atelier',fontSize=9,leading=14,spaceAfter=7),
+      'body':ParagraphStyle('body',fontName='Atelier',fontSize=9,leading=14,spaceAfter=6,allowWidows=False,allowOrphans=False),
+      'label':ParagraphStyle('label',fontName='Atelier',fontSize=9,leading=14,spaceAfter=7,keepWithNext=True),
       'title':ParagraphStyle('title',fontName='AtelierBold',fontSize=22,leading=28,spaceAfter=18,textColor=colors.HexColor('#187e75')),
       'h2':ParagraphStyle('h2',fontName='AtelierBold',fontSize=15,leading=20,spaceBefore=18,spaceAfter=9,keepWithNext=True),
       'h3':ParagraphStyle('h3',fontName='AtelierBold',fontSize=12,leading=17,spaceBefore=14,spaceAfter=8,keepWithNext=True),
@@ -42,6 +43,12 @@ def main():
     text=(ROOT/'content/portpilot.md').read_text(encoding='utf-8')
     story=[];code=[];fenced=False
     for line in text.splitlines():
+        if line.strip() in ('<details>', '</details>'):
+            continue
+        summary=re.fullmatch(r'<summary>(.*?)</summary>',line.strip())
+        if summary:
+            story.append(Paragraph(inline(summary[1]),styles['h4']))
+            continue
         if line.startswith('```'):
             if fenced:
                 story.append(Preformatted('\n'.join(code),styles['code'],maxLineLength=98,splitChars=' ',newLineChars='  '));code=[]
@@ -54,7 +61,7 @@ def main():
         if match:
             level=len(match[1]);style='title' if level==1 else 'h'+str(level)
             story.append(Paragraph(inline(match[2]),styles[style]));continue
-        style='list' if re.match(r'^(- |\d+\. )',line) else 'body'
+        style='list' if re.match(r'^(- |\d+\. )',line) else ('label' if re.fullmatch(r'\*\*[^*]+\*\*',line.strip()) else 'body')
         story.append(Paragraph(inline(line),styles[style]))
     def footer(canvas,doc):
         canvas.saveState();canvas.setFont('Atelier',8);canvas.setFillColor(colors.HexColor('#60768b'))

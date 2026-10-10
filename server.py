@@ -19,6 +19,8 @@ import zipfile
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 
+from atelier_version import version_info
+
 BASE_DIR = Path(__file__).resolve().parent
 COURSES = {"socle", "portpilot", "headerscope", "fileguard", "toolwrap", "reconwrap"}
 EXCLUDED = {".git", ".venv", "__pycache__"}
@@ -229,7 +231,8 @@ class RequestHandler(BaseHTTPRequestHandler):
             except Exception:
                 git = "git indisponible"
             self._json(200, {"status": "ok", "python": sys.version.split()[0], "git": git,
-                             "lab": self.server.lab.status(), "mode": "local"})
+                             "lab": self.server.lab.status(), "mode": "local",
+                             "version": version_info(BASE_DIR)})
         elif p == "/api/state":
             if self.command == "GET":
                 if self.server.state_path.exists():
