@@ -69,6 +69,13 @@ class CourseContentTests(unittest.TestCase):
                     self.assertCountEqual(used, known, "chaque test est demandé dans exactement un palier")
                     for p in paliers:
                         self.assertTrue(all(p.get(k) for k in ("title", "goal", "do", "check", "hint")), p["id"])
+                        if "example" in p:
+                            self.assertTrue(all(isinstance(p["example"].get(k), str) and
+                                                p["example"][k].strip()
+                                                for k in ("input", "output", "note")), p["id"])
+                        if "rules" in p:
+                            self.assertTrue(all(isinstance(rule, str) and rule.strip()
+                                                for rule in p["rules"]), p["id"])
 
     def test_local_links_and_documents_exist(self):
         for course in self.courses.values():
@@ -112,6 +119,8 @@ class CourseContentTests(unittest.TestCase):
                         with self.subTest(palier=palier["id"], title=block["title"]):
                             self.assertIn(block["kind"], ("shell", "python", "yaml", "markdown"))
                             self.assertTrue(all(block.get(key) for key in ("title", "context", "code")))
+                            self.assertIn(block.get("placement", "after_actions"),
+                                          ("before_actions", "after_actions"))
                             if block["kind"] == "python":
                                 ast.parse(block["code"])
                             else:

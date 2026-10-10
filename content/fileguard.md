@@ -21,11 +21,11 @@ Les liens symboliques sont hors périmètre : refuse-les clairement, comme recom
 <!-- BEGIN GENERATED EXERCISES -->
 ## Comment travailler un exercice
 
-Chaque mission construit une partie du projet. Commence par « Avant de commencer », puis avance palier par palier. Les durées sont des repères : prends le temps de comprendre chaque résultat.
+Ces exercices sont ton entraînement. Chaque palier explique les notions utiles, montre les données ou les règles attendues, puis te fait écrire et vérifier ton propre code. Les durées sont des repères : avance quand tu comprends le résultat.
 
-1. Lis l’objectif et les fichiers concernés. Un fichier indiqué comme « à créer » n’est pas fourni : c’est toi qui l’écris.
+1. Lis « Pour comprendre » et l’exemple lorsqu’il y en a un. Repère ce qui entre dans le programme, ce qui doit en sortir et les règles à respecter.
 2. Les cartes de tests donnent l’entrée et le résultat attendu. Écris les tests correspondants dans le fichier indiqué ; cocher un palier ne les exécute pas. Avec unittest, « Ran 0 tests » signifie qu’aucun test n’a été exécuté : ce n’est pas une validation. Un cas décrit peut contenir plusieurs valeurs ; le nombre de méthodes Python n’est donc pas forcément le nombre d’identifiants.
-3. Suis les actions numérotées. Les blocs Python se placent dans l’éditeur ; les commandes se lancent au moment demandé. Relis les blocs Git : des modifications et des actions dans GitHub/GitLab peuvent être nécessaires entre deux commandes.
+3. Suis les actions numérotées, une à la fois. Les exemples servent à apprendre une notion ; tu écris toi-même la solution de l’exercice. Les blocs Terminal donnent les commandes à lancer au moment indiqué.
 4. Vérifie le résultat indiqué avant de poursuivre. Un échec attendu (phase rouge, argument refusé ou conflit volontaire) est expliqué dans le palier.
 5. Si tu bloques, lis la dernière ligne de l’erreur, compare l’entrée et l’attendu, puis ouvre l’indice. Fais un petit changement et relance.
 
@@ -40,6 +40,16 @@ La console web repart à neuf à chaque exécution : un `cd`, une activation de 
 Un venv créé sur le Mac ne fonctionne pas dans le conteneur : utilise `python3` dans ce dernier. Remplace `main` par `master` si nécessaire. Si une branche existe déjà, reprends-la avec `git switch NOM` sans `-c`. Après chaque fusion, actualise la branche principale avant la mission suivante.
 
 ### Les mots utiles
+
+**Chaîne / champ.** Une chaîne (str) est du texte. Un champ est un morceau de donnée, comme l’utilisateur dans une ligne de journal.
+
+**Liste / position.** Une liste conserve plusieurs valeurs dans un ordre. Sa première position porte le numéro 0, la suivante 1, etc.
+
+**Dictionnaire / clé.** Un dictionnaire associe un nom à une valeur : {"fruit": "pomme"}. fruit est la clé ; pomme est sa valeur.
+
+**None.** Une valeur Python qui représente l’absence de résultat. Dans analyser_ligne, elle signifie que la ligne est refusée. Elle s’écrit sans guillemets.
+
+**split / strip.** split() sans argument découpe une chaîne sur ses espaces. split(".") découpe sur les points. strip() retire les espaces aux bords.
 
 **Contrat.** Les règles à respecter : arguments reçus, valeur retournée, erreurs et cas limites. Tu choisis le code qui respecte ces règles.
 
@@ -100,11 +110,18 @@ Partir d’un dépôt propre, sur une branche dédiée à cette MR.
 
 **Où tu travailles :** Dépôt
 
+**Pour comprendre**
+
+- La branche principale (main) contient le travail déjà fusionné. Ta branche feat/... reçoit les changements de cette mission.
+- Un dépôt « propre » n’a aucune modification en attente : git status te le confirme.
+
 **Actions dans l’ordre**
 
-1. Ouvre le dossier workspaces/fileguard dans le terminal de VS Code (ou, dans le conteneur, docker compose exec atelier bash puis cd /workspaces/fileguard).
-2. Si le dépôt n’est pas encore cloné, fais d’abord l’étape « Cloner le dépôt » de l’onglet Environnement.
-3. Crée la branche de MR1 depuis la branche principale, puis vérifie où tu es.
+1. Ouvre workspaces/fileguard dans VS Code, ou Coder dans Cyber Atelier avec cwd sur « . ».
+2. Si le dépôt n’est pas cloné, fais d’abord la préparation de l’onglet Environnement.
+3. Lis git status ; enregistre ton travail en cours avant de changer de branche.
+4. Reviens sur main avec git switch main, mets-la à jour avec git pull --ff-only, puis crée feat/empreinte. Remplace main par master si ton dépôt utilise ce nom.
+5. Vérifie le nom de ta branche avec git status. Si elle existe déjà, reprends-la avec git switch sans -c.
 
 **Terminal · Relire l’état du dépôt**
 
@@ -136,11 +153,16 @@ Comprendre pourquoi on lit un fichier en mode binaire pour obtenir ses octets ex
 
 **Où tu travailles :** Terminal : exemple binaire
 
+**Pour comprendre**
+
+- Un octet est une unité du contenu d’un fichier. bytes représente ces octets ; str représente du texte décodé.
+- rb lit les octets tels quels ; wb les écrit. Un saut de ligne supplémentaire change aussi le contenu.
+
 **Actions dans l’ordre**
 
-1. Un fichier est une suite d’octets. Le mode texte (par défaut) décode le contenu et peut traiter les fins de ligne ; le mode binaire (rb, wb) donne les octets tels quels.
-2. Lance l’exemple ci-dessous dans le terminal : il crée un dossier temporaire, écrit un fichier de fruits, le relit en octets et le supprime à la sortie du bloc with.
-3. Compare b"pomme" à "pomme" : le premier est de type bytes, le second de type str. Aucun fichier ne reste dans ton dépôt.
+1. Lance l’exemple terminal qui crée un fichier dans un dossier temporaire.
+2. Observe b'pomme' et le type bytes. Compare avec "pomme", de type str.
+3. Repère wb, rb et with. Vérifie que le dossier temporaire disparaît à la fin de l’exemple.
 
 **Terminal · Commande à lancer au moment indiqué**
 
@@ -167,7 +189,24 @@ with TemporaryDirectory() as dossier:
 
 **Pour comprendre**
 
-- Notion : un fichier temporaire est créé par tempfile et supprimé à la fin du bloc with. Exemple sans rapport avec l’exercice : un dossier temporaire contenant un fichier de fruits.
+- SHA-256 calcule une empreinte de 64 caractères hexadécimaux à partir des octets. Elle sert à comparer des contenus.
+- Un oracle est une valeur attendue connue, écrite dans le test ; on ne la recalcule pas avec la fonction à vérifier.
+
+**Exemple de résultat attendu**
+
+Ce que tu donnes :
+
+```text
+Un fichier de zéro octet.
+```
+
+Ce que tu dois obtenir :
+
+```text
+e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+```
+
+Un fichier vide a une empreinte ; le retour n’est pas vide.
 
 **Cas de test à écrire**
 
@@ -179,11 +218,11 @@ L’entrée est ce que tu donnes au code ; l’attendu est ce que ton test doit 
 
 **Actions dans l’ordre**
 
-1. Dans verification.py, importe unittest, crée une classe héritant de unittest.TestCase et des méthodes commençant par test_. Ajoute le point d’entrée unittest.main() sous la garde if __name__ == "__main__". Sans ce lancement, python3 verification.py peut finir avec 0 sans exécuter aucun test.
-2. Crée verification.py avec une classe de test unittest. Ajoute le test F1 : un fichier de zéro octet, dans un dossier temporaire créé par le test, comparé à l’oracle du fichier vide écrit en constante dans le test.
-3. Lance le test : il échoue, parce que fileguard.py n’existe pas encore. C’est la phase rouge, elle est normale.
-4. Crée fileguard.py avec une fonction calculer_sha256(chemin) (ce nom est proposé ; tu peux le garder). Elle ouvre le fichier en mode binaire, calcule le SHA-256 des octets et renvoie l’empreinte en hexadécimal minuscule. Relance : F1 passe (phase verte).
-5. Commit de ce palier.
+1. Crée verification.py : classe unittest.TestCase, méthodes test_, unittest.main() sous __main__.
+2. Écris F1 : fichier temporaire de zéro octet, empreinte comparée à la constante du cas de test.
+3. Lance et comprends le rouge : module ou fonction absente.
+4. Crée fileguard.py et calculer_sha256(chemin) : lecture binaire, SHA-256, retour hexadécimal minuscule.
+5. Relance F1, vérifie son exécution puis commite.
 
 **Terminal · Commande à lancer au moment indiqué**
 
@@ -216,6 +255,11 @@ Vérifier que l’empreinte dépend des octets exacts, sans fin de ligne ajouté
 
 **Où tu travailles :** fileguard.py ; verification.py
 
+**Pour comprendre**
+
+- b"abc" représente trois octets ; b"abc\n" en représente quatre et aurait une autre empreinte.
+- Un nouveau test peut déjà passer : conserve-le même sans modification de code.
+
 **Cas de test à écrire**
 
 L’entrée est ce que tu donnes au code ; l’attendu est ce que ton test doit vérifier.
@@ -226,10 +270,10 @@ L’entrée est ce que tu donnes au code ; l’attendu est ce que ton test doit 
 
 **Actions dans l’ordre**
 
-1. Ajoute le test F2 : un fichier temporaire qui contient exactement les octets de « abc », sans saut de ligne final. Compare à l’oracle abc, écrit en constante dans le test.
-2. Lance les tests. S’il passe tout de suite, c’est possible : écris le test quand même et note-le dans ton message de commit.
-3. Si F2 échoue, relis comment ton fichier est ouvert et écrit. Ne change jamais la constante de l’oracle pour faire passer le test.
-4. Une fois F1 et F2 verts, commit.
+1. Ajoute F2 : écris exactement b"abc" dans un fichier temporaire en mode binaire.
+2. Compare calculer_sha256 à la constante donnée pour F2, sans recalculer l’attendu.
+3. En cas d’échec, vérifie les octets et le mode de lecture ; garde la constante intacte.
+4. Relance F1 et F2 puis commite ; note si le code n’a pas eu besoin de changer.
 
 **Terminal · Commande à lancer au moment indiqué**
 
@@ -256,6 +300,11 @@ git commit -m "Vérifie l’empreinte des trois octets abc"
 
 **Où tu travailles :** fileguard.py ; verification.py
 
+**Pour comprendre**
+
+- L’empreinte dépend du contenu, pas du nom du fichier. Deux fichiers aux mêmes octets donnent la même empreinte.
+- Le test prépare ses données pour rester indépendant de ton ordinateur.
+
 **Cas de test à écrire**
 
 L’entrée est ce que tu donnes au code ; l’attendu est ce que ton test doit vérifier.
@@ -266,9 +315,10 @@ L’entrée est ce que tu donnes au code ; l’attendu est ce que ton test doit 
 
 **Actions dans l’ordre**
 
-1. Ajoute le test F3 : dans un même dossier temporaire, crée deux fichiers qui ont les mêmes octets, calcule leurs empreintes et compare-les.
-2. Le test ne lit ni le dossier personnel, ni un journal, ni une fixture : tout ce dont il a besoin est créé dans le dossier temporaire.
-3. Lance les tests, vérifie que F1, F2 et F3 passent, puis commit.
+1. Ajoute F3 : deux fichiers de noms différents, mêmes octets, dans un dossier temporaire.
+2. Calcule les deux empreintes et compare-les.
+3. Vérifie que le test ne lit ni fixture, ni journal, ni fichier personnel.
+4. Relance F1 à F3 puis commite.
 
 **Terminal · Commande à lancer au moment indiqué**
 
@@ -295,13 +345,10 @@ Comprendre ce que la CI exécute, et ce qu’elle ne prouve pas encore.
 
 **Où tu travailles :** .gitlab-ci.yml
 
-**Actions dans l’ordre**
+**Pour comprendre**
 
-1. Crée .gitlab-ci.yml à la racine du dépôt, avec un seul job dont la ligne script lance uniquement python3 verification.py. Le job ne copie aucune fixture et ne lit aucun chemin du portail.
-2. Le YAML se lit à l’indentation (deux espaces par niveau). Exemple sans rapport avec l’exercice : un job qui affiche un mot.
-3. Lance la même commande en local avant de pousser.
-4. Distingue quatre niveaux : test local réussi ; pipeline GitLab réellement exécuté ; fusion autorisée par les règles de l’école ; case cochée dans Cyber Atelier, qui ne vérifie rien. Un fichier .gitlab-ci.yml présent ne prouve pas qu’un pipeline a tourné.
-5. Commit ce fichier.
+- YAML utilise les espaces pour exprimer les niveaux : les commandes script appartiennent à leur job.
+- La CI exécute les tests sur un runner ; sa configuration seule ne prouve pas leur exécution.
 
 **Éditeur · Exemple YAML à lire**
 
@@ -312,6 +359,13 @@ job-bonjour:
   script:
     - echo "bonjour"
 ```
+
+**Actions dans l’ordre**
+
+1. Lis le job bonjour de l’exemple et repère l’indentation.
+2. Rédige .gitlab-ci.yml à la racine : un job lance uniquement python3 verification.py.
+3. Ne copie aucune fixture et ne lis aucun chemin du portail dans ce job.
+4. Lance la même commande en local et commite la CI. La livraison suivante vérifiera le pipeline.
 
 **Terminal · Commande à lancer au moment indiqué**
 
@@ -338,13 +392,20 @@ Relire le diff, pousser la branche, ouvrir la MR et ne fusionner que le dernier 
 
 **Où tu travailles :** MR GitLab
 
+**Pour comprendre**
+
+- git diff montre les lignes modifiées ; git diff --staged montre celles choisies pour le prochain commit. Le diff de la MR compare toute ta branche à main.
+- La demande de fusion (MR dans GitLab, PR dans GitHub) permet de relire le travail avant de l’intégrer à main.
+
 **Actions dans l’ordre**
 
-1. Regarde ce que tu livres : fichiers modifiés et historique. La MR doit contenir fileguard.py, verification.py et .gitlab-ci.yml, sans __pycache__.
-2. Pousse la branche et ouvre la merge request vers main.
-3. Relis le diff comme s’il était écrit par quelqu’un d’autre.
-4. Fusionne seulement si le dernier commit a passé le pipeline GitLab et que les règles de l’école l’autorisent. Vert en local ne suffit pas.
-5. Après la fusion, reviens sur main et mets-la à jour avant MR2.
+1. Lance la suite complète avec la commande indiquée au début de la mission.
+2. Relis git status et git diff : la livraison doit contenir fileguard.py, verification.py et .gitlab-ci.yml, sans __pycache__, avec les modifications nécessaires de cette mission.
+3. Ajoute les fichiers par leur nom, relis git diff --staged, puis commite ce qui ne l’est pas encore.
+4. Pousse feat/empreinte et ouvre la demande de fusion vers main.
+5. Dans GitLab, ouvre le pipeline du dernier commit : vérifie qu’il a réellement exécuté les tests et qu’il est vert. Un test local réussi ne le remplace pas.
+6. Relis le diff et fusionne lorsque le pipeline et les règles de l’école le permettent.
+7. Après la fusion, reviens sur main et lance git pull --ff-only avant la mission suivante.
 
 **Terminal · Relire l’état du dépôt**
 
@@ -401,10 +462,18 @@ Partir de la MR1 fusionnée, pas d’une branche ancienne.
 
 **Où tu travailles :** Dépôt
 
+**Pour comprendre**
+
+- La branche principale (main) contient le travail déjà fusionné. Ta branche feat/... reçoit les changements de cette mission.
+- Un dépôt « propre » n’a aucune modification en attente : git status te le confirme.
+
 **Actions dans l’ordre**
 
-1. Reviens sur main et mets-la à jour, puis crée la branche de MR2.
-2. Vérifie que ton dépôt est propre avant de commencer.
+1. Ouvre workspaces/fileguard dans VS Code, ou Coder dans Cyber Atelier avec cwd sur « . ».
+2. Vérifie que MR1 est fusionnée et que F1 à F3 passent sur main.
+3. Lis git status ; enregistre ton travail en cours avant de changer de branche.
+4. Reviens sur main avec git switch main, mets-la à jour avec git pull --ff-only, puis crée feat/manifest. Remplace main par master si ton dépôt utilise ce nom.
+5. Vérifie le nom de ta branche avec git status. Si elle existe déjà, reprends-la avec git switch sans -c.
 
 **Terminal · Après la fusion : actualiser la principale**
 
@@ -442,11 +511,17 @@ Disposer d’un petit dossier d’exemple, relisible, dans le dépôt.
 
 **Où tu travailles :** fixtures/
 
+**Pour comprendre**
+
+- Les fixtures sont trois fichiers fictifs fournis pour les essais ; leurs copies font partie de cette livraison.
+- chmod u+w permet de modifier les copies, sans toucher aux originaux.
+
 **Actions dans l’ordre**
 
-1. Sur le Mac, reste dans workspaces/fileguard : ../../ remonte jusqu’au projet Cyber Atelier, où se trouve fixtures/integrity. Dans le conteneur, remplace ../../fixtures par /app/fixtures.
-2. La commande crée fixtures/, copie les trois fichiers fictifs, puis rend les copies modifiables (chmod u+w). Les originaux restent en lecture seule.
-3. Vérifie le résultat, puis commit les copies : elles font partie de la MR2.
+1. Sur le Mac, depuis workspaces/fileguard, copie ../../fixtures/integrity dans fixtures/. Dans le conteneur, utilise /app/fixtures/integrity.
+2. Rends les copies modifiables avec chmod u+w.
+3. Vérifie README.txt, message.txt et settings.ini avec ls fixtures.
+4. Ajoute explicitement ces trois fichiers et commite les copies.
 
 **Terminal · Commande à lancer au moment indiqué**
 
@@ -491,12 +566,38 @@ Savoir écrire exactement le format du contrat, avec un ordre de clés et une fi
 
 **Pour comprendre**
 
-- Notion : json.dumps écrit un dictionnaire dans l’ordre où ses clés ont été ajoutées. Avec indent=2, la sortie est lisible et stable. Exemple sans rapport avec l’exercice : un panier de fruits.
+- Le manifeste conserve les noms et empreintes à un moment donné. JSON enregistre cette structure dans manifest.json.
+- Un nom simple est message.txt, sans dossier ni chemin absolu. L’ordre fait partie du format demandé.
+
+**Exemple de résultat attendu**
+
+Ce que tu donnes :
+
+```text
+Un dossier vide.
+```
+
+Ce que tu dois obtenir :
+
+```text
+{"schema": 1, "files": []}
+```
+
+files reste une liste même quand elle est vide.
+
+**Règles à respecter**
+
+- Objet racine : schema vaut 1, puis files contient une liste.
+- Chaque entrée a exactement name puis sha256 : nom simple et empreinte de 64 caractères hexadécimaux minuscules.
+- Entrées triées par name ; indentation stable, UTF-8, saut de ligne final.
+- Pas de chemin absolu ni de donnée secrète ; manifest.json ne contient jamais sa propre empreinte.
 
 **Actions dans l’ordre**
 
-1. Contrat : un objet JSON avec la clé schema (valeur 1), puis la clé files : une liste d’objets. Chaque objet a exactement deux clés, name (nom simple) puis sha256 (64 caractères hexadécimaux minuscules). Le fichier se termine par un saut de ligne.
-2. Tu n’as rien à coder à ce palier : écris à la main, sur un exemple fictif, un JSON qui respecte ce contrat, puis compare-le avec la forme donnée dans le guide.
+1. Écris à la main un manifeste fictif dans un fichier d’essai, sans encore coder la génération.
+2. Compare sa structure aux règles : objet racine, liste files, objets par fichier.
+3. Explique pourquoi sort_keys=True changerait l’ordre schema puis files.
+4. Retire le fichier d’essai ; un manifeste généré ne sera pas commité.
 
 **Terminal · Commande à lancer au moment indiqué**
 
@@ -524,7 +625,8 @@ Lister les fichiers réguliers du premier niveau avec pathlib, sans entrer dans 
 
 **Pour comprendre**
 
-- Notion : pathlib.Path(dossier).iterdir() donne les entrées directes d’un dossier. Exemple sans rapport : lister les fichiers d’un dossier fruits.
+- Le premier niveau désigne les fichiers directement dans le dossier donné ; les sous-dossiers ne sont pas parcourus.
+- Un dossier vide reste admis et donne une liste vide.
 
 **Cas de test à écrire**
 
@@ -536,9 +638,10 @@ L’entrée est ce que tu donnes au code ; l’attendu est ce que ton test doit 
 
 **Actions dans l’ordre**
 
-1. Ajoute le test F4 : un dossier temporaire vide donne un manifeste valide avec une liste vide. Lance-le, il échoue parce que la fonction n’existe pas encore.
-2. Écris le plus petit code qui fait passer F4. Ne parcours aucun sous-dossier.
-3. Commit ce palier.
+1. Ajoute F4 : un dossier temporaire vide donne schema 1 et files vide.
+2. Lance et repère la fonction manquante. Choisis son nom et conserve-le dans les tests.
+3. Écris la génération minimale pour ce cas, au format du palier précédent.
+4. Relance F1 à F4 puis commite.
 
 **Terminal · Commande à lancer au moment indiqué**
 
@@ -571,6 +674,11 @@ Obtenir le même fichier quel que soit l’ordre de création des fichiers.
 
 **Où tu travailles :** fileguard.py ; verification.py
 
+**Pour comprendre**
+
+- Le système ne garantit pas l’ordre de lecture des fichiers. sorted sur les noms rend la liste stable.
+- Déterministe signifie ici : mêmes données → même contenu du manifeste.
+
 **Cas de test à écrire**
 
 L’entrée est ce que tu donnes au code ; l’attendu est ce que ton test doit vérifier.
@@ -581,11 +689,11 @@ L’entrée est ce que tu donnes au code ; l’attendu est ce que ton test doit 
 
 **Actions dans l’ordre**
 
-1. Ajoute le test F5 : crée plusieurs fichiers dans un ordre non trié, génère le manifeste, puis vérifie que les entrées sont triées par nom.
-2. Trie les noms avant l’écriture, avec sorted(). Écris le fichier en UTF-8 et ajoute un saut de ligne final, puis vérifie que le contenu correspond au contrat.
-3. Le nom de fichier du manifeste est manifest.json. Ce palier ne règle pas encore l’exclusion : elle viendra à F6.
-4. Le guide demande de décider et de documenter si la commande crée ou remplace le manifeste. Note ta décision maintenant ; tu la rédigeras dans le README en MR3.
-5. Commit ce palier.
+1. Ajoute F5 : crée plusieurs fichiers temporaires dans un ordre non alphabétique ; vérifie les entrées triées par name.
+2. Complète l’inventaire des fichiers réguliers du premier niveau, réutilise calculer_sha256 et écris manifest.json en UTF-8 avec un saut de ligne final.
+3. Compare deux générations sur les mêmes données.
+4. Choisis si creer crée seulement ou remplace un manifeste existant ; note ce choix pour le README.
+5. Relance F1 à F5 puis commite.
 
 **Terminal · Commande à lancer au moment indiqué**
 
@@ -618,6 +726,11 @@ Exclure le manifeste de son propre inventaire, même quand il se trouve dans le 
 
 **Où tu travailles :** fileguard.py ; verification.py
 
+**Pour comprendre**
+
+- Le manifeste est une sortie de l’inventaire. Se compter lui-même ferait changer son contenu à chaque génération.
+- L’exclusion se fait sur le nom simple manifest.json.
+
 **Cas de test à écrire**
 
 L’entrée est ce que tu donnes au code ; l’attendu est ce que ton test doit vérifier.
@@ -628,9 +741,10 @@ L’entrée est ce que tu donnes au code ; l’attendu est ce que ton test doit 
 
 **Actions dans l’ordre**
 
-1. Ajoute le test F6 : écris le manifeste dans le même dossier que les données, relance l’inventaire, et vérifie que manifest.json n’apparaît pas dans ses propres entrées.
-2. Écris le plus petit code qui fait passer F6. La comparaison se fait sur le nom simple du fichier, pas sur un chemin complet.
-3. Commit ce palier.
+1. Ajoute F6 : place manifest.json dans le dossier temporaire des données, puis relance l’inventaire.
+2. Vérifie qu’aucune entrée files ne porte ce nom.
+3. Ajoute l’exclusion sans retirer les autres fichiers réguliers.
+4. Relance F1 à F6 puis commite.
 
 **Terminal · Commande à lancer au moment indiqué**
 
@@ -665,7 +779,8 @@ Refuser clairement un lien symbolique, et tester ce refus quand le système perm
 
 **Pour comprendre**
 
-- Notion : os.symlink(cible, lien) crée un lien dans un dossier temporaire. Exemple sans rapport : un raccourci vers un fichier de fruits. Pathlib.is_symlink() dit si une entrée est un lien.
+- Un lien symbolique pointe vers un autre chemin : le suivre pourrait sortir du dossier prévu. Le contrat le refuse.
+- skipTest indique avec une raison que le système ne permet pas de créer ce lien.
 
 **Cas de test à écrire**
 
@@ -677,9 +792,10 @@ L’entrée est ce que tu donnes au code ; l’attendu est ce que ton test doit 
 
 **Actions dans l’ordre**
 
-1. Ajoute le test F7 : crée un lien vers un fichier temporaire. Si le système refuse de créer le lien, le test se termine proprement avec skipTest et un message clair.
-2. Écris le code qui refuse le lien avec une erreur explicite dont le message indique qu’un lien symbolique est refusé. Pour le contrat, choisis un type d’exception et documente-le dans le README en MR3.
-3. Vérifie que le test passe quand le lien existe, et que l’inventaire ne le suit pas. Commit.
+1. Ajoute F7 : crée un fichier temporaire et un lien vers lui dans le dossier à examiner.
+2. Si la création du lien n’est pas supportée, utilise skipTest avec une explication.
+3. Sinon, attends une exception explicite indiquant le refus du lien. Choisis son type et note-le pour le README.
+4. Détecte le lien avant de lire sa cible, relance F1 à F7 puis commite.
 
 **Terminal · Commande à lancer au moment indiqué**
 
@@ -712,12 +828,21 @@ Relire le diff, pousser feat/manifest, ouvrir la MR et ne pas livrer de fichiers
 
 **Où tu travailles :** MR GitLab
 
+**Pour comprendre**
+
+- git diff montre les lignes modifiées ; git diff --staged montre celles choisies pour le prochain commit. Le diff de la MR compare toute ta branche à main.
+- La demande de fusion (MR dans GitLab, PR dans GitHub) permet de relire le travail avant de l’intégrer à main.
+
 **Actions dans l’ordre**
 
-1. Regarde le diff : fileguard.py, verification.py, fixtures/. Un manifest.json généré par tes essais ne doit pas être commité.
-2. Pousse la branche et ouvre la merge request vers main.
-3. Attends le pipeline vert dans GitLab, puis fusionne seulement si les règles de l’école l’autorisent. Vert en local ne suffit pas.
-4. Après la fusion, reviens sur main et mets-la à jour avant MR3.
+1. Lance la suite complète avec la commande indiquée au début de la mission.
+2. Écarte manifest.json produit par tes essais. Vérifie les trois fixtures d’origine dans la MR.
+3. Relis git status et git diff : la livraison doit contenir fileguard.py, verification.py et fixtures/, avec les modifications nécessaires de cette mission.
+4. Ajoute les fichiers par leur nom, relis git diff --staged, puis commite ce qui ne l’est pas encore.
+5. Pousse feat/manifest et ouvre la demande de fusion vers main.
+6. Dans GitLab, ouvre le pipeline du dernier commit : vérifie qu’il a réellement exécuté les tests et qu’il est vert. Un test local réussi ne le remplace pas.
+7. Relis le diff et fusionne lorsque le pipeline et les règles de l’école le permettent.
+8. Après la fusion, reviens sur main et lance git pull --ff-only avant la mission suivante.
 
 **Terminal · Relire l’état du dépôt**
 
@@ -774,10 +899,18 @@ Partir de la MR2 fusionnée, pour que la comparaison s’appuie sur le bon code.
 
 **Où tu travailles :** Dépôt
 
+**Pour comprendre**
+
+- La branche principale (main) contient le travail déjà fusionné. Ta branche feat/... reçoit les changements de cette mission.
+- Un dépôt « propre » n’a aucune modification en attente : git status te le confirme.
+
 **Actions dans l’ordre**
 
-1. Reviens sur main, mets-la à jour, puis crée la branche de MR3.
-2. Vérifie que ton dépôt est propre.
+1. Ouvre workspaces/fileguard dans VS Code, ou Coder dans Cyber Atelier avec cwd sur « . ».
+2. Vérifie que MR2 est fusionnée et que F1 à F7 passent sur main.
+3. Lis git status ; enregistre ton travail en cours avant de changer de branche.
+4. Reviens sur main avec git switch main, mets-la à jour avec git pull --ff-only, puis crée feat/comparaison. Remplace main par master si ton dépôt utilise ce nom.
+5. Vérifie le nom de ta branche avec git status. Si elle existe déjà, reprends-la avec git switch sans -c.
 
 **Terminal · Après la fusion : actualiser la principale**
 
@@ -817,13 +950,24 @@ Séparer présence et absence des noms, puis comparer les empreintes nom par nom
 
 **Pour comprendre**
 
-- Notion : un set ne contient que des valeurs distinctes ; la différence ensembliste donne ce qui est dans l’un et pas dans l’autre. Exemple sans rapport : deux paniers de fruits.
+- Le manifeste est la référence de départ ; l’inventaire décrit les fichiers actuels.
+- L’intersection contient les noms des deux côtés ; la différence contient les noms d’un seul côté.
+
+**Règles à respecter**
+
+- comparer(manifeste, inventaire) retourne inchange, modifie, supprime et ajoute : listes triées de noms.
+- Deux côtés, même empreinte → inchange.
+- Deux côtés, empreinte différente → modifie.
+- Seulement dans le manifeste → supprime.
+- Seulement dans l’inventaire → ajoute.
+- manifest.json est exclu de toutes les catégories.
 
 **Actions dans l’ordre**
 
-1. Contrat proposé pour la comparaison : une fonction comparer(manifeste, inventaire) qui renvoie un dictionnaire aux clés inchange, modifie, supprime et ajoute, chacune avec une liste triée de noms. Un nom présent des deux côtés avec une empreinte différente est modifié.
-2. Le manifeste lui-même est ignoré : aucune entrée qui le concerne ne peut apparaître dans une catégorie.
-3. Pas de code à ce palier : vérifie sur l’exemple de commande que tu sais ce qu’est une différence et une intersection.
+1. Observe l’exemple d’ensembles sans coder comparer pour l’instant.
+2. Classe sur papier des noms présents seulement avant, seulement maintenant et des deux côtés.
+3. Pour un nom des deux côtés, compare ensuite les empreintes.
+4. Vérifie que tu sais distinguer les quatre catégories et leur tri.
 
 **Terminal · Commande à lancer au moment indiqué**
 
@@ -843,6 +987,11 @@ python3 -c "a = {'pomme', 'poire'}; b = {'poire', 'kiwi'}; print(a - b, b - a, a
 
 **Où tu travailles :** fileguard.py ; verification.py
 
+**Pour comprendre**
+
+- Sans différence, les fichiers restent dans le résultat, rangés dans inchange.
+- Les quatre clés sont présentes même quand trois listes sont vides.
+
 **Cas de test à écrire**
 
 L’entrée est ce que tu donnes au code ; l’attendu est ce que ton test doit vérifier.
@@ -853,9 +1002,10 @@ L’entrée est ce que tu donnes au code ; l’attendu est ce que ton test doit 
 
 **Actions dans l’ordre**
 
-1. Ajoute le test F8 : un dossier temporaire dont chaque fichier correspond exactement au manifeste. Tous les noms doivent être dans inchange, et les autres catégories vides.
-2. Lance le test : il échoue tant que comparer n’existe pas. Écris le plus petit code qui fait passer F8.
-3. Commit ce palier.
+1. Ajoute F8 : dossier temporaire correspondant exactement au manifeste.
+2. Vérifie tous les noms dans inchange et trois autres listes vides.
+3. Crée comparer(manifeste, inventaire) avec les catégories et le tri prévus.
+4. Relance F1 à F8 puis commite.
 
 **Terminal · Commande à lancer au moment indiqué**
 
@@ -882,6 +1032,11 @@ Distinguer un fichier dont le contenu a changé d’un fichier qui a disparu.
 
 **Où tu travailles :** fileguard.py ; verification.py
 
+**Pour comprendre**
+
+- Même nom et nouveaux octets : fichier modifié. Nom disparu de l’inventaire actuel : fichier supprimé.
+- La comparaison prend le manifeste comme référence.
+
 **Cas de test à écrire**
 
 L’entrée est ce que tu donnes au code ; l’attendu est ce que ton test doit vérifier.
@@ -896,9 +1051,10 @@ L’entrée est ce que tu donnes au code ; l’attendu est ce que ton test doit 
 
 **Actions dans l’ordre**
 
-1. Ajoute le test F9 : même nom, contenu différent, donc une empreinte différente. Le nom doit être dans modifie.
-2. Ajoute le test F10 : un nom présent dans le manifeste mais absent du dossier. Le nom doit être dans supprime.
-3. Lance les tests, écris le code qui les fait passer, puis commit.
+1. Ajoute F9 : crée le manifeste puis change le contenu du fichier ; attends son nom dans modifie.
+2. Ajoute F10 : crée le manifeste puis retire le fichier temporaire ; attends son nom dans supprime.
+3. Complète comparer sans confondre les situations ni placer un nom dans deux catégories.
+4. Relance F1 à F10 puis commite.
 
 **Terminal · Commande à lancer au moment indiqué**
 
@@ -925,6 +1081,11 @@ Gérer les nouveaux fichiers, puis vérifier que les quatre catégories restent 
 
 **Où tu travailles :** fileguard.py ; verification.py
 
+**Pour comprendre**
+
+- Un fichier actuel absent du manifeste est ajouté.
+- Le cas mixte vérifie que les catégories fonctionnent ensemble et restent exclusives.
+
 **Cas de test à écrire**
 
 L’entrée est ce que tu donnes au code ; l’attendu est ce que ton test doit vérifier.
@@ -939,9 +1100,10 @@ L’entrée est ce que tu donnes au code ; l’attendu est ce que ton test doit 
 
 **Actions dans l’ordre**
 
-1. Ajoute le test F11 : un nouveau fichier régulier au premier niveau, absent du manifeste. Son nom doit être dans ajoute.
-2. Ajoute le test F12 : un dossier qui contient un cas inchangé, un modifié, un supprimé et un ajouté. Chaque nom doit être dans sa catégorie exacte, et nulle part ailleurs.
-3. Lance les tests, écris le code qui les fait passer, puis commit.
+1. Ajoute F11 : nouveau fichier régulier au premier niveau, nom dans ajoute.
+2. Ajoute F12 : un fichier par catégorie, inchangé, modifié, supprimé et ajouté.
+3. Compare les listes exactes triées, avec chaque nom seulement dans sa catégorie.
+4. Complète le code, relance F1 à F12 puis commite.
 
 **Terminal · Commande à lancer au moment indiqué**
 
@@ -968,6 +1130,11 @@ Vérifier les cas limites : un manifeste sans entrée, et un manifeste conservé
 
 **Où tu travailles :** fileguard.py ; verification.py
 
+**Pour comprendre**
+
+- Sans entrée dans le manifeste, tous les fichiers actuels sont nouveaux.
+- manifest.json reste exclu même s’il est conservé avec les données.
+
 **Cas de test à écrire**
 
 L’entrée est ce que tu donnes au code ; l’attendu est ce que ton test doit vérifier.
@@ -982,9 +1149,10 @@ L’entrée est ce que tu donnes au code ; l’attendu est ce que ton test doit 
 
 **Actions dans l’ordre**
 
-1. Ajoute le test F13 : un manifeste sans entrée et un dossier qui contient des fichiers. Tous les fichiers doivent être dans ajoute.
-2. Ajoute le test F14 : le manifeste est conservé à côté des données. Il ne doit jamais être signalé comme ajouté ou modifié.
-3. Écris le code qui fait passer les deux tests, puis commit.
+1. Ajoute F13 : manifeste vide, dossier temporaire contenant des fichiers ; tous dans ajoute.
+2. Ajoute F14 avec manifest.json à proximité : il n’est ni ajouté ni modifié.
+3. Complète ces limites sans retirer l’exclusion de l’inventaire.
+4. Relance F1 à F14 puis commite.
 
 **Terminal · Commande à lancer au moment indiqué**
 
@@ -1013,13 +1181,15 @@ Relier la création et la vérification à une ligne de commande, sans parcourir
 
 **Pour comprendre**
 
-- Notion : sys.argv contient les arguments de la ligne de commande. Exemple sans rapport : un petit script qui affiche le premier argument.
+- creer enregistre la référence ; verifier compare l’état actuel à cette référence.
+- Un message clair et un code non nul signalent une entrée inutilisable.
 
 **Actions dans l’ordre**
 
-1. Ajoute deux commandes : creer DOSSIER (écrit manifest.json) et verifier DOSSIER (affiche les quatre catégories, un nom par ligne). Le dossier est toujours explicite ; le programme ne cherche rien ailleurs.
-2. Vérifie qu’un argument manquant ou un dossier inexistant donne un message clair et un code de sortie non nul.
-3. Commit ce palier.
+1. Ajoute creer DOSSIER et verifier DOSSIER ; aucun dossier n’est cherché ailleurs automatiquement.
+2. creer écrit manifest.json selon ton choix création/remplacement. verifier affiche les quatre catégories, un nom par ligne.
+3. Essaie un argument manquant et un dossier inexistant : message clair, code non nul.
+4. Relance les tests et commite la CLI.
 
 **Terminal · Commande à lancer au moment indiqué**
 
@@ -1058,12 +1228,18 @@ Expliquer le programme et ses limites à quelqu’un qui ne l’a pas écrit.
 
 **Où tu travailles :** README.md
 
+**Pour comprendre**
+
+- Le README documente tes décisions : remplacement du manifeste et exception pour les liens.
+- Une référence modifiable avec les données ne certifie pas leur origine.
+
 **Actions dans l’ordre**
 
-1. Le README contient : la structure du dossier, le format du manifeste (schema 1, files, name, sha256), les commandes, le comportement des liens symboliques et des sous-dossiers, le sens du résultat et les limites.
-2. Indique si creer crée ou remplace manifest.json, et quelle exception est levée pour un lien symbolique.
-3. Écris que le manifeste doit être digne de confiance, puisqu’une personne qui modifie les fichiers peut modifier un manifeste conservé à côté, et que le projet n’est pas un antivirus.
-4. Commit le README.
+1. Documente structure du dossier, format schema/files/name/sha256, commandes et catégories.
+2. Précise premier niveau seulement, refus des liens et type d’exception choisi.
+3. Indique si creer crée ou remplace manifest.json.
+4. Explique le besoin d’une référence de confiance et la limite : FileGuard n’est pas un antivirus.
+5. Suis les commandes du README puis commite.
 
 **Terminal · Enregistrer le travail vérifié**
 
@@ -1084,12 +1260,21 @@ Montrer les quatre catégories sur un scénario, puis livrer la MR3 et fusionner
 
 **Où tu travailles :** Dossier temporaire ; MR GitLab
 
+**Pour comprendre**
+
+- git diff montre les lignes modifiées ; git diff --staged montre celles choisies pour le prochain commit. Le diff de la MR compare toute ta branche à main.
+- La demande de fusion (MR dans GitLab, PR dans GitHub) permet de relire le travail avant de l’intégrer à main.
+
 **Actions dans l’ordre**
 
-1. Démonstration (hors tests) : copie les fixtures dans un dossier de démonstration hors du dépôt, crée le manifeste, modifie un fichier, supprime-en un autre, ajoute un nouveau fichier, puis vérifie. Tu dois voir un fichier dans chaque catégorie, et README.txt inchangé.
-2. Relis le diff de la MR3, pousse la branche, puis ouvre la troisième merge request vers main.
-3. Attends le pipeline vert dans GitLab et fusionne seulement si les règles de l’école l’autorisent. La démonstration locale n’est pas une preuve de fusion.
-4. Après la fusion, mets main à jour : la série de trois MR est terminée.
+1. Lance la suite complète avec la commande indiquée au début de la mission.
+2. Fais la démo hors tests sur des copies hors du dépôt : crée le manifeste, modifie message.txt, supprime settings.ini, ajoute nouveau.txt. Vérifie ces trois catégories ainsi que README.txt dans inchange. Les changements de démo ne sont pas livrés.
+3. Relis git status et git diff : la livraison doit contenir fileguard.py, verification.py et README.md, avec les modifications nécessaires de cette mission.
+4. Ajoute les fichiers par leur nom, relis git diff --staged, puis commite ce qui ne l’est pas encore.
+5. Pousse feat/comparaison et ouvre la demande de fusion vers main.
+6. Dans GitLab, ouvre le pipeline du dernier commit : vérifie qu’il a réellement exécuté les tests et qu’il est vert. Un test local réussi ne le remplace pas.
+7. Relis le diff et fusionne lorsque le pipeline et les règles de l’école le permettent.
+8. Après la fusion, reviens sur main et lance git pull --ff-only avant la mission suivante.
 
 **Terminal · Commande à lancer au moment indiqué**
 

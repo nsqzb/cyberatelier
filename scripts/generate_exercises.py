@@ -27,6 +27,17 @@ def cases(items):
                     f'- Entrée : {case["input"]}',f'- Résultat attendu : {case["expected"]}',''])
     return out
 
+def blocks(items, placement):
+    out=[]
+    previous_context=None
+    for b in items:
+        if b.get('placement','after_actions')!=placement: continue
+        out += [f'**{"Terminal" if b["kind"]=="shell" else "Éditeur"} · {b["title"]}**','']
+        if b['context']!=previous_context: out += [b['context'],'']
+        out += [fence(b['code'],'bash' if b['kind']=='shell' else b['kind']),'']
+        previous_context=b['context']
+    return out
+
 def generated(data, course):
     guide=data['learningGuide']
     out=[START,'## Comment travailler un exercice','',guide['body'],'']
@@ -50,16 +61,19 @@ def generated(data, course):
             out += [f'#### Palier {n} — {p["title"]} ({p["minutes"]} min)','',p['goal'],'',f'**Où tu travailles :** {p["workspace"]}','']
             if p['explanation']:
                 out += ['**Pour comprendre**','']+[f'- {item}' for item in p['explanation']]+['']
+            out += blocks(p['blocks'],'before_actions')
+            if p.get('example'):
+                example=p['example']
+                out += ['**Exemple de résultat attendu**','','Ce que tu donnes :','',
+                        fence(example['input'],'text'),'','Ce que tu dois obtenir :','',
+                        fence(example['output'],'text'),'',example['note'],'']
+            if p.get('rules'):
+                out += ['**Règles à respecter**','']+[f'- {item}' for item in p['rules']]+['']
             wanted=[t for t in step.get('tests',[]) if t['id'] in p.get('tests',[])]
             if wanted:
                 out += ['**Cas de test à écrire**','','L’entrée est ce que tu donnes au code ; l’attendu est ce que ton test doit vérifier.','']+cases(wanted)
             out += ['**Actions dans l’ordre**','']+[f'{i}. {item}' for i,item in enumerate(p['do'],1)]+['']
-            previous_context=None
-            for b in p['blocks']:
-                out += [f'**{"Terminal" if b["kind"]=="shell" else "Éditeur"} · {b["title"]}**','']
-                if b['context']!=previous_context: out += [b['context'],'']
-                out += [fence(b['code'],'bash' if b['kind']=='shell' else b['kind']),'']
-                previous_context=b['context']
+            out += blocks(p['blocks'],'after_actions')
             out += [f'**Tu sais que c’est bon quand :** {p["check"]}','',f'*Indice si tu bloques :* {p["hint"]}','']
         if step.get('demos'):
             out += ['**Démonstrations manuelles (hors CI)**','','Ces essais utilisent le laboratoire ou les outils réels. Ils sont séparés des tests obligatoires.','']+cases(step['demos'])
