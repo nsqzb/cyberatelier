@@ -1,6 +1,6 @@
 # Cyber Atelier
 
-Cyber Atelier est une application locale pour pratiquer Python et GitLab à son rythme. Elle contient trois parcours guidés de cinq heures. Le code que tu écris et ta progression sont enregistrés dans des volumes Docker persistants. Aucun corrigé Python ni pipeline d’exercice n’est préinstallé.
+Cyber Atelier est une application locale pour pratiquer Python et GitLab à son rythme. Elle contient six parcours guidés de cinq heures, soit trente heures de pratique (voir la section « Parcours et chemin conseillé »). Le code que tu écris et ta progression sont enregistrés dans des volumes Docker persistants. Aucun corrigé Python ni pipeline d’exercice n’est préinstallé.
 
 ## Démarrer
 
@@ -15,9 +15,28 @@ Ouvre ensuite <http://127.0.0.1:8080>. L’application utilise le port `8080` pa
 
 Le service écoute sur `0.0.0.0:8080` à l’intérieur du conteneur afin que Docker puisse lui transmettre les requêtes. La publication côté machine est limitée à `127.0.0.1` : l’application est accessible depuis cette machine, pas depuis le réseau local. Dans le laboratoire, `127.0.0.1` désigne le conteneur lui-même. Le labo écoute sur le port 8000 à l’intérieur du conteneur et n’est pas publié sur l’hôte.
 
+## Parcours et chemin conseillé
+
+Six parcours de cinq heures chacun, trois merge requests par parcours. Pour les objectifs, les branches et les ids de tests, voir `docs/PARCOURS.md`.
+
+- **Socle Python & Git** (`socle`), 5 h : fonctions pures, tests unittest, fichiers et JSON, Git en équipe (conflit, rebase, tag).
+- **PortPilot** (`portpilot`), 5 h : scanner TCP limité à 127.0.0.1, validation de ports, pipeline GitLab.
+- **HeaderScope** (`headerscope`), 5 h : client HTTP vers le labo local et contrôle de trois en-têtes de sécurité.
+- **FileGuard** (`fileguard`), 5 h : empreintes SHA-256, manifeste et comparaison inchangé, modifié, supprimé ou ajouté.
+- **ToolWrap** (`toolwrap`), 5 h : lancer un outil externe avec `subprocess`, CLI `argparse`, lecture des sorties nmap et adsim.
+- **ReconWrap** (`reconwrap`), 5 h : assembler un mini-framework avec des modules réseau, web et Active Directory, des rapports et une version v0.1.0.
+
+Chemin conseillé : suis l'ordre ci-dessus. Le socle prépare tout le reste. PortPilot et HeaderScope fournissent les modules réseau et web que ReconWrap réutilise ; ToolWrap apprend à piloter les outils dont ReconWrap a besoin. Commence ReconWrap seulement après ToolWrap.
+
+## Outils fournis et leurs limites
+
+- **nmap** : outil réel, installé dans le conteneur. Il sert uniquement à une démonstration sur `127.0.0.1`, port `8000`, labo démarré, par exemple `nmap -sT -p 8000 -oX - 127.0.0.1`. Limite : aucune autre cible ni plage n'est autorisée. Les tests obligatoires n'appellent jamais nmap, car le runner GitLab ne l'a pas : ils lisent des fichiers XML fictifs.
+- **adsim** (`/app/tools/adsim.py`) : simulateur **fictif** d'un annuaire Active Directory, domaine `LAB.LOCAL`. Il ne se connecte à aucun annuaire ni à aucun réseau, et ses données sont fixes. Il ne remplace pas un vrai Active Directory : le vrai AD se pratiquera dans le projet final, sur un domaine personnel.
+- **Fixtures** (`/app/fixtures/`, en lecture seule) : `integrity` pour FileGuard, `socle` (journal de connexions fictif), `nmap` (sorties XML) et `adsim` (sorties JSON et texte). Copie-les dans ton dépôt avec les commandes indiquées dans la console de chaque parcours. Ce sont des données fictives : elles ne prouvent rien sur un vrai réseau ni sur un vrai domaine.
+
 ## Travailler sur les parcours
 
-L’onglet Coder permet de créer et modifier les fichiers du projet, puis de lancer de vraies commandes dans ce projet. Une commande lancée depuis l’interface s’arrête au bout de 30 secondes ; utilise le shell interactif ci-dessus pour une opération plus longue. Ce shell reste attaché au conteneur et ne garde pas de session après sa fermeture. Les dossiers `portpilot`, `headerscope` et `fileguard` sont réservés au travail apprenant. Les fixtures de FileGuard sont fournies dans l’application et peuvent être copiées dans le dépôt par tes soins.
+L’onglet Coder permet de créer et modifier les fichiers du projet, puis de lancer de vraies commandes dans ce projet. Une commande lancée depuis l’interface s’arrête au bout de 30 secondes ; utilise le shell interactif décrit ci-dessous pour une opération plus longue. Avant chaque commande, l’éditeur enregistre le fichier ouvert : la commande lit la version affichée. Ce shell reste attaché au conteneur et ne garde pas de session après sa fermeture. Les dossiers `portpilot`, `headerscope` et `fileguard` sont réservés au travail apprenant. Les fixtures fictives de FileGuard sont fournies en lecture seule dans `/app/fixtures/integrity`. Depuis la console du parcours FileGuard, `mkdir -p fixtures && cp /app/fixtures/integrity/* fixtures/ && chmod u+w fixtures/*` les copie dans ton dépôt et rend les copies modifiables (le bouton « Préparer dans la console » de l’onglet Environnement remplit cette commande).
 
 Pour les opérations Git interactives, ouvre un shell dans le conteneur :
 
@@ -27,9 +46,16 @@ cd /workspaces/portpilot
 git clone URL_DU_DEPOT_ECOLE .
 ```
 
-Remplace `URL_DU_DEPOT_ECOLE` par l’URL fournie par ton école. Tu peux aussi utiliser les dossiers `headerscope` et `fileguard`. Git, bash et le client OpenSSH sont installés. Avec une URL SSH, tu peux créer une clé dans le conteneur avec `ssh-keygen`, puis ajouter son contenu `.pub` à ton compte GitLab scolaire. Le dossier personnel du conteneur est conservé dans un volume Docker pour garder ta configuration Git et SSH entre les redémarrages. La clé privée qui s’y trouve reste un secret : ne l’ajoute jamais à un dépôt ni à une archive partagée. Avec HTTPS, Git peut demander un jeton ; ne colle pas de mot de passe ou de jeton dans les notes de l’atelier, les fichiers du projet ou une commande conservée dans l’historique. L’application ne gère pas les comptes de l’école.
+Remplace `URL_DU_DEPOT_ECOLE` par l’URL fournie par ton école. Avant ton premier commit, déclare une fois ton identité Git (elle est conservée dans le volume `home`) :
 
-Le labo intégré sert de cible locale pour HeaderScope et PortPilot. Démarre-le avec le bouton de laboratoire dans l’interface avant de lancer les exercices concernés ; il écoute sur le port 8000 du conteneur. Il n’est pas nécessaire de démarrer un serveur HTTP séparé. Un runner GitLab de l’école est une machine distincte : `127.0.0.1` dans un job désigne ce runner, et non le conteneur de Cyber Atelier. Les runners, leur configuration, les variables de CI et les droits de fusion sont fournis par l’école. Si le runner n’exécute pas le labo, les tests réseau visant celui-ci ne peuvent pas y réussir ; suis les consignes du parcours pour privilégier les tests autonomes adaptés au runner. Un résultat local réussi ne valide pas automatiquement une merge request et ne coche pas sa progression.
+```bash
+git config --global user.name "Prénom Nom"
+git config --global user.email "adresse@ecole.example"
+```
+
+Tu peux aussi utiliser les dossiers `headerscope` et `fileguard`. Git, bash et le client OpenSSH sont installés. Avec une URL SSH, tu peux créer une clé dans le conteneur avec `ssh-keygen`, puis ajouter son contenu `.pub` à ton compte GitLab scolaire. Le dossier personnel du conteneur est conservé dans un volume Docker pour garder ta configuration Git et SSH entre les redémarrages. La clé privée qui s’y trouve reste un secret : ne l’ajoute jamais à un dépôt ni à une archive partagée. Avec HTTPS, Git peut demander un jeton ; ne colle pas de mot de passe ou de jeton dans les notes de l’atelier, les fichiers du projet ou une commande conservée dans l’historique. L’application ne gère pas les comptes de l’école.
+
+Le labo intégré sert de cible locale pour HeaderScope et PortPilot. Il démarre automatiquement avec l’application et écoute sur le port 8000 du conteneur ; le bouton de la page du parcours permet de l’arrêter (pour observer une connexion refusée) ou de le relancer. Il n’est pas nécessaire de démarrer un serveur HTTP séparé. Un runner GitLab de l’école est une machine distincte : `127.0.0.1` dans un job désigne ce runner, et non le conteneur de Cyber Atelier. Les runners, leur configuration, les variables de CI et les droits de fusion sont fournis par l’école. Si le runner n’exécute pas le labo, les tests réseau visant celui-ci ne peuvent pas y réussir ; suis les consignes du parcours pour privilégier les tests autonomes adaptés au runner. Un résultat local réussi ne valide pas automatiquement une merge request et ne coche pas sa progression.
 
 ## Arrêter et reprendre
 
@@ -46,6 +72,16 @@ docker compose start
 ```
 
 Ou utilise `docker compose down` pour supprimer les conteneurs. Les volumes nommés `workspaces`, `data` et `home` restent présents. Au prochain lancement, `docker compose up -d` les réutilise. `home` conserve la configuration Git et SSH ; `docker compose down -v` supprime aussi ces volumes, y compris cette configuration, ainsi que le code et la progression.
+
+## Mettre à jour Cyber Atelier
+
+Remplace les fichiers de l’application (ou applique le patch fourni), puis reconstruis l’image depuis le dossier du projet :
+
+```bash
+docker compose up --build -d
+```
+
+Les volumes `workspaces`, `data` et `home` sont réutilisés tels quels : ton code, ta progression et ta configuration Git sont conservés. Fais une sauvegarde (section suivante) avant une mise à jour importante. N’utilise pas `docker compose down -v` pour « repartir proprement » : cette commande supprime les volumes.
 
 ## Sauvegarder et restaurer
 
@@ -71,3 +107,13 @@ L’import remplace les chemins présents dans les volumes par ceux de l’archi
 Les ports et chemins internes peuvent être ajustés par variables d’environnement : `ATELIER_PORT` choisit le port publié par Compose (8080 par défaut) ; dans le conteneur, `ATELIER_HOST=0.0.0.0`, `ATELIER_PORT=8080`, `WORKSPACES_DIR=/workspaces`, `DATA_DIR=/data` et `LAB_PORT=8000`. Pour un lancement Python natif, le serveur utilise par défaut `ATELIER_HOST=127.0.0.1`.
 
 L’application exécute les commandes et le code de l’apprenant dans le conteneur sous un compte non-root. Elle est destinée à un usage personnel local, pas à être hébergée ou exposée sur un réseau. Le conteneur ne reçoit pas le socket Docker et n’a pas de privilèges administrateur. Les fichiers de l’application sont en lecture seule ; le code, la progression et le dossier personnel sont conservés séparément dans les volumes nommés `workspaces`, `data` et `home`. Git, bash, OpenSSH et Python sont disponibles sans installation de dépendances au démarrage.
+
+## Vérifier l’infrastructure
+
+Les tests de l’application (serveur, laboratoire et cohérence des contenus) s’exécutent dans le conteneur :
+
+```bash
+docker compose exec -T atelier python -m unittest discover -s tests -p 'test_*.py' -v
+```
+
+Ces 46 tests vérifient Cyber Atelier lui-même, pas tes exercices : tes exercices sont testés par tes propres tests (`verification.py` ou `unittest`, selon le parcours).

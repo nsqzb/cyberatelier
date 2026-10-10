@@ -1,0 +1,8 @@
+alice;actif;Domain Users,IT Support
+bob;actif;Domain Users,Comptabilite
+claire;actif;Domain Users,Direction,Domain Admins
+david;actif;Domain Users,IT Support
+emma;actif;Domain Users,Comptabilite
+felix;inactif;Domain Users,Comptabilite
+ancien.stagiaire;inactif;Domain Users
+svc-sauvegarde;inactif;Domain Users

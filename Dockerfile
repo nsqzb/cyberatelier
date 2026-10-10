@@ -10,7 +10,7 @@ ENV PYTHONDONTWRITEBYTECODE=1 \
     LAB_PORT=8000
 
 RUN apt-get update \
-    && apt-get install -y --no-install-recommends git bash openssh-client ca-certificates \
+    && apt-get install -y --no-install-recommends git bash openssh-client ca-certificates nmap \
     && rm -rf /var/lib/apt/lists/* \
     && groupadd --system --gid 10001 atelier \
     && useradd --system --uid 10001 --gid atelier --home-dir /home/atelier \

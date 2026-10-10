@@ -1,9 +1,615 @@
 {
   "version": 1,
   "title": "Cyber Atelier",
-  "totalMinutes": 900,
-  "description": "Trois parcours Python de cinq heures pour débuter avec des fonctions, des tests reproductibles et trois merge requests GitLab par projet. Les tests locaux n’attestent pas automatiquement qu’une fusion est autorisée.",
+  "totalMinutes": 1800,
+  "description": "Six parcours Python et Git de cinq heures, du premier test unitaire à un mini-framework modulaire : bases, trois outils locaux (scanner TCP, en-têtes HTTP, intégrité de fichiers), pilotage d’outils externes et assemblage final, avec trois merge requests par parcours. Les tests locaux n’attestent pas automatiquement qu’une fusion est autorisée.",
   "courses": [
+    {
+      "id": "socle",
+      "title": "Socle Python & Git",
+      "subtitle": "Premiers pas en Python, tests unittest et Git en équipe",
+      "description": "Pour un débutant qui connaît variables, listes et fonctions : écris de petites fonctions pures, teste-les avec unittest, lis un journal de connexions fictif, puis livre le tout avec Git (branche, merge request, conflit, rebase, tag). Ce parcours prépare PortPilot, HeaderScope et FileGuard.",
+      "level": "Débutant",
+      "color": "#7A4FB0",
+      "durationMinutes": 300,
+      "goals": [
+        "Écrire des fonctions pures avec conditions, boucles, listes, dictionnaires et chaînes de caractères.",
+        "Écrire des tests unittest qui se relancent à chaque modification du code.",
+        "Lire et écrire des fichiers en gérant les erreurs, puis manipuler JSON et pathlib.",
+        "Utiliser Git en équipe : branche, commit, push, merge request, conflit, rebase simple et tag."
+      ],
+      "prerequisites": [
+        "Connaître les variables, les listes et les fonctions Python.",
+        "Disposer de Python 3, de Git et d’un dépôt de cours vide autorisé par ton école.",
+        "Savoir ouvrir un terminal dans Cyber Atelier (commande docker compose exec atelier bash pour les opérations interactives)."
+      ],
+      "scope": [
+        "Aucune cible réseau, aucun scan, aucun outil offensif : les journaux sont fictifs et utilisent les adresses de documentation 192.0.2.0/24.",
+        "Bibliothèque standard uniquement : python -m unittest, aucun pip install, aucun pytest.",
+        "Programme attendu : trois fichiers Python, leurs tests, un README et un .gitignore."
+      ],
+      "concepts": [
+        "conditions et boucles",
+        "listes, dictionnaires et chaînes",
+        "fonctions pures et valeurs de retour",
+        "exceptions (try, except, raise)",
+        "fichiers texte, JSON et pathlib",
+        "unittest et assertions",
+        "tempfile",
+        "Git : status, diff, add, commit, log, restore, stash, revert",
+        "Git : branche, merge request, conflit, rebase, tag"
+      ],
+      "files": [
+        {
+          "name": ".gitignore",
+          "purpose": "Liste ce qui ne doit pas être versionné : cache Python et copies de fixtures (MR1)."
+        },
+        {
+          "name": "outils.py",
+          "purpose": "Fonctions pures de validation, d’analyse d’une ligne et de comptage (MR1)."
+        },
+        {
+          "name": "test_outils.py",
+          "purpose": "Tests unittest de outils.py (MR1)."
+        },
+        {
+          "name": "journal.py",
+          "purpose": "Lecture de fichier, erreurs, chargement des événements, rapport et JSON (MR2)."
+        },
+        {
+          "name": "test_journal.py",
+          "purpose": "Tests unittest de journal.py, avec fichiers temporaires (MR2)."
+        },
+        {
+          "name": "analyseur.py",
+          "purpose": "Affichage du rapport et point d’entrée en ligne de commande (MR3)."
+        },
+        {
+          "name": "test_analyseur.py",
+          "purpose": "Tests unittest du formatage, des codes de retour et de l’import sans effet de bord (MR3)."
+        },
+        {
+          "name": "README.md",
+          "purpose": "Usage, format du journal, codes de retour et limites du programme (MR3)."
+        },
+        {
+          "name": "fixtures/socle/auth.log",
+          "purpose": "Journal fictif copié pour les démonstrations locales. Il n’est pas versionné."
+        }
+      ],
+      "setup": [
+        {
+          "label": "Vérifier Python",
+          "command": "python --version",
+          "note": "Utilise python3 si la commande python n’existe pas. Le parcours n’utilise que la bibliothèque standard : aucun pip install."
+        },
+        {
+          "label": "Vérifier Git",
+          "command": "git --version",
+          "note": "Travaille dans le dépôt de cours fourni ou autorisé par ton école."
+        },
+        {
+          "label": "Configurer ton identité Git (une seule fois)",
+          "command": "git config --global user.name \"Prénom Nom\" && git config --global user.email \"adresse@ecole.example\"",
+          "note": "Remplace les deux valeurs d’exemple par ton nom et l’adresse de ton compte GitLab scolaire. Sans identité, git commit refuse de créer le commit. La configuration est conservée dans le volume home."
+        },
+        {
+          "label": "Cloner le dépôt",
+          "command": "git clone <URL_DU_DEPOT> .",
+          "note": "Le dossier du parcours est vide : clone directement ici avec le point (dossier courant). Fais-le dans docker compose exec atelier bash, depuis le dossier Cyber Atelier, puis cd /workspaces/socle. Un cd du terminal web ne persiste pas entre deux commandes. HTTPS peut demander un jeton, SSH peut demander de confirmer l’empreinte du serveur.",
+          "interactive": true
+        },
+        {
+          "label": "Vérifier le dépôt cloné",
+          "command": "git status",
+          "note": "Vérifie que tu es sur la branche principale (main ou master) et que le dépôt est propre."
+        },
+        {
+          "label": "Copier les fixtures du parcours",
+          "command": "mkdir -p fixtures && cp -r /app/fixtures/socle/. fixtures/socle/ && chmod -R u+w fixtures/socle",
+          "note": "Copie le journal fictif auth.log dans ton dossier de travail. Les originaux sont en lecture seule ; la copie est modifiable. Ne l’ajoute pas à Git : le .gitignore de MR1 l’exclut."
+        },
+        {
+          "label": "Créer la branche MR1",
+          "command": "git switch -c feat/bases",
+          "note": "Crée-la depuis la branche principale à jour (git pull d’abord si le dépôt a déjà reçu des commits)."
+        }
+      ],
+      "steps": [
+        {
+          "id": "socle-mr1",
+          "title": "MR1 — Fonctions pures, premier unittest et première merge request",
+          "branch": "feat/bases",
+          "minutes": 100,
+          "mission": "Écris 4 petites fonctions, chacune avec ses tests : à chaque palier, tu écris un test, tu le vois échouer, tu écris le code qui le fait passer, puis tu fais un commit.",
+          "tests": [
+            {
+              "id": "S1",
+              "title": "Nom valide simple",
+              "input": "« alice », « Alice_01 », « a-b-c »",
+              "expected": "True pour les trois."
+            },
+            {
+              "id": "S2",
+              "title": "Bornes de longueur",
+              "input": "« abc » (3 caractères), une chaîne valide de 16 caractères, « ab » (2), une chaîne valide de 17 caractères",
+              "expected": "True pour 3 et 16 caractères, False pour 2 et 17."
+            },
+            {
+              "id": "S3",
+              "title": "Premier caractère et caractères interdits",
+              "input": "« 1alice », « _alice », « ali ce », « ali.ce », « alicé », chaîne vide",
+              "expected": "False pour les six cas."
+            },
+            {
+              "id": "S4",
+              "title": "Espaces de bord",
+              "input": "« bob » entouré d’espaces, puis « b » entouré d’espaces",
+              "expected": "True pour « bob » après retrait des espaces ; False pour « b », qui fait 1 caractère."
+            },
+            {
+              "id": "S5",
+              "title": "Type non chaîne",
+              "input": "None, puis 42",
+              "expected": "Les deux appels lèvent TypeError (assertRaises)."
+            },
+            {
+              "id": "S6",
+              "title": "Ligne de journal nominale",
+              "input": "« 2026-01-05 08:12:44 LOGIN_OK alice 192.0.2.10 »",
+              "expected": "Dictionnaire exact : date « 2026-01-05 », heure « 08:12:44 », evenement « LOGIN_OK », utilisateur « alice », ip « 192.0.2.10 »."
+            },
+            {
+              "id": "S7",
+              "title": "Lignes refusées par la structure ou l’événement",
+              "input": "Chaîne vide ; ligne à 4 champs ; ligne à 6 champs ; événement « LOGIN_BOOM »",
+              "expected": "None pour les quatre cas."
+            },
+            {
+              "id": "S8",
+              "title": "Adresse invalide",
+              "input": "ip « 192.0.2.300 », ip « 192.0.2 », ip « abc.def.ghi.jkl »",
+              "expected": "None pour les trois lignes."
+            },
+            {
+              "id": "S9",
+              "title": "Comptage des événements",
+              "input": "Liste vide, puis deux LOGIN_OK et un LOGIN_FAIL. Vérifier aussi que la liste d’entrée est identique avant et après l’appel.",
+              "expected": "Liste vide : LOGIN_OK 0 et LOGIN_FAIL 0. Deuxième cas : LOGIN_OK 2 et LOGIN_FAIL 1. Liste inchangée."
+            },
+            {
+              "id": "S10",
+              "title": "Échecs par utilisateur",
+              "input": "Liste vide ; alice avec deux LOGIN_FAIL ; bob avec un seul LOGIN_OK ; carol avec un LOGIN_FAIL",
+              "expected": "Liste vide : {}. Cas mixte : {\"alice\": 2, \"carol\": 1}, sans bob."
+            }
+          ],
+          "acceptance": [
+            "python3 -m unittest -v affiche OK pour S1 à S10.",
+            "git log --oneline montre un commit par palier de code (au moins cinq).",
+            "La pull request ne contient que outils.py et test_outils.py, sans __pycache__ ni fixtures."
+          ],
+          "paliers": [
+            {
+              "id": "socle-mr1-p1",
+              "title": "Prépare ton dépôt et ta branche",
+              "minutes": 10,
+              "goal": "Avoir un dossier propre, relié à GitHub, sur la branche de la mission.",
+              "do": [
+                "Ouvre le dossier workspaces/socle de Cyber Atelier dans VS Code, puis un terminal (Terminal > New Terminal).",
+                "Une branche est une ligne de travail séparée de main : tu codes dessus sans risque, et main ne bouge pas tant que tu n’as pas fusionné.",
+                "Crée la branche de la mission et vérifie où tu es."
+              ],
+              "commands": [
+                "git switch -c feat/bases",
+                "git status"
+              ],
+              "check": "git status affiche « On branch feat/bases » et « nothing to commit, working tree clean ».",
+              "hint": "Si Git répond « not a git repository », tu n’es pas dans le bon dossier. Si la branche existe déjà, utilise git switch feat/bases (sans -c)."
+            },
+            {
+              "id": "socle-mr1-p2",
+              "title": "Écris ton tout premier test",
+              "minutes": 10,
+              "goal": "Comprendre à quoi sert un test avant d’en écrire pour de vrai.",
+              "do": [
+                "Crée un fichier exemple.py (jetable, il ne sera pas livré) et recopie le code ci-dessous. Ici, doubler est un exemple sans rapport avec ton exercice.",
+                "Lance-le. Puis remplace 8 par 9, relance et lis le message : c’est ainsi que Python te dit qu’un test échoue. Remets 8.",
+                "Retiens la forme : une classe qui hérite de unittest.TestCase, des méthodes dont le nom commence par test_, et assertEqual(obtenu, attendu).",
+                "Quand c’est compris, supprime le fichier : rm exemple.py."
+              ],
+              "commands": [
+                "import unittest\n\ndef doubler(n):\n    return n * 2\n\nclass TestDoubler(unittest.TestCase):\n    def test_doubler_un_nombre(self):\n        self.assertEqual(doubler(4), 8)\n\nif __name__ == \"__main__\":\n    unittest.main()",
+                "python3 exemple.py -v"
+              ],
+              "check": "Tu as vu « OK » avec 8, puis « FAIL » avec 9, et tu sais lire la ligne « AssertionError: 8 != 9 ».",
+              "hint": "Si python3 n’est pas trouvé, tape python3 --version dans le terminal de VS Code. Les messages d’échec se lisent de bas en haut : la dernière ligne dit ce qui ne va pas."
+            },
+            {
+              "id": "socle-mr1-p3",
+              "title": "Un test d’abord, puis la fonction : les noms valides",
+              "minutes": 15,
+              "goal": "Écrire un test AVANT le code (il échoue), puis le minimum de code pour le faire passer.",
+              "do": [
+                "Crée test_outils.py : importe unittest et from outils import valider_nom_utilisateur, puis une classe TestValiderNomUtilisateur avec un test pour S1.",
+                "Lance les tests : ils échouent parce que outils.py n’existe pas encore. C’est la phase « rouge », elle est normale.",
+                "Crée outils.py avec valider_nom_utilisateur(nom), qui retourne True ou False. Fais passer S1 : c’est la phase « verte ».",
+                "Contrat complet de la fonction, que tu vas compléter aux deux paliers suivants : le nom fait de 3 à 16 caractères, commence par une lettre ASCII, puis ne contient que des lettres ASCII, des chiffres, _ ou -. Les espaces de début et de fin sont retirés avant le contrôle. Un nom qui n’est pas une chaîne lève TypeError."
+              ],
+              "commands": [
+                "python3 -m unittest -v",
+                "git add outils.py test_outils.py",
+                "git commit -m \"Ajoute valider_nom_utilisateur pour les noms valides\""
+              ],
+              "tests": [
+                "S1"
+              ],
+              "check": "python3 -m unittest -v affiche 1 test OK, et git log --oneline montre ton nouveau commit.",
+              "hint": "La fonction n’a pas besoin d’être maligne maintenant : S1 ne vérifie que des noms valides. Écris le test suivant avant de compliquer la fonction."
+            },
+            {
+              "id": "socle-mr1-p4",
+              "title": "Les limites : longueur et caractères",
+              "minutes": 15,
+              "goal": "Faire échouer un test, puis compléter la fonction règle par règle.",
+              "do": [
+                "Ajoute les tests S2 et S3, lance-les : certains échouent.",
+                "Complète valider_nom_utilisateur : longueur de 3 à 16, première lettre ASCII, caractères suivants autorisés.",
+                "Relance les tests après chaque règle ajoutée : tu avances par petits pas, jamais à l’aveugle."
+              ],
+              "commands": [
+                "python3 -m unittest -v",
+                "git add outils.py test_outils.py",
+                "git commit -m \"Contrôle la longueur et les caractères des noms\""
+              ],
+              "tests": [
+                "S2",
+                "S3"
+              ],
+              "check": "S1, S2 et S3 passent.",
+              "hint": "Piège : str.isalpha() et str.isalnum() acceptent aussi les lettres accentuées comme « é ». Pour rester en ASCII, compare chaque caractère à la chaîne string.ascii_letters (module string), ou teste avec str.isascii()."
+            },
+            {
+              "id": "socle-mr1-p5",
+              "title": "Espaces et mauvais types",
+              "minutes": 12,
+              "goal": "Gérer deux cas limites, dont une erreur levée volontairement.",
+              "do": [
+                "Ajoute les tests S4 et S5.",
+                "S4 : les espaces autour du nom sont retirés avant le contrôle.",
+                "S5 : un nom qui n’est pas une chaîne lève TypeError. Pour tester une exception avec unittest, la forme est celle de l’exemple ci-dessous (ici avec int, sans rapport avec ton exercice).",
+                "Écris le code pour que tout passe, puis fais un commit."
+              ],
+              "commands": [
+                "with self.assertRaises(ValueError):\n    int(\"abc\")",
+                "python3 -m unittest -v",
+                "git add outils.py test_outils.py",
+                "git commit -m \"Gère les espaces et les types invalides\""
+              ],
+              "tests": [
+                "S4",
+                "S5"
+              ],
+              "check": "S1 à S5 passent.",
+              "hint": "isinstance(nom, str) vérifie le type. Fais ce contrôle en premier, avant d’appeler une méthode de chaîne comme strip()."
+            },
+            {
+              "id": "socle-mr1-p6",
+              "title": "Lire une ligne de journal",
+              "minutes": 15,
+              "goal": "Transformer une ligne de texte en données avec split, un dictionnaire et None.",
+              "do": [
+                "Le journal fictif contient des lignes comme « 2026-01-05 08:12:44 LOGIN_OK alice 192.0.2.10 » : date, heure, événement, utilisateur, adresse IP.",
+                "Contrat de analyser_ligne(ligne) : elle retourne un dictionnaire avec les clés date, heure, evenement, utilisateur et ip. Elle retourne None si la ligne est vide (après retrait des espaces de bord), si elle n’a pas exactement 5 champs, si l’événement n’est ni LOGIN_OK ni LOGIN_FAIL, ou si l’adresse n’a pas exactement 4 nombres entiers de 0 à 255 séparés par des points.",
+                "Procède test par test : S6 d’abord, puis S7, puis S8. Un test, un correctif."
+              ],
+              "commands": [
+                "python3 -m unittest -v",
+                "git add outils.py test_outils.py",
+                "git commit -m \"Ajoute analyser_ligne\""
+              ],
+              "tests": [
+                "S6",
+                "S7",
+                "S8"
+              ],
+              "check": "S1 à S8 passent.",
+              "hint": "split() sans argument découpe sur les espaces et ignore ceux des bords. Pour l’adresse, découpe sur les points puis vérifie chaque morceau : est-ce des chiffres, puis est-ce entre 0 et 255 ?"
+            },
+            {
+              "id": "socle-mr1-p7",
+              "title": "Compter les événements",
+              "minutes": 13,
+              "goal": "Parcourir une liste avec une boucle et construire des dictionnaires.",
+              "do": [
+                "compter_evenements(evenements) reçoit une liste de dictionnaires renvoyés par analyser_ligne. Elle retourne toujours les deux clés LOGIN_OK et LOGIN_FAIL, même à zéro, et ne modifie pas la liste reçue.",
+                "echecs_par_utilisateur(evenements) ne garde que les utilisateurs ayant au moins un LOGIN_FAIL, avec leur nombre d’échecs. Une liste vide donne un dictionnaire vide.",
+                "Écris S9 puis la première fonction, puis S10 et la seconde."
+              ],
+              "commands": [
+                "python3 -m unittest -v",
+                "git add outils.py test_outils.py",
+                "git commit -m \"Ajoute le comptage des événements et des échecs\""
+              ],
+              "tests": [
+                "S9",
+                "S10"
+              ],
+              "check": "Les 10 tests S1 à S10 passent.",
+              "hint": "Pars d’un dictionnaire qui contient déjà les deux clés à 0, puis parcours la liste avec une boucle for. dict.get(clé, 0) renvoie 0 quand la clé n’existe pas encore."
+            },
+            {
+              "id": "socle-mr1-p8",
+              "title": "Livre ta pull request",
+              "minutes": 10,
+              "goal": "Relire ton travail, le pousser sur GitHub et le fusionner proprement.",
+              "do": [
+                "Regarde ce que tu vas livrer : fichiers modifiés et historique.",
+                "Pousse la branche, puis ouvre la pull request (GitHub dit pull request ; GitLab dit merge request, c’est la même idée).",
+                "Relis le diff dans GitHub comme si c’était le code de quelqu’un d’autre. Ici aucun contrôle automatique ne tourne : c’est toi qui vérifies que les 10 tests passent en local avant de fusionner. Un pipeline viendra avec les parcours GitLab.",
+                "Clique sur « Merge pull request » dans GitHub, puis reviens sur main à jour pour préparer la mission suivante."
+              ],
+              "commands": [
+                "git status",
+                "git diff main --stat",
+                "git push -u origin feat/bases",
+                "gh pr create --base main --title \"Bases : validation et analyse de journal\" --body \"Ajoute outils.py et ses tests S1 à S10.\"",
+                "git switch main",
+                "git pull --ff-only"
+              ],
+              "check": "La pull request ne contient que outils.py et test_outils.py, et ton main local contient la fusion (git log --oneline).",
+              "hint": "Si gh pr create se plaint d’une branche non poussée, lance d’abord git push -u origin feat/bases. Fusionne uniquement quand git status est propre et les 10 tests passent."
+            }
+          ]
+        },
+        {
+          "id": "socle-mr2",
+          "title": "MR2 — Fichiers, exceptions, JSON et Git de rattrapage",
+          "branch": "feat/fichiers-erreurs",
+          "minutes": 100,
+          "mission": "Ajoute journal.py et test_journal.py. Le module lit le journal fictif copié dans fixtures/socle/, gère les lignes malformées, les erreurs de fichier et le JSON, puis produit un rapport de données. Pourquoi : un journal réel est imparfait ; un outil de sécurité doit compter ce qu’il ne comprend pas, sans s’arrêter au premier problème. Tu apprends aussi à défaire proprement : restore, revert, stash et log.",
+          "tasks": [
+            "Prépare la branche : reviens sur la branche principale, mets-la à jour avec git pull, crée feat/fichiers-erreurs et lis git log --oneline. Pourquoi : chaque MR part d’une base à jour, sinon tu travailles sur un code périmé.",
+            "Écris verifier_chemin(chemin) et lire_journal(chemin) avec pathlib pour le chemin et UTF-8 pour le contenu. verifier_chemin lève ValueError si le chemin est vide ou ne contient que des espaces, sans accéder au disque. lire_journal appelle verifier_chemin, retourne une liste de chaînes sans espaces de bord et sans lignes vides, et laisse remonter FileNotFoundError si le fichier est absent. Pourquoi : lire un fichier est la source de presque toutes les erreurs réelles ; il faut savoir qui la gère.",
+            "Écris charger_evenements(lignes), qui retourne un couple (evenements, malformees). evenements est la liste des dictionnaires valides obtenus avec analyser_ligne de outils.py, dans l’ordre d’arrivée ; malformees compte les lignes refusées. Une liste vide donne ([], 0). Pourquoi : un outil compte les lignes abîmées ; il ne plante pas sur elles.",
+            "Écris construire_rapport(evenements, nb_malformees), qui retourne un dictionnaire aux clés lignes_valides, login_ok, login_fail, lignes_malformees et echecs_par_utilisateur. Réutilise compter_evenements et echecs_par_utilisateur de outils.py. Pourquoi : un rapport est d’abord une donnée ; son affichage viendra en MR3.",
+            "Écris sauvegarder_rapport(rapport, chemin) avec json.dump (UTF-8, ensure_ascii=False, indent=2) et charger_rapport(chemin) avec json.load. charger_rapport attrape json.JSONDecodeError et lève ValueError avec un message en français qui nomme le fichier ; FileNotFoundError reste levé telle quelle. Pourquoi : un rapport enregistré doit pouvoir être relu par un autre outil, et un fichier corrompu doit produire une erreur claire.",
+            "Écris test_journal.py avec unittest et tempfile.TemporaryDirectory pour fabriquer chaque fichier. Puis pratique Git : fais un commit volontairement fautif sur ta branche, constate l’échec des tests, annule-le avec git revert (sans réécrire l’historique), mets une modification en cours de côté avec git stash, annule une modification de fichier avec git restore, puis relis git log --oneline. Pousse et ouvre la MR. Pourquoi : savoir défaire un commit ou une modification est indispensable quand une CI devient rouge."
+          ],
+          "tests": [
+            {
+              "id": "S11",
+              "title": "Lecture nettoyée",
+              "input": "Fichier temporaire de trois lignes, une ligne vide et des espaces en fin de ligne",
+              "expected": "Liste de trois chaînes, dans l’ordre, sans espaces de bord et sans ligne vide."
+            },
+            {
+              "id": "S12",
+              "title": "Fichier absent",
+              "input": "Chemin inexistant dans un dossier temporaire",
+              "expected": "lire_journal lève FileNotFoundError (assertRaises)."
+            },
+            {
+              "id": "S13",
+              "title": "Chemin vide ou blanc",
+              "input": "Chaîne vide, une chaîne de trois espaces, puis « dossier/auth.log »",
+              "expected": "ValueError pour les deux premiers cas ; aucune exception pour le troisième, sans accès au disque."
+            },
+            {
+              "id": "S14",
+              "title": "Lignes valides et malformées",
+              "input": "Quatre lignes dont deux invalides (une mauvaise structure, un événement inconnu), puis une liste vide",
+              "expected": "Deux événements dans l’ordre d’arrivée et malformees = 2 ; liste vide : ([], 0)."
+            },
+            {
+              "id": "S15",
+              "title": "Construction du rapport",
+              "input": "Trois LOGIN_OK, deux LOGIN_FAIL dont deux pour alice, et un nombre de lignes malformées de 1",
+              "expected": "lignes_valides 5, login_ok 3, login_fail 2, lignes_malformees 1, echecs_par_utilisateur {\"alice\": 2}."
+            },
+            {
+              "id": "S16",
+              "title": "Aller-retour JSON avec accents",
+              "input": "Rapport contenant la clé « échecs » et une valeur accentuée, sauvegardé puis rechargé",
+              "expected": "Le rapport rechargé est égal à l’original, et le fichier est relu sans erreur par json.load."
+            },
+            {
+              "id": "S17",
+              "title": "Erreurs de chargement JSON",
+              "input": "Fichier contenant « {pas du json » ; chemin absent",
+              "expected": "ValueError pour le fichier corrompu ; FileNotFoundError pour le chemin absent."
+            },
+            {
+              "id": "S18",
+              "title": "Journal vide",
+              "input": "construire_rapport([], 0)",
+              "expected": "lignes_valides 0, login_ok 0, login_fail 0, lignes_malformees 0, echecs_par_utilisateur {} ; aucune exception."
+            }
+          ],
+          "demos": [
+            {
+              "id": "D1",
+              "title": "Rapport sur la copie du journal fictif",
+              "input": "Script local (hors tests) qui lit fixtures/socle/auth.log avec lire_journal, charger_evenements et construire_rapport",
+              "expected": "Aucune trace d’erreur. lignes_valides + lignes_malformees est égal au nombre de lignes non vides du fichier, que tu comptes avec une commande de ton choix."
+            }
+          ],
+          "acceptance": [
+            "python -m unittest passe pour S1 à S18 ; les tests de MR1 (S1 à S10) restent verts.",
+            "Les tests créent leurs fichiers dans un dossier temporaire et ne laissent rien dans le dépôt.",
+            "git log --oneline montre le commit fautif et son revert ; git stash list est vide à la fin.",
+            "Le diff de la MR est relu et ne contient que journal.py, test_journal.py et les modifications éventuelles de outils.py justifiées."
+          ],
+          "hint": "Commence par verifier_chemin : c’est la plus petite fonction, et lire_journal doit s’appuyer dessus. Pense à ce que chaque fonction doit faire en cas d’erreur, et qui doit attraper cette erreur.\n\nNiveau 2 : pathlib.Path permet de lire un fichier en UTF-8 avec read_text. Pour le JSON, la documentation du module json décrit dump, load et leurs paramètres ; JSONDecodeError est une sous-classe de ValueError. Un try/except autour d’un seul appel reste plus lisible qu’un bloc géant.\n\nNiveau 3 : pour charger_evenements, parcours les lignes avec une boucle for, garde la trace de deux listes ou d’un compteur, puis renvoie le couple. Pour le rapport, réutilise les fonctions de outils.py plutôt que de recopier leur logique."
+        },
+        {
+          "id": "socle-mr3",
+          "title": "MR3 — Analyseur complet, conflit de fusion, rebase et tag",
+          "branch": "feat/analyseur",
+          "minutes": 70,
+          "mission": "Assemble un petit programme complet : analyseur.py lit un journal passé en argument, affiche le rapport et renvoie un code de retour. Sépare les fonctions de données (journal.py, outils.py) de l’affichage (analyseur.py). Ajoute le README et les tests complets. Puis pratique le conflit de fusion, un rebase local simple et un tag v0.1.0. Pourquoi : un programme utilisable se lance en ligne de commande, se documente et se versionne proprement ; c’est le modèle de l’outil final.",
+          "tasks": [
+            "Écris formater_rapport(rapport), qui retourne une chaîne de caractères sans rien afficher. Quatre lignes fixes dans cet ordre : « Lignes valides : », « Connexions réussies : », « Échecs de connexion : », « Lignes malformées : », suivies d’une ligne par utilisateur en échec, triés par ordre alphabétique. Sans échec, écris « Aucun échec ». Pourquoi : séparer la donnée et son affichage permet de tester le texte sans lancer le programme.",
+            "Écris main(argv), qui retourne un code de retour entier et ne ferme jamais le programme lui-même. argv vide : message d’usage sur la sortie d’erreur et code 2. Fichier absent ou invalide : message clair sur la sortie d’erreur et code 1. Succès : affiche le rapport formaté et retourne 0. Attrape FileNotFoundError et ValueError dans main, et nulle part ailleurs dans analyseur.py. Pourquoi : un seul endroit gère les erreurs visibles par l’utilisateur.",
+            "Termine analyseur.py par le bloc standard if __name__ == \"__main__\", qui transmet les arguments à main et utilise sa valeur comme code de sortie. Vérifie qu’importer le module n’affiche rien. Pourquoi : un module peut être importé par un test ou un autre outil sans se lancer tout seul.",
+            "Écris test_analyseur.py avec unittest : formatage complet, cas sans échec, codes de retour de main, fichier valide avec une ligne malformée, et import sans effet de bord. Redirige la sortie avec io.StringIO et contextlib.redirect_stdout ; utilise un dossier temporaire pour les fichiers. Pourquoi : un programme qui sort un code de retour est testable comme une fonction.",
+            "Rédige README.md : objectif du programme, format attendu du journal, commande d’usage, codes de retour (0, 1, 2), limites (données fictives, aucune connexion réseau). Ajoute au .gitignore ce qui doit l’être. Pourquoi : un outil sans mode d’emploi n’est pas livrable, et les limites font partie du contrat.",
+            "Git, guidé pas à pas : (1) depuis la branche principale à jour, crée exercice/conflit-a, modifie la première ligne de README.md et commite ; (2) reviens sur main, crée exercice/conflit-b, modifie la même ligne différemment et commite ; (3) depuis exercice/conflit-a, lance git merge exercice/conflit-b ; (4) lis git status, repère les marqueurs de conflit, choisis la ligne voulue, supprime les marqueurs, git add puis git commit ; (5) supprime les deux branches d’exercice. Ensuite, sur feat/analyseur, fais un git rebase main après que main a avancé (par exemple : un petit commit de correction sur main, poussé ou local selon l’école), relis git log --oneline --graph, et pose le tag annoté v0.1.0 avec git tag -a v0.1.0 -m « Analyseur de journal, version 0.1.0 ». Pourquoi : un conflit n’est pas une catastrophe ; c’est un désaccord entre deux lignes d’historique qu’on résout en connaissance de cause. Ce conflit est volontaire et reste local : ne le pousse pas sur la branche principale."
+          ],
+          "tests": [
+            {
+              "id": "S19",
+              "title": "Formatage complet",
+              "input": "Rapport avec 5 lignes valides, 3 connexions réussies, 2 échecs répartis entre bob (1) et alice (1), 1 malformée",
+              "expected": "Les quatre lignes de compteurs ont leurs valeurs ; la ligne alice apparaît avant la ligne bob."
+            },
+            {
+              "id": "S20",
+              "title": "Formatage sans échec",
+              "input": "echecs_par_utilisateur vide",
+              "expected": "La chaîne contient « Aucun échec » et aucune ligne d’utilisateur."
+            },
+            {
+              "id": "S21",
+              "title": "Usage sans argument",
+              "input": "main([])",
+              "expected": "Code 2 ; message sur la sortie d’erreur ; rien sur la sortie standard."
+            },
+            {
+              "id": "S22",
+              "title": "Fichier absent",
+              "input": "main avec un chemin inexistant dans un dossier temporaire",
+              "expected": "Code 1 ; message clair ; aucune exception ne sort de main."
+            },
+            {
+              "id": "S23",
+              "title": "Fichier valide avec une ligne malformée",
+              "input": "Fichier temporaire de deux lignes valides et une malformée, passé à main",
+              "expected": "Code 0 ; la sortie contient « Lignes valides : 2 » et « Lignes malformées : 1 »."
+            },
+            {
+              "id": "S24",
+              "title": "Import sans effet de bord",
+              "input": "Import du module analyseur dans le test, sortie redirigée",
+              "expected": "Aucune sortie : le bloc __main__ ne s’exécute pas à l’import."
+            }
+          ],
+          "demos": [
+            {
+              "id": "D2",
+              "title": "Analyseur en ligne de commande",
+              "input": "python analyseur.py fixtures/socle/auth.log, puis python analyseur.py sans argument ; vérifie le code avec echo $?",
+              "expected": "Premier cas : rapport affiché et code 0. Second cas : message d’usage et code 2."
+            }
+          ],
+          "acceptance": [
+            "python -m unittest passe pour S1 à S24, et les tests créent leurs fichiers dans un dossier temporaire.",
+            "Le conflit de fusion a été résolu à la main : aucun marqueur <<<<<<< , ======= ou >>>>>>> ne reste dans README.md.",
+            "git log --oneline --graph montre la branche rebasée sur main ; le tag v0.1.0 est présent dans git tag -l.",
+            "La merge request vers la branche principale a été relue ; les branches exercice/ ont été supprimées et ne figurent pas sur GitLab."
+          ],
+          "hint": "Sépare d’abord les rôles : une fonction calcule le texte, une autre écrit sur la sortie. main doit être la seule à décider des codes de retour.\n\nNiveau 2 : io.StringIO remplace la sortie standard dans un test ; contextlib.redirect_stdout la branche dessus. Pour les codes, sys.exit n’est pas nécessaire dans main : retourne simplement l’entier.\n\nNiveau 3 : pour le conflit, lance d’abord git merge --abort si tu veux recommencer. Dans le fichier en conflit, ne garde qu’une version de la ligne, puis vérifie avec git diff que plus aucun marqueur ne reste avant de commiter."
+        }
+      ],
+      "timeline": [
+        {
+          "label": "Préparer le poste, Git et les fixtures",
+          "minutes": 20
+        },
+        {
+          "label": "MR1 — fonctions pures, unittest, premier push",
+          "minutes": 100
+        },
+        {
+          "label": "MR2 — fichiers, erreurs, JSON, Git de rattrapage",
+          "minutes": 100
+        },
+        {
+          "label": "MR3 — analyseur complet, conflit, rebase, tag",
+          "minutes": 70
+        },
+        {
+          "label": "Relecture et marge",
+          "minutes": 10
+        }
+      ],
+      "references": [
+        {
+          "label": "Tutoriel Python : erreurs et exceptions",
+          "url": "https://docs.python.org/3/tutorial/errors.html"
+        },
+        {
+          "label": "Module unittest",
+          "url": "https://docs.python.org/3/library/unittest.html"
+        },
+        {
+          "label": "Module json",
+          "url": "https://docs.python.org/3/library/json.html"
+        },
+        {
+          "label": "Module pathlib",
+          "url": "https://docs.python.org/3/library/pathlib.html"
+        },
+        {
+          "label": "Module tempfile",
+          "url": "https://docs.python.org/3/library/tempfile.html"
+        },
+        {
+          "label": "Module __main__ et if __name__ == \"__main__\"",
+          "url": "https://docs.python.org/3/library/__main__.html"
+        },
+        {
+          "label": "Git : git restore",
+          "url": "https://git-scm.com/docs/git-restore"
+        },
+        {
+          "label": "Git : git revert",
+          "url": "https://git-scm.com/docs/git-revert"
+        },
+        {
+          "label": "Git : git stash",
+          "url": "https://git-scm.com/docs/git-stash"
+        },
+        {
+          "label": "Git : git merge et résolution des conflits",
+          "url": "https://git-scm.com/docs/git-merge"
+        },
+        {
+          "label": "Git : git rebase",
+          "url": "https://git-scm.com/docs/git-rebase"
+        },
+        {
+          "label": "Git : git tag",
+          "url": "https://git-scm.com/docs/git-tag"
+        },
+        {
+          "label": "Git : fichier .gitignore",
+          "url": "https://git-scm.com/docs/gitignore"
+        },
+        {
+          "label": "GitLab : demandes de fusion (merge requests)",
+          "url": "https://docs.gitlab.com/user/project/merge_requests/"
+        }
+      ],
+      "resources": [
+        {
+          "label": "Télécharger le guide Socle (Markdown)",
+          "url": "/content/socle.md"
+        }
+      ],
+      "completion": [
+        "Dépôt contenant outils.py, journal.py, analyseur.py, leurs tests unittest, README.md et .gitignore.",
+        "Trois MR successives, chacune créée depuis la branche principale à jour et relue avant fusion.",
+        "Tests S1 à S24 exécutés localement avec python -m unittest ; démonstrations D1 et D2 faites à la main, hors CI.",
+        "Tag v0.1.0 posé, et conflit ainsi que rebase réalisés sur des branches locales."
+      ],
+      "limits": [
+        "Données entièrement fictives (fixtures/socle, adresses 192.0.2.0/24) ; aucun réseau, aucune cible, aucun outil offensif.",
+        "Les tests obligatoires n’ouvrent pas fixtures/ et n’ont besoin d’aucun service : ils tournent sur un runner sans labo. La lecture de auth.log reste une démonstration locale.",
+        "Le parcours n’introduit ni pytest, ni packaging, ni CI complète : ce sont des étapes ultérieures.",
+        "Le conflit et le rebase sont provoqués sur des branches locales jetables, jamais sur la branche principale."
+      ]
+    },
     {
       "id": "portpilot",
       "title": "PortPilot",
@@ -71,14 +677,25 @@
           "note": "Travaille dans le dépôt fourni ou autorisé par ton école."
         },
         {
-          "label": "Cloner le dépôt",
-          "command": "git clone <URL_DU_DEPOT> .",
-          "note": "Le dossier du parcours est vide : clone directement ici avant de créer les fichiers. Le point signifie « dossier courant ». Pour une session Git interactive, utilise docker compose exec atelier bash depuis le dossier Cyber Atelier ; un cd du terminal web ne persiste pas entre deux commandes."
+          "label": "Configurer ton identité Git (une seule fois)",
+          "command": "git config --global user.name \"Prénom Nom\" && git config --global user.email \"adresse@ecole.example\"",
+          "note": "Remplace les deux valeurs d’exemple par le nom et l’adresse de ton compte GitLab scolaire. Sans identité, git commit refuse de créer le commit. Cette configuration est conservée dans le volume home et sert aux trois parcours."
         },
         {
-          "label": "Créer la première branche",
+          "label": "Cloner le dépôt",
+          "command": "git clone <URL_DU_DEPOT> .",
+          "note": "Le dossier du parcours est vide : clone directement ici avant de créer les fichiers. Le point signifie « dossier courant ». Le clone peut demander un jeton HTTPS ou la confirmation de l’empreinte SSH du serveur : fais-le dans docker compose exec atelier bash (depuis le dossier Cyber Atelier), puis cd /workspaces/portpilot. Un cd du terminal web ne persiste pas entre deux commandes.",
+          "interactive": true
+        },
+        {
+          "label": "Vérifier le dépôt cloné",
           "command": "git status",
-          "note": "Après le clone dans le dossier de cours, vérifie la branche principale et le dépôt avant de créer feat/validation."
+          "note": "Après le clone, vérifie que tu es sur la branche principale (main ou master) et que le dépôt est propre."
+        },
+        {
+          "label": "Créer la branche MR1",
+          "command": "git switch -c feat/validation",
+          "note": "Crée-la depuis la branche principale à jour."
         }
       ],
       "steps": [
@@ -330,9 +947,15 @@
           "note": "Confirme l’accès au dépôt de l’école."
         },
         {
+          "label": "Configurer ton identité Git (une seule fois)",
+          "command": "git config --global user.name \"Prénom Nom\" && git config --global user.email \"adresse@ecole.example\"",
+          "note": "Remplace les deux valeurs d’exemple par le nom et l’adresse de ton compte GitLab scolaire. Sans identité, git commit refuse de créer le commit. Cette configuration est conservée dans le volume home et sert aux trois parcours."
+        },
+        {
           "label": "Cloner le dépôt",
           "command": "git clone <URL_DU_DEPOT> .",
-          "note": "Le dossier du parcours est vide : clone directement ici avant de créer les fichiers. Le point signifie « dossier courant ». Pour une session Git interactive, utilise docker compose exec atelier bash depuis le dossier Cyber Atelier ; un cd du terminal web ne persiste pas entre deux commandes."
+          "note": "Le dossier du parcours est vide : clone directement ici avant de créer les fichiers. Le point signifie « dossier courant ». Le clone peut demander un jeton HTTPS ou la confirmation de l’empreinte SSH du serveur : fais-le dans docker compose exec atelier bash (depuis le dossier Cyber Atelier), puis cd /workspaces/headerscope. Un cd du terminal web ne persiste pas entre deux commandes.",
+          "interactive": true
         },
         {
           "label": "Créer la branche MR1",
@@ -450,25 +1073,25 @@
           "tasks": [
             "Traite un chemin choisi parmi les quatre chemins nommés, appelle le classement de réponse et affiche statut, alertes et résumé.",
             "Vérifie en démonstration que /fragile donne trois alertes et /durci zéro ; traite /absent et /erreur comme 404 et 500.",
-            "Démarre explicitement le laboratoire intégré avec son bouton avant la démonstration, puis arrête-le après.",
+            "Vérifie avant la démonstration que le laboratoire intégré est actif : il démarre avec l’application, et son bouton permet de l’arrêter ou de le relancer.",
             "Documente le contrat, le délai, les tests et le fait que le laboratoire du portail n’est pas supposé présent sur le runner scolaire.",
             "Ouvre la troisième MR depuis la branche principale actualisée et vérifie le pipeline du dernier commit."
           ],
-          "tests": [
+          "demos": [
             {
-              "id": "H11",
+              "id": "D1",
               "title": "Résultat fragile",
               "input": "Réponse locale du chemin /fragile",
               "expected": "Trois alertes de politique."
             },
             {
-              "id": "H12",
+              "id": "D2",
               "title": "Résultat durci",
               "input": "Réponse locale du chemin /durci",
               "expected": "Zéro alerte."
             },
             {
-              "id": "H13",
+              "id": "D3",
               "title": "Statuts d’erreur",
               "input": "/absent puis /erreur pendant une démonstration locale",
               "expected": "404 puis 500 identifiés comme erreurs HTTP."
@@ -586,7 +1209,7 @@
         },
         {
           "name": "fixtures/",
-          "purpose": "Exemples fictifs README.txt, settings.ini et message.txt copiés par l’apprenant."
+          "purpose": "Exemples fictifs README.txt, settings.ini et message.txt, copiés depuis /app/fixtures/integrity (commande dans l’onglet Environnement)."
         },
         {
           "name": ".gitlab-ci.yml",
@@ -605,14 +1228,25 @@
           "note": "Utilise un dépôt de cours autorisé."
         },
         {
+          "label": "Configurer ton identité Git (une seule fois)",
+          "command": "git config --global user.name \"Prénom Nom\" && git config --global user.email \"adresse@ecole.example\"",
+          "note": "Remplace les deux valeurs d’exemple par le nom et l’adresse de ton compte GitLab scolaire. Sans identité, git commit refuse de créer le commit. Cette configuration est conservée dans le volume home et sert aux trois parcours."
+        },
+        {
           "label": "Cloner le dépôt",
           "command": "git clone <URL_DU_DEPOT> .",
-          "note": "Le dossier du parcours est vide : clone directement ici avant de créer les fichiers. Le point signifie « dossier courant ». Pour une session Git interactive, utilise docker compose exec atelier bash depuis le dossier Cyber Atelier ; un cd du terminal web ne persiste pas entre deux commandes."
+          "note": "Le dossier du parcours est vide : clone directement ici avant de créer les fichiers. Le point signifie « dossier courant ». Le clone peut demander un jeton HTTPS ou la confirmation de l’empreinte SSH du serveur : fais-le dans docker compose exec atelier bash (depuis le dossier Cyber Atelier), puis cd /workspaces/fileguard. Un cd du terminal web ne persiste pas entre deux commandes.",
+          "interactive": true
         },
         {
           "label": "Créer la branche MR1",
           "command": "git switch -c feat/empreinte",
           "note": "Commence depuis la branche principale."
+        },
+        {
+          "label": "Copier les fixtures fictives (MR2)",
+          "command": "mkdir -p fixtures && cp /app/fixtures/integrity/* fixtures/ && chmod u+w fixtures/*",
+          "note": "Les originaux sont fournis en lecture seule dans /app/fixtures/integrity ; chmod u+w rend tes copies modifiables, par exemple pour simuler un fichier modifié. Ce sont des données fictives : elles ne remplacent pas les tests sur fichiers temporaires."
         }
       ],
       "steps": [
@@ -668,7 +1302,7 @@
             "Trie les noms avant écriture, utilise une indentation stable et ajoute un saut de ligne final.",
             "Exclus manifest.json ; refuse les liens symboliques et ne parcours pas les sous-dossiers.",
             "Teste un répertoire vide, plusieurs noms triés, exclusion du manifeste et refus d’un lien symbolique quand le système en permet la création.",
-            "Copie les fixtures fictives README.txt, settings.ini et message.txt dans le dépôt de cours ; elles ne sont pas présumées présentes sur le runner."
+            "Copie les fixtures fictives README.txt, settings.ini et message.txt dans le dépôt de cours (commande prête dans l’onglet Environnement) ; elles ne sont pas présumées présentes sur le runner."
           ],
           "tests": [
             {
@@ -824,6 +1458,820 @@
           "url": "/content/fileguard.md"
         }
       ]
+    },
+    {
+      "id": "toolwrap",
+      "title": "ToolWrap — piloter un outil externe",
+      "subtitle": "Wrapper subprocess, CLI argparse et lecture de sorties XML et JSON",
+      "description": "Encapsule proprement un outil en ligne de commande depuis Python : lancement sans shell, délai, code de retour, erreurs normalisées, CLI avec périmètre autorisé, puis lecture des sorties réelles de nmap et d’adsim. C’est la compétence centrale du futur framework de pentest : chaque module, réseau comme Active Directory, sera un wrapper.",
+      "level": "Débutant",
+      "color": "#B5523B",
+      "durationMinutes": 300,
+      "goals": [
+        "Lancer un outil externe avec subprocess.run et une liste d’arguments, sans shell dès qu’une entrée utilisateur est en jeu.",
+        "Normaliser le résultat d’un outil (code de retour, sorties, erreur) dans un dictionnaire unique, même en cas d’échec.",
+        "Construire une CLI argparse avec sous-commandes, codes de sortie et liste blanche de cibles limitée au laboratoire.",
+        "Analyser une sortie XML (nmap) et une sortie JSON (adsim), puis produire un rapport texte à partir de données communes.",
+        "Pratiquer Git sur de petites branches : revue de diff, conflit de fusion résolu, rebase."
+      ],
+      "prerequisites": [
+        "Avoir terminé le Socle : unittest, fichiers, JSON, exceptions, Git de base (branche, commit, diff).",
+        "Idéalement avoir fait PortPilot et HeaderScope (fonctions pures, validation, client local).",
+        "Disposer de Python 3 et de Git dans le conteneur Cyber Atelier."
+      ],
+      "scope": [
+        "Outils : nmap, installé dans le conteneur et utilisé seulement en démonstration sur 127.0.0.1:8000 ; adsim, simulateur FICTIF du domaine LAB.LOCAL.",
+        "Cible réseau : 127.0.0.1 uniquement. Aucune cible externe, aucune plage, aucun exploit.",
+        "Tests obligatoires : unittest avec unittest.mock sur subprocess.run et fixtures locales. Aucun processus réel, aucun nmap, aucun réseau dans ces tests.",
+        "Bibliothèque standard uniquement : subprocess, argparse, ipaddress, logging, xml.etree.ElementTree, json, unittest. Aucune dépendance pip."
+      ],
+      "concepts": [
+        "subprocess",
+        "liste d’arguments et shell",
+        "injection de commande (notion)",
+        "capture_output, timeout, returncode",
+        "TimeoutExpired et FileNotFoundError",
+        "dictionnaire normalisé",
+        "argparse et sous-commandes",
+        "codes de sortie",
+        "ipaddress et liste blanche",
+        "logging",
+        "xml.etree.ElementTree",
+        "json",
+        "unittest.mock",
+        "conflit de fusion",
+        "rebase"
+      ],
+      "files": [
+        {
+          "name": "toolwrap.py",
+          "purpose": "Wrapper lancer_outil, analyse des sorties nmap (XML) et adsim (JSON), format commun et rapport texte."
+        },
+        {
+          "name": "cli.py",
+          "purpose": "Interface argparse, validation de cible, liste blanche et codes de sortie retournés par main."
+        },
+        {
+          "name": "tests/",
+          "purpose": "Tests unittest : wrapper et parseurs avec mocks et fixtures, CLI avec arguments passés en liste."
+        },
+        {
+          "name": "fixtures/nmap/ et fixtures/adsim/",
+          "purpose": "Copies modifiables des sorties fictives, lues par les tests sans nmap ni adsim."
+        },
+        {
+          "name": "README.md",
+          "purpose": "Périmètre, codes de sortie, commandes de test, démonstrations séparées et bilan honnête."
+        },
+        {
+          "name": ".gitignore",
+          "purpose": "Exclut les fichiers générés par Python, par exemple __pycache__/."
+        }
+      ],
+      "setup": [
+        {
+          "label": "Vérifier Python",
+          "command": "python3 --version",
+          "note": "Attendu : Python 3. Utilise python si python3 n’existe pas."
+        },
+        {
+          "label": "Vérifier Git",
+          "command": "git --version",
+          "note": "Confirme que Git est disponible dans le conteneur."
+        },
+        {
+          "label": "Vérifier ton identité Git",
+          "command": "git config --global --get user.name && git config --global --get user.email",
+          "note": "Si l’une des deux valeurs est vide, reprends la configuration des parcours précédents avec le nom et l’adresse de ton compte scolaire. Sans identité, git commit refuse de créer le commit."
+        },
+        {
+          "label": "Cloner le dépôt",
+          "command": "git clone <URL_DU_DEPOT> .",
+          "note": "Le dossier du parcours est vide : clone directement ici avant de créer les fichiers. Le clone peut demander un jeton HTTPS ou la confirmation de l’empreinte SSH : fais-le dans docker compose exec atelier bash (depuis le dossier Cyber Atelier), puis cd /workspaces/toolwrap. Un cd du terminal web ne persiste pas entre deux commandes.",
+          "interactive": true
+        },
+        {
+          "label": "Copier les fixtures nmap",
+          "command": "mkdir -p fixtures && cp -r /app/fixtures/nmap/. fixtures/nmap/ && chmod -R u+w fixtures/nmap",
+          "note": "Copies modifiables des sorties XML fictives (open_8000.xml, closed_8000.xml, mixed.xml, broken.xml). Les originaux restent en lecture seule."
+        },
+        {
+          "label": "Copier les fixtures adsim",
+          "command": "mkdir -p fixtures && cp -r /app/fixtures/adsim/. fixtures/adsim/ && chmod -R u+w fixtures/adsim",
+          "note": "Sorties fictives d’adsim (users.json, users.txt, groups.json, computers.json, broken.json). Le simulateur est fictif : il ne se connecte à aucun annuaire."
+        },
+        {
+          "label": "Créer la branche MR1",
+          "command": "git switch -c feat/subprocess",
+          "note": "Crée-la depuis la branche principale à jour."
+        }
+      ],
+      "steps": [
+        {
+          "id": "toolwrap-mr1",
+          "title": "MR1 — Lancer un outil proprement (subprocess)",
+          "branch": "feat/subprocess",
+          "minutes": 100,
+          "mission": "Écris lancer_outil(args, timeout) dans toolwrap.py. Il reçoit une liste d’arguments dont le premier élément est le programme, lance l’outil avec subprocess.run, capture stdout et stderr en texte, applique le délai et retourne toujours le même dictionnaire normalisé : returncode, stdout, stderr, erreur. Pourquoi : le framework appellera des dizaines d’outils ; un seul wrapper garantit que chaque module traite les erreurs de la même façon. Règle : aucune chaîne n’est passée à un shell avec une entrée utilisateur. Exemple sans rapport avec ton outil : un script salue quelqu’un en composant la chaîne « echo Bonjour » suivie du prénom, puis la donne à un shell. Si le prénom saisi est « Ana; echo piraté », le shell exécute deux commandes au lieu d’une : c’est une injection de commande. Avec la liste ['echo', 'Bonjour', 'Ana; echo piraté'], le texte reste un seul argument et rien n’est interprété. Une liste vide ne lance rien et retourne une erreur normalisée.",
+          "tasks": [
+            "Entraîne-toi avec echo et python3 -c dans le terminal. Observe stdout, stderr et le code de retour, puis lis la documentation de subprocess.run sur capture_output, text et returncode.",
+            "Entraîne-toi sur adsim depuis le terminal : python /app/tools/adsim.py users --format json, puis la même commande avec --fail, puis un argument invalide. Note les trois codes de sortie et le canal (stdout ou stderr) de chaque message.",
+            "Écris lancer_outil : pas de shell, capture_output, text, timeout transmis et check laissé à False. Le dictionnaire contient les quatre clés même quand le programme n’a jamais démarré.",
+            "Traite séparément le délai dépassé, le programme introuvable et le code de retour non nul. Chaque cas remplit erreur avec un message court en français ; aucune exception ne remonte à l’appelant.",
+            "Écris les tests W1 à W5 dans tests/ avec unittest.mock.patch appliqué à subprocess.run. Aucun processus réel : vérifie les arguments reçus par le mock, dont la liste et le délai.",
+            "Ajoute un .gitignore pour __pycache__/, puis fais git status et git diff avant chaque commit. Commits atomiques, messages clairs, puis git log --oneline pour relire l’historique de la MR."
+          ],
+          "tests": [
+            {
+              "id": "W1",
+              "title": "Succès normalisé",
+              "input": "Résultat simulé : code 0, stdout « ok », stderr vide ; appel lancer_outil(['echo', 'ok'], 2)",
+              "expected": "Dictionnaire avec returncode 0, stdout « ok », stderr vide et erreur None. Aucune exception."
+            },
+            {
+              "id": "W2",
+              "title": "Code de retour non nul",
+              "input": "Résultat simulé : code 3, stderr « erreur simulée »",
+              "expected": "returncode 3 et stderr conservés ; erreur est une chaîne non vide ; aucune exception. Un code 0 n’est pas une erreur."
+            },
+            {
+              "id": "W3",
+              "title": "Délai dépassé",
+              "input": "subprocess.run lève TimeoutExpired ; délai demandé : 2 secondes",
+              "expected": "returncode None et erreur non vide qui mentionne le délai ; le timeout de 2 secondes est bien transmis à subprocess.run."
+            },
+            {
+              "id": "W4",
+              "title": "Outil introuvable",
+              "input": "subprocess.run lève FileNotFoundError",
+              "expected": "returncode None et erreur « outil introuvable » ou un message équivalent court ; aucune exception ne remonte."
+            },
+            {
+              "id": "W5",
+              "title": "Liste d’arguments intacte",
+              "input": "['echo', 'Ana; echo piraté']",
+              "expected": "subprocess.run reçoit exactement cette liste de deux éléments, sans shell=True (absent ou False). Le texte après le point-virgule reste dans un seul argument."
+            }
+          ],
+          "acceptance": [
+            "Les tests W1 à W5 sont découverts par unittest et passent sans outil réel, sans nmap et sans réseau.",
+            "Aucun appel à subprocess.run n’utilise shell=True, et W5 vérifie que la liste est transmise intacte.",
+            "lancer_outil retourne toujours les quatre clés, y compris en cas de délai dépassé ou d’outil absent.",
+            "L’historique git log --oneline montre des commits au message clair, et la MR ne contient ni __pycache__ ni fichier non voulu."
+          ],
+          "hint": "Le dictionnaire doit toujours avoir les mêmes quatre clés, même quand le programme n’a jamais démarré.\n\nNiveau 2 : Pense à ce que subprocess.run lève dans chaque cas d’échec, et à ce que tu peux renseigner dans returncode quand aucun code n’existe.\n\nNiveau 3 : Dans les tests, le patch doit viser le nom tel qu’il est utilisé dans ton module ; la section « where to patch » de la documentation unittest.mock l’explique. Vérifie ensuite les arguments reçus avec call_args."
+        },
+        {
+          "id": "toolwrap-mr2",
+          "title": "MR2 — CLI, périmètre et Git sous contrôle",
+          "branch": "feat/cli-perimetre",
+          "minutes": 100,
+          "mission": "Ajoute une interface argparse avec deux sous-commandes, reseau et ad. Valide chaque cible avec ipaddress et une liste blanche de périmètre : dans le labo, seule l’adresse 127.0.0.1 est autorisée, et toute autre valeur est refusée avant tout lancement. Ajoute un logging basique et des codes de sortie cohérents. Pourquoi : la CLI est la porte d’entrée du framework, et la liste blanche empêche de lancer un outil contre une cible hors périmètre. Git : tu provoques puis résous un conflit de fusion dans une branche jetable, puis tu rebases ta branche sur une base mise à jour.",
+          "tasks": [
+            "Lis la documentation argparse sur les sous-commandes et l’aide (--help). Crée le parseur des sous-commandes reseau et ad sans rien lancer, puis vérifie que python3 cli.py --help s’affiche. Pour reseau : une cible obligatoire et --port, avec 8000 par défaut. Pour ad : un sujet parmi users, groups et computers, puis --format json ou text.",
+            "Valide la cible avec ipaddress. Une valeur qui n’est pas une adresse (par exemple localhost) ou qui n’est pas dans la liste blanche est refusée avec un message en français. La liste blanche est une constante unique, documentée dans le README.",
+            "Branche les sous-commandes sur lancer_outil. Codes de sortie : 0 succès, 1 échec de l’outil (code de retour non nul ou erreur), 2 arguments invalides ou cible refusée. Ajoute un logging basique sur stderr : commande lancée, code retourné.",
+            "Écris les tests W6 à W10 : passe des listes d’arguments à main, remplace lancer_outil par un faux pour ne jamais lancer d’outil, et capture la sortie d’erreur avec contextlib.",
+            "Conflit guidé dans une branche jetable (hors MR) : modifie la même ligne de README.md sur deux branches, fusionne, observe les marqueurs de conflit, résous-le, puis git add et git commit. Supprime la branche jetable une fois résolue.",
+            "Rebase : après une évolution de la branche principale, place feat/cli-perimetre dessus avec git rebase, résous les conflits éventuels, relis git log --oneline --graph. Ne rebase jamais une branche déjà partagée sans le dire."
+          ],
+          "tests": [
+            {
+              "id": "W6",
+              "title": "Sous-commande reseau",
+              "input": "['reseau', '127.0.0.1', '--port', '8000']",
+              "expected": "Sous-commande reseau, cible 127.0.0.1, port 8000 sous forme d’entier. Sans --port, la valeur par défaut 8000 est retenue."
+            },
+            {
+              "id": "W7",
+              "title": "Aide",
+              "input": "['--help']",
+              "expected": "SystemExit de code 0 ; la sortie affichée mentionne les sous-commandes reseau et ad."
+            },
+            {
+              "id": "W8",
+              "title": "Liste blanche",
+              "input": "« 127.0.0.1 » puis « 127.0.0.2 », « 8.8.8.8 », « localhost », « 127.0.0.1/32 »",
+              "expected": "127.0.0.1 accepté ; les quatre autres refusés par ValueError avec un message clair en français. Aucune résolution de nom n’est tentée."
+            },
+            {
+              "id": "W9",
+              "title": "Cible refusée sans lancement",
+              "input": "['reseau', '8.8.8.8'] avec lancer_outil remplacé par un faux",
+              "expected": "main retourne 2, un message d’erreur est écrit sur stderr et lancer_outil n’est jamais appelé."
+            },
+            {
+              "id": "W10",
+              "title": "Codes de retour de main",
+              "input": "['ad', 'users'] avec lancer_outil simulé : une fois code 0, une fois code 3 (ou erreur)",
+              "expected": "main retourne 0 dans le premier cas et 1 dans le second. Le sujet users est transmis à l’outil."
+            }
+          ],
+          "acceptance": [
+            "python3 -m unittest discover -s tests passe avec W1 à W10, sans outil réel.",
+            "--help fonctionne ; les codes 0, 1 et 2 ainsi que la liste blanche sont documentés dans le README.",
+            "Un refus de cible n’appelle jamais lancer_outil.",
+            "Le conflit a été résolu puis la branche jetable supprimée ; après rebase, git log --oneline --graph montre un historique lisible par rapport à la branche principale."
+          ],
+          "hint": "Une adresse loopback n’est pas automatiquement autorisée : le contrat de la liste blanche dit exactement laquelle.\n\nNiveau 2 : ipaddress lève ValueError pour une chaîne qui n’est pas une adresse IP ; c’est un moyen de refuser localhost sans résoudre de nom.\n\nNiveau 3 : Git entoure les zones contestées de marqueurs <<<<<<<, ======= et >>>>>>>. Tu choisis le texte final, puis git add et git commit. Pendant un rebase, lis le message de Git à chaque arrêt avant de continuer."
+        },
+        {
+          "id": "toolwrap-mr3",
+          "title": "MR3 — Lire les sorties nmap et adsim, rapport et bilan",
+          "branch": "feat/parsing",
+          "minutes": 70,
+          "mission": "Analyse des sorties d’outils : XML nmap avec xml.etree.ElementTree, JSON adsim avec json.loads. Normalise les deux formats en dictionnaires communs, produis un rapport texte affiché sur stdout et écris les tests sur fixtures, sans nmap ni réseau. Les démonstrations, hors tests, passent les sorties réelles de nmap et d’adsim dans ton parseur. Pourquoi : le framework doit comparer des résultats venant d’outils différents ; sans format commun, chaque module devient une exception à part. adsim est FICTIF : le vrai Active Directory sera traité dans le projet final, sur un domaine qui t’appartient.",
+          "tasks": [
+            "Ouvre les fixtures XML (open_8000.xml, closed_8000.xml, mixed.xml) et repère la structure : hôte, ports, protocole, numéro et état de chaque port. Écris l’analyse XML avec xml.etree.ElementTree sur ces trois fichiers.",
+            "Traite broken.xml : l’erreur d’analyse est capturée, le retour est normalisé avec une erreur non vide et une liste vide. Le programme ne plante pas.",
+            "Analyse les JSON adsim (users.json, groups.json, computers.json) avec json.loads : repère les champs count et items. Traite broken.json comme une erreur normalisée.",
+            "Normalise tous les éléments dans un format commun (source, type, nom, statut, details), avec les mêmes clés pour nmap et adsim. Documente les valeurs de statut dans le README.",
+            "Écris un rapport texte : une ligne par élément, puis des totaux cohérents. Pour une liste vide, affiche un message clair. Écris les tests W11 à W16 avec les fixtures, puis exécute les démonstrations D1 à D3 dans le conteneur.",
+            "Termine le README : périmètre, codes de sortie, commandes de tests, démonstrations séparées de la CI, et bilan honnête (ce qui est prouvé par les tests, ce qui est seulement démontré, ce qui reste à faire)."
+          ],
+          "tests": [
+            {
+              "id": "W11",
+              "title": "XML ouvert",
+              "input": "Fixture open_8000.xml",
+              "expected": "Un élément : source nmap, nom « 8000/tcp », statut « open », erreur None."
+            },
+            {
+              "id": "W12",
+              "title": "XML mixte, ordre conservé",
+              "input": "Fixture mixed.xml, qui contient trois ports : open, closed et filtered",
+              "expected": "Trois éléments dans l’ordre du fichier, de statuts open, closed puis filtered ; erreur None."
+            },
+            {
+              "id": "W13",
+              "title": "XML cassé",
+              "input": "Fixture broken.xml",
+              "expected": "Aucune exception ; items vide ; erreur est une chaîne non vide."
+            },
+            {
+              "id": "W14",
+              "title": "JSON adsim valide",
+              "input": "Fixture users.json",
+              "expected": "Nombre d’éléments égal au champ count du fichier ; statut « actif » ou « inactif » selon enabled ; groupes conservés, liste vide si l’utilisateur n’a aucun groupe."
+            },
+            {
+              "id": "W15",
+              "title": "JSON invalide",
+              "input": "Fixture broken.json",
+              "expected": "items vide ; erreur non vide ; aucune exception."
+            },
+            {
+              "id": "W16",
+              "title": "Rapport texte",
+              "input": "Trois éléments normalisés (deux open, un closed), puis une liste vide",
+              "expected": "Une ligne par élément dans l’ordre, puis un total cohérent (3 éléments, 2 open, 1 closed) ; pour la liste vide, un message indique qu’aucun élément n’a été trouvé."
+            }
+          ],
+          "demos": [
+            {
+              "id": "D1",
+              "title": "nmap réel sur le labo",
+              "input": "Labo HTTP démarré avec son bouton sur 127.0.0.1:8000 ; lancer_outil sur nmap -sT -p 8000 -oX - 127.0.0.1, puis sortie XML passée au parseur",
+              "expected": "Le port 8000 est au statut open. Si le labo est arrêté, le résultat doit être différent (closed ou erreur) : explique la différence dans le bilan."
+            },
+            {
+              "id": "D2",
+              "title": "adsim réel, sortie JSON",
+              "input": "python /app/tools/adsim.py users --format json passé par lancer_outil, puis sortie passée au parseur",
+              "expected": "Éléments normalisés, erreur None, nombre égal au champ count de la sortie réelle."
+            },
+            {
+              "id": "D3",
+              "title": "Erreurs réelles d’adsim",
+              "input": "adsim avec --fail (code 3), puis adsim avec un délai supérieur au timeout de lancer_outil",
+              "expected": "Le code 3 est normalisé en erreur sans trace Python ; le délai dépassé est normalisé en erreur de timeout."
+            }
+          ],
+          "acceptance": [
+            "Les tests W11 à W16 passent avec les fixtures seules, sans nmap, sans réseau et sans adsim.",
+            "Un XML ou un JSON cassé ne fait jamais planter le programme : il produit une erreur normalisée.",
+            "Les démonstrations D1 à D3 sont exécutées dans le conteneur, hors unittest discover, et leurs sorties réelles sont consignées dans le README ou le bilan.",
+            "Le bilan distingue tests unitaires (fixtures et mocks), démonstrations réelles (nmap sur le labo, adsim fictif) et limites."
+          ],
+          "hint": "Les fixtures sont la meilleure documentation : ouvre-les avant d’écrire la moindre recherche d’élément.\n\nNiveau 2 : ElementTree lève une erreur d’analyse sur un XML mal formé, et json.loads lève JSONDecodeError sur un JSON invalide. Capture ces exceptions précises et renvoie le format normalisé avec une erreur.\n\nNiveau 3 : Décide une seule fois les clés communes (source, type, nom, statut, details), écris-les dans le README, puis fais passer nmap et adsim par ce même format."
+        }
+      ],
+      "timeline": [
+        {
+          "label": "Préparer le dépôt, vérifier Python et Git, copier les fixtures, lire le contrat",
+          "minutes": 20
+        },
+        {
+          "label": "MR1 — subprocess, wrapper, mocks et tests",
+          "minutes": 100
+        },
+        {
+          "label": "MR2 — CLI argparse, liste blanche, conflit et rebase",
+          "minutes": 100
+        },
+        {
+          "label": "MR3 — parsing XML et JSON, rapport, démonstrations et bilan",
+          "minutes": 70
+        },
+        {
+          "label": "Marge de débogage et bilan honnête",
+          "minutes": 10
+        }
+      ],
+      "references": [
+        {
+          "label": "subprocess",
+          "url": "https://docs.python.org/3/library/subprocess.html"
+        },
+        {
+          "label": "argparse",
+          "url": "https://docs.python.org/3/library/argparse.html"
+        },
+        {
+          "label": "ipaddress",
+          "url": "https://docs.python.org/3/library/ipaddress.html"
+        },
+        {
+          "label": "xml.etree.ElementTree",
+          "url": "https://docs.python.org/3/library/xml.etree.elementtree.html"
+        },
+        {
+          "label": "json",
+          "url": "https://docs.python.org/3/library/json.html"
+        },
+        {
+          "label": "unittest.mock",
+          "url": "https://docs.python.org/3/library/unittest.mock.html"
+        },
+        {
+          "label": "Git — git rebase",
+          "url": "https://git-scm.com/docs/git-rebase"
+        },
+        {
+          "label": "Git — résoudre un conflit de fusion (livre Pro Git)",
+          "url": "https://git-scm.com/book/en/v2/Git-Branching-Basic-Branching-and-Merging"
+        }
+      ],
+      "resources": [
+        {
+          "label": "Télécharger le guide ToolWrap (Markdown)",
+          "url": "/content/toolwrap.md"
+        }
+      ],
+      "completion": [
+        "toolwrap.py, cli.py, tests/, fixtures copiées, .gitignore et README.md dans le dépôt.",
+        "Trois MR successives (feat/subprocess, feat/cli-perimetre, feat/parsing), chacune ouverte depuis la branche principale à jour.",
+        "Conflit de fusion résolu et rebase effectué, avec les commandes et l’historique relus.",
+        "Démonstrations D1 à D3 consignées dans le bilan, séparées des tests unitaires."
+      ],
+      "limits": [
+        "adsim est un simulateur FICTIF (domaine LAB.LOCAL) : il ne se connecte à aucun annuaire réel. Le vrai Active Directory sera traité dans le projet final, sur un domaine qui t’appartient.",
+        "La cible reste 127.0.0.1 ; la liste blanche ne doit pas être élargie pendant ce parcours.",
+        "Les tests mockent subprocess.run : ils prouvent la logique du wrapper, pas le comportement réel de nmap ou d’adsim. Ce rôle revient aux démonstrations.",
+        "nmap n’est pas disponible sur un runner GitLab : les tests obligatoires ne l’appellent jamais.",
+        "Un état open ne prouve ni la nature du service ni une vulnérabilité ; une sortie fictive ne prouve rien sur un vrai domaine."
+      ]
+    },
+    {
+      "id": "reconwrap",
+      "title": "ReconWrap — assembler un mini-framework",
+      "subtitle": "Parcours de synthèse : modules réseau, web et Active Directory, CLI et rapports",
+      "description": "Assemble un petit framework modulaire qui lance tes modules (réseau, web, Active Directory) contre le laboratoire local, produit un rapport JSON et Markdown, puis se documente et se livre comme un vrai projet. Tu réutilises ton propre code de PortPilot et de HeaderScope : le parcours porte sur l’architecture, l’orchestration et la livraison, pas sur la réécriture de ce que tu sais déjà faire.",
+      "level": "Débutant",
+      "color": "#2F6F4F",
+      "durationMinutes": 300,
+      "goals": [
+        "Concevoir un contrat commun : chaque module reçoit une cible validée et retourne un résultat normalisé.",
+        "Brancher des modules existants sans les copier à l’aveugle, et isoler l’échec d’un module pour que les autres continuent.",
+        "Produire une CLI argparse et des rapports JSON et Markdown dont les tests sont déterministes.",
+        "Livrer un projet documenté, taggé en v0.1.0, avec des tests unittest qui tournent sans labo ni nmap."
+      ],
+      "prerequisites": [
+        "Avoir terminé les parcours Socle et ToolWrap.",
+        "Idéalement avoir fait PortPilot et HeaderScope : tu réutilises ton propre code, que tu relis et adaptes avant de le brancher.",
+        "Connaître la bibliothèque standard utile ici : argparse, json, subprocess, logging, pathlib et unittest.",
+        "Savoir créer une branche et une merge request dans le dépôt de l’école ; le conteneur Cyber Atelier fournit nmap, adsim et le laboratoire HTTP sur 127.0.0.1:8000."
+      ],
+      "scope": [
+        "Périmètre loopback : seule la cible 127.0.0.1 est acceptée. Toute autre valeur est refusée avant l’appel d’un module.",
+        "Le module web n’interroge que les quatre chemins du laboratoire : /fragile, /durci, /absent et /erreur sur 127.0.0.1:8000.",
+        "Le module réseau ne vérifie que le port du laboratoire (8000) avec nmap en démonstration ; aucun scan de plage, aucune liste de ports distante.",
+        "Le module AD appelle adsim, simulateur fictif du domaine LAB.LOCAL. Aucun annuaire réel, aucune authentification.",
+        "Les tests obligatoires (CI) s’appuient sur les fixtures fournies, copiées dans le dépôt : ils n’appellent ni nmap, ni adsim, ni le labo, ni le réseau. Les démonstrations sont séparées et hors CI.",
+        "Bibliothèque standard uniquement : aucune dépendance pip, un venv suffit.",
+        "Aucune exploitation, aucun crawl, aucune cible distante. Le framework est un outil d’apprentissage, utilisé dans un cadre scolaire autorisé."
+      ],
+      "concepts": [
+        "architecture en package",
+        "contrat de résultat",
+        "registre et dispatch",
+        "validation de cible",
+        "venv",
+        "logging",
+        "argparse et codes de sortie",
+        "subprocess (liste d’arguments, timeout)",
+        "xml.etree.ElementTree",
+        "json et rapports",
+        "fichiers temporaires et fixtures",
+        "unittest",
+        "docstrings et annotations de type",
+        "tag annoté et CHANGELOG",
+        "CI GitLab"
+      ],
+      "files": [
+        {
+          "name": "reconwrap/__init__.py",
+          "purpose": "Version et API publique du package."
+        },
+        {
+          "name": "reconwrap/__main__.py",
+          "purpose": "Point d’entrée de python -m reconwrap ; il délègue à la CLI."
+        },
+        {
+          "name": "reconwrap/core.py",
+          "purpose": "Contrat de résultat, validation de cible, registre des modules et dispatch."
+        },
+        {
+          "name": "reconwrap/network.py",
+          "purpose": "Module réseau : adaptation de ton PortPilot et lecture du XML nmap."
+        },
+        {
+          "name": "reconwrap/web.py",
+          "purpose": "Module web : adaptation de ton HeaderScope sur les chemins du laboratoire."
+        },
+        {
+          "name": "reconwrap/ad.py",
+          "purpose": "Module Active Directory : appel d’adsim ou lecture d’une sortie capturée, puis résultat normalisé."
+        },
+        {
+          "name": "reconwrap/rapport.py",
+          "purpose": "Écriture des rapports JSON et Markdown avec noms sûrs et date passée en paramètre."
+        },
+        {
+          "name": "reconwrap/cli.py",
+          "purpose": "Interface argparse : modules, cible, chemin web, format, dossier de sortie."
+        },
+        {
+          "name": "tests/",
+          "purpose": "Tests unittest : faux modules, fichiers temporaires et fixtures. Aucun test n’a besoin du labo."
+        },
+        {
+          "name": "fixtures/nmap/ et fixtures/adsim/",
+          "purpose": "Copies locales des fixtures fournies ; la CI les lit à la place des vrais outils."
+        },
+        {
+          "name": ".gitignore",
+          "purpose": "Ignore .venv/, __pycache__/ et rapports/. À créer dès la MR1."
+        },
+        {
+          "name": ".gitlab-ci.yml",
+          "purpose": "Pipeline de merge request qui lance unittest. Tu l’écris en MR3."
+        },
+        {
+          "name": "README.md",
+          "purpose": "Installation, usage, architecture, ajout d’un module, limites et périmètre."
+        },
+        {
+          "name": "CHANGELOG.md",
+          "purpose": "Historique des versions, avec la version 0.1.0."
+        }
+      ],
+      "setup": [
+        {
+          "label": "Vérifier Python",
+          "command": "python --version",
+          "note": "Python 3 suffit. Utilise python3 si la commande python n’existe pas."
+        },
+        {
+          "label": "Vérifier Git",
+          "command": "git --version",
+          "note": "Confirme que Git est disponible avant de cloner le dépôt de l’école."
+        },
+        {
+          "label": "Configurer ton identité Git (une seule fois)",
+          "command": "git config --global user.name \"Prénom Nom\" && git config --global user.email \"adresse@ecole.example\"",
+          "note": "Remplace les deux valeurs d’exemple par le nom et l’adresse de ton compte GitLab scolaire. Sans identité, git commit refuse de créer le commit. Cette configuration est conservée dans le volume home et sert à tous les parcours."
+        },
+        {
+          "label": "Cloner le dépôt",
+          "command": "git clone <URL_DU_DEPOT> .",
+          "note": "Le dossier du parcours est vide : clone directement ici avant de créer les fichiers. Le point signifie « dossier courant ». Le clone peut demander un jeton HTTPS ou la confirmation de l’empreinte SSH : fais-le dans docker compose exec atelier bash (depuis le dossier Cyber Atelier), puis cd /workspaces/reconwrap. Un cd du terminal web ne persiste pas entre deux commandes.",
+          "interactive": true
+        },
+        {
+          "label": "Créer le venv",
+          "command": "python -m venv .venv",
+          "note": "Crée l’environnement dans le dossier du projet. Dans la console web, chaque commande repart à neuf : une activation (source .venv/bin/activate) ne persiste pas. Appelle .venv/bin/python explicitement. Le dossier .venv ne doit jamais être commité : ajoute-le à .gitignore dans la MR1, avant ton premier git add."
+        },
+        {
+          "label": "Créer la branche MR1",
+          "command": "git switch -c feat/architecture",
+          "note": "Crée-la depuis la branche principale à jour. Vérifie d’abord avec git status que ton dépôt est propre."
+        }
+      ],
+      "steps": [
+        {
+          "id": "reconwrap-mr1",
+          "title": "MR1 — Architecture, contrat et registre",
+          "branch": "feat/architecture",
+          "minutes": 100,
+          "mission": "Pose la structure du package reconwrap/ et le contrat commun. Chaque module expose une fonction qui prend une cible validée et des options, puis retourne un dict normalisé avec les clés module, statut (OK, ERREUR ou IGNORE), donnees, alertes et duree_s. Le registre associe un nom de module à sa fonction. Le dispatch vérifie la cible, appelle le module et convertit une exception en résultat ERREUR, pour qu’une panne ne casse jamais le reste. Les tests utilisent de faux modules : cette MR ne lance aucun outil. Pourquoi : ce contrat est la colonne vertébrale du framework. Sans lui, ajouter un module oblige à modifier tout le reste.",
+          "tasks": [
+            "Crée le package reconwrap/ avec __init__.py et __main__.py, puis un .gitignore qui couvre .venv/, __pycache__/ et rapports/. Vérifie avec git status que .venv n’apparaît pas avant ton premier commit.",
+            "Écris la fabrique qui construit le dict de résultat normalisé et refuse tout statut hors de OK, ERREUR et IGNORE.",
+            "Valide la cible : seule 127.0.0.1 est acceptée. Une adresse externe, un nom de domaine, une plage ou une chaîne contenant autre chose sont refusés avant tout appel de module.",
+            "Crée le registre (nom vers fonction) et le dispatch : un nom inconnu doit être signalé clairement, et une exception levée par un module doit devenir un résultat ERREUR.",
+            "Ajoute un logger par module (niveaux DEBUG, INFO, ERREUR et un format qui affiche le nom du module), et branche-le sur le dispatch. Les tests vérifient les résultats, pas le texte affiché à l’écran.",
+            "Avant chaque commit, lance git status, git diff puis python -m unittest. Fais des commits atomiques (structure, contrat, registre, logging séparés), puis relis le diff complet de la MR."
+          ],
+          "tests": [
+            {
+              "id": "R1",
+              "title": "Résultat normalisé",
+              "input": "Fabrique appelée avec module « faux », statut « OK », donnees vide, alertes vide et duree_s 0.0.",
+              "expected": "Dict aux cinq clés exactes module, statut, donnees, alertes, duree_s ; alertes est une liste et duree_s un nombre positif ou nul."
+            },
+            {
+              "id": "R2",
+              "title": "Statut refusé",
+              "input": "Statut « FAUX », puis statut « ok » en minuscules.",
+              "expected": "ValueError avec un message en français qui cite le statut refusé. Aucun dict n’est retourné : les minuscules sont refusées aussi."
+            },
+            {
+              "id": "R3",
+              "title": "Nom de module inconnu",
+              "input": "Registre contenant trois faux modules nommés network, web et ad ; demande du module « scanner ».",
+              "expected": "ValueError qui liste les modules connus. Aucun des trois faux modules n’est appelé."
+            },
+            {
+              "id": "R4",
+              "title": "Exception isolée",
+              "input": "Faux module qui lève RuntimeError avec le message « boom ».",
+              "expected": "Le dispatch ne propage pas l’exception ; il retourne statut ERREUR, alertes vide, et donnees contient le message d’erreur."
+            },
+            {
+              "id": "R5",
+              "title": "Cible loopback seulement",
+              "input": "127.0.0.1, puis 192.0.2.10, example.com, une chaîne vide, 10.0.0.0/24 et « 127.0.0.1; ls ».",
+              "expected": "127.0.0.1 est accepté. Toutes les autres valeurs lèvent ValueError et aucun module n’est appelé."
+            }
+          ],
+          "acceptance": [
+            "python -m reconwrap s’exécute sans traceback, même si aucun module n’est encore branché.",
+            "Les tests R1 à R5 passent localement avec python -m unittest, sans réseau et sans outil externe.",
+            "Ajouter un faux module ne demande aucune modification du dispatch : seul le registre change.",
+            "Le .venv n’est pas suivi par Git, les commits sont atomiques et le diff de la MR a été relu."
+          ],
+          "hint": "Écris d’abord le contrat sur papier : quels champs, quels statuts, quelles erreurs. Ensuite seulement le code, en testant chaque règle avec un faux module.\n\nNiveau 2 : Une fonction construit le dict, une autre vérifie le statut. Le dispatch n’a qu’à appeler le module dans un bloc protégé et convertir l’exception. Pour le logging, regarde comment un logger se crée à partir d’un nom.\n\nNiveau 3 : Le registre peut être un dict ordinaire de nom vers fonction. Pour la cible, la documentation de ipaddress permet de tester si une adresse est une adresse de bouclage, mais garde une règle lisible : 127.0.0.1 seulement, rien d’autre."
+        },
+        {
+          "id": "reconwrap-mr2",
+          "title": "MR2 — Modules, CLI et rapports",
+          "branch": "feat/orchestration-rapport",
+          "minutes": 100,
+          "mission": "Branche les trois modules réels sur le contrat de MR1 et ajoute l’orchestration. Le module réseau reprend ton PortPilot et lit le XML de nmap. Le module web reprend ton HeaderScope sur les quatre chemins du labo. Le module AD appelle adsim. Un module en échec ne fait pas échouer les autres. La CLI argparse choisit les modules, la cible, le chemin web et le format. Les rapports JSON et Markdown s’écrivent dans un dossier dédié, avec une date passée en paramètre pour que les tests restent déterministes. La CI lit les fixtures copiées dans le dépôt ; les démonstrations contre le labo sont séparées. Pourquoi : c’est la première fois que ton code parle à de vrais outils. Tu apprends à isoler les effets de bord (processus, réseau, disque) pour que le reste reste testable.",
+          "tasks": [
+            "Copie les fixtures dans le dépôt, puis vérifie avec git status qu’elles sont suivies : mkdir -p fixtures && cp -r /app/fixtures/nmap/. fixtures/nmap/ && cp -r /app/fixtures/adsim/. fixtures/adsim/ && chmod -R u+w fixtures. Les originaux sont en lecture seule.",
+            "Module réseau : reprends la logique de PortPilot (validation, états open, closed, filtered) et lis le XML avec xml.etree.ElementTree. Ajoute une option qui lit un fichier XML fourni, pour la CI. Un XML cassé donne ERREUR, sans trace d’exception.",
+            "Module web : reprends le classement de HeaderScope et accepte un des quatre chemins du labo. Dans donnees, distingue un code HTTP (404, 500), une panne de connexion et un timeout.",
+            "Module AD : lance adsim avec subprocess en liste d’arguments (jamais shell=True), avec un délai maximal, puis lis la sortie JSON. Un code de retour non nul ou un JSON invalide donne ERREUR. Ajoute une option qui lit une sortie capturée, pour la CI.",
+            "CLI argparse : --modules (choix parmi le registre), --cible (127.0.0.1 par défaut), --chemin (pour le module web), --format (json ou md) et --sortie (dossier de rapport). Une valeur invalide donne un code de sortie 2. Pratique git stash et git restore au moins une fois pendant cette MR.",
+            "Rapport : écris le JSON et le Markdown dans le dossier de sortie, avec des noms de fichiers sûrs (sans séparateur de chemin ni ..) et une date passée en paramètre. Documente le code de sortie choisi dans le README de MR3."
+          ],
+          "tests": [
+            {
+              "id": "R6",
+              "title": "Échec isolé",
+              "input": "Trois faux modules dans cet ordre : A retourne OK, B lève une exception, C retourne OK.",
+              "expected": "Trois résultats dans l’ordre demandé : A OK, B ERREUR, C OK. C est bien exécuté après l’échec de B."
+            },
+            {
+              "id": "R7",
+              "title": "Module inconnu en CLI",
+              "input": "--modules network,scanner, dans un dossier temporaire.",
+              "expected": "Code de sortie 2, message d’erreur sur stderr, aucun rapport écrit."
+            },
+            {
+              "id": "R8",
+              "title": "Cible refusée en CLI",
+              "input": "--cible 192.0.2.10, dans un dossier temporaire.",
+              "expected": "Code de sortie 2, aucun module appelé, aucun fichier écrit."
+            },
+            {
+              "id": "R9",
+              "title": "Rapport JSON déterministe",
+              "input": "Mêmes résultats écrits deux fois, avec la date injectée 2026-01-05T08:00:00, dans deux dossiers temporaires.",
+              "expected": "Les deux fichiers JSON sont identiques octet pour octet. Ils contiennent la date injectée et, pour chaque module, les clés module, statut et alertes."
+            },
+            {
+              "id": "R10",
+              "title": "Nom de fichier sûr",
+              "input": "Nom de rapport « ../../evil » puis « rapport final/v1 », dans un dossier temporaire.",
+              "expected": "Le nom est refusé ou nettoyé. Aucun fichier n’est créé en dehors du dossier demandé, et aucun nom ne contient de séparateur de chemin."
+            },
+            {
+              "id": "R11",
+              "title": "Rapport Markdown",
+              "input": "Un résultat OK sans alerte, puis un résultat ERREUR avec deux alertes.",
+              "expected": "Un titre, une ligne par module avec son statut, les alertes listées sous leur module, dans l’ordre des résultats."
+            },
+            {
+              "id": "R12",
+              "title": "Lecture XML nmap",
+              "input": "Fixtures nmap : open_8000.xml, closed_8000.xml, mixed.xml et broken.xml.",
+              "expected": "Le port 8000 est open dans open_8000.xml et closed dans closed_8000.xml. mixed.xml donne open, closed et filtered. broken.xml donne ERREUR sans exception."
+            },
+            {
+              "id": "R13",
+              "title": "Lecture AD depuis fixtures",
+              "input": "Fixtures adsim : users.json, puis broken.json. Le module lit la sortie capturée, il n’appelle pas adsim.",
+              "expected": "users.json : le nombre de comptes égale count et actifs et inactifs sont distingués. broken.json donne ERREUR avec un message."
+            },
+            {
+              "id": "R14",
+              "title": "Classement web sans réseau",
+              "input": "Statut 404 avec en-têtes quelconques, puis statut 200 avec les trois en-têtes conformes.",
+              "expected": "404 : statut ERREUR, code 404 conservé, alertes vide. 200 conforme : zéro alerte. Aucune connexion n’est ouverte."
+            }
+          ],
+          "demos": [
+            {
+              "id": "D1",
+              "title": "Réseau contre le labo",
+              "input": "Labo démarré avec son bouton. python -m reconwrap --modules network --cible 127.0.0.1 --format json --sortie rapports/",
+              "expected": "Le port 8000 est signalé open dans le rapport JSON."
+            },
+            {
+              "id": "D2",
+              "title": "Web : chemin fragile",
+              "input": "Labo démarré. --modules web --chemin /fragile --format md",
+              "expected": "Trois alertes, une par en-tête absent ou non conforme."
+            },
+            {
+              "id": "D3",
+              "title": "Web : chemin durci",
+              "input": "Labo démarré. --modules web --chemin /durci --format md",
+              "expected": "Zéro alerte."
+            },
+            {
+              "id": "D4",
+              "title": "Erreurs HTTP 404 et 500",
+              "input": "Labo démarré. --modules web avec --chemin /absent, puis --chemin /erreur.",
+              "expected": "Statut ERREUR avec le code 404, puis avec le code 500 ; alertes vide dans les deux cas."
+            },
+            {
+              "id": "D5",
+              "title": "Active Directory avec adsim",
+              "input": "python -m reconwrap --modules ad --format json --sortie rapports/ (dans le conteneur).",
+              "expected": "Les comptes du domaine LAB.LOCAL apparaissent avec leur état actif ou inactif. Aucun annuaire réel n’est contacté."
+            },
+            {
+              "id": "D6",
+              "title": "Labo arrêté",
+              "input": "Arrête le labo avec son bouton, puis lance --modules network,web,ad.",
+              "expected": "Le module web signale une panne de connexion, distincte d’un code HTTP. Les autres modules produisent quand même leur résultat et le rapport est écrit."
+            }
+          ],
+          "acceptance": [
+            "Les neuf tests R6 à R14 passent localement avec python -m unittest, sans nmap, sans labo et sans réseau.",
+            "Un module en échec ne bloque ni les autres modules ni l’écriture du rapport. Le code de sortie choisi est documenté et identique à chaque lancement.",
+            "Toute cible autre que 127.0.0.1 est refusée avant l’appel d’un module. Le code n’utilise jamais shell=True.",
+            "Les démonstrations D1 à D6 sont consignées à part, avec le labo démarré explicitement. Elles ne figurent pas dans la CI."
+          ],
+          "hint": "Garde la même règle partout : chaque module fait une seule chose et retourne un résultat du contrat. L’orchestration ne sait pas comment fonctionnent nmap ou adsim ; elle appelle seulement les modules du registre.\n\nNiveau 2 : Pour lancer adsim ou nmap, subprocess.run avec une liste d’arguments, un timeout et une capture de la sortie est la forme à retenir. Un module ne construit jamais une commande en concaténant une cible. Pour les rapports, pathlib et un nom simple valent mieux que des astuces de chaîne, et la date est un argument de la fonction.\n\nNiveau 3 : Pour tester sans nmap ni labo, copie une sortie capturée dans fixtures et fais-la lire au module par une option. Pour le nom de fichier, accepte seulement un motif simple (lettres, chiffres, tirets, points sans séquence ..) et refuse le reste plutôt que de le réparer. La documentation de argparse explique le code 2 pour une erreur d’usage."
+        },
+        {
+          "id": "reconwrap-mr3",
+          "title": "MR3 — Documentation, qualité et release v0.1.0",
+          "branch": "feat/doc-qualite",
+          "minutes": 70,
+          "mission": "Rends le projet utilisable par quelqu’un d’autre. Tu écris le README complet (installation, usage, architecture, ajout d’un module, limites éthiques et légales, périmètre), les docstrings et annotations de type de l’API publique, une checklist de relecture, puis le fichier .gitlab-ci.yml qui lance python -m unittest sur chaque merge request. Tu termines par un CHANGELOG, un tag v0.1.0, une pratique de conflit et d’annulation, puis une page sur ce que tu ferais pour le projet final. Le pipeline reste sur des tests locaux : il n’appelle ni nmap, ni labo, ni réseau. Pourquoi : un outil que personne ne sait lancer ou relire n’est pas un livrable. La documentation et la release sont des compétences de projet, pas un décor.",
+          "tasks": [
+            "Relis le diff complet de la branche par rapport à la principale avec une checklist écrite par toi (noms, erreurs, effets de bord, chemins, tests). Ajoute docstrings et annotations de type à l’API publique, puis vérifie qu’elles correspondent au comportement réel.",
+            "Écris le README : installation dans un venv, lancement, options de la CLI, architecture (un module par domaine), comment ajouter un module, périmètre loopback, limites éthiques et légales.",
+            "Écris .gitlab-ci.yml : une image Python, une étape qui lance python -m unittest depuis la racine, déclenchée sur les merge requests. Vérifie la commande en local avant de pousser.",
+            "Crée CHANGELOG.md (version 0.1.0, ajouts, limites connues). Une fois la MR fusionnée, pose le tag annoté v0.1.0 sur la principale (git tag -a) et pousse-le séparément.",
+            "Dans une branche jetable, provoque un conflit volontaire sur README.md entre deux branches, résous-le en lisant les marqueurs, puis annule un commit de test avec git revert sur une autre branche jetable, jamais sur la principale. Supprime ensuite les branches jetables.",
+            "Rédige docs/PROJET_FINAL.md : ce que tu ferais pour le projet final (module AD réel contre un domaine dont tu as l’autorisation écrite, interface graphique optionnelle, ce que tu ne ferais pas). Termine par un bilan honnête et la liste de ce qui reste à apprendre."
+          ],
+          "tests": [
+            {
+              "id": "R15",
+              "title": "Contrat des trois modules hors ligne",
+              "input": "Résultats de network (fixture XML), ad (fixture JSON) et web (classement injecté), relus avec la fabrique de résultat de MR1.",
+              "expected": "Les trois résultats ont les cinq clés, un statut OK, ERREUR ou IGNORE, et une liste d’alertes."
+            },
+            {
+              "id": "R16",
+              "title": "Suite complète sans labo",
+              "input": "python -m unittest lancé depuis la racine, labo arrêté et nmap absent du système.",
+              "expected": "Code de sortie 0. Les tests R1 à R15 sont découverts, et aucun test ne se connecte à 127.0.0.1:8000 ni n’appelle nmap ou adsim."
+            },
+            {
+              "id": "R17",
+              "title": "Aide de la CLI",
+              "input": "python -m reconwrap --help",
+              "expected": "Code de sortie 0. L’aide affiche les options --modules, --cible, --chemin, --format et --sortie."
+            }
+          ],
+          "acceptance": [
+            "Une personne qui n’a pas écrit le code peut installer et lancer l’outil en suivant le README, sans aide extérieure.",
+            "Le pipeline de la MR lance python -m unittest et passe. Si l’instance de l’école n’a pas de runner, note-le au lieu de déclarer la CI validée.",
+            "Le tag v0.1.0 pointe sur le commit fusionné de la principale. Le conflit et le revert ont été faits dans des branches jetables, supprimées ensuite.",
+            "docs/PROJET_FINAL.md distingue ce qui est fait, ce qui reste à apprendre, et précise l’autorisation nécessaire pour tout test sur un vrai domaine."
+          ],
+          "hint": "Relis ton projet comme quelqu’un qui ne le connaît pas. Si une phrase du README ne correspond pas au code, c’est le README ou le code qui doit changer.\n\nNiveau 2 : Pour la CI, une seule étape suffit. Vérifie d’abord la commande depuis la racine du dépôt. Un tag annoté se crée avec git tag -a et se pousse séparément de la branche.\n\nNiveau 3 : Pour le conflit, modifie la même ligne de README.md sur deux branches jetables puis fusionne l’une dans l’autre, et lis les marqueurs avant de choisir. La documentation de git revert explique comment annuler un commit sans réécrire l’historique de la branche principale."
+        }
+      ],
+      "timeline": [
+        {
+          "label": "Préparer Python, Git, le venv et lire le contrat",
+          "minutes": 20
+        },
+        {
+          "label": "MR1 — architecture, contrat et registre",
+          "minutes": 100
+        },
+        {
+          "label": "MR2 — modules, CLI et rapports",
+          "minutes": 100
+        },
+        {
+          "label": "MR3 — documentation, qualité et release",
+          "minutes": 70
+        },
+        {
+          "label": "Marge et relecture finale",
+          "minutes": 10
+        }
+      ],
+      "references": [
+        {
+          "label": "argparse",
+          "url": "https://docs.python.org/3/library/argparse.html"
+        },
+        {
+          "label": "venv",
+          "url": "https://docs.python.org/3/library/venv.html"
+        },
+        {
+          "label": "logging",
+          "url": "https://docs.python.org/3/library/logging.html"
+        },
+        {
+          "label": "subprocess",
+          "url": "https://docs.python.org/3/library/subprocess.html"
+        },
+        {
+          "label": "unittest",
+          "url": "https://docs.python.org/3/library/unittest.html"
+        },
+        {
+          "label": "xml.etree.ElementTree",
+          "url": "https://docs.python.org/3/library/xml.etree.elementtree.html"
+        },
+        {
+          "label": "ipaddress",
+          "url": "https://docs.python.org/3/library/ipaddress.html"
+        },
+        {
+          "label": "pathlib",
+          "url": "https://docs.python.org/3/library/pathlib.html"
+        },
+        {
+          "label": "git tag",
+          "url": "https://git-scm.com/docs/git-tag"
+        },
+        {
+          "label": "git revert",
+          "url": "https://git-scm.com/docs/git-revert"
+        },
+        {
+          "label": "git stash",
+          "url": "https://git-scm.com/docs/git-stash"
+        },
+        {
+          "label": "GitLab CI/CD : fichier .gitlab-ci.yml",
+          "url": "https://docs.gitlab.com/ci/yaml/"
+        }
+      ],
+      "resources": [
+        {
+          "label": "Télécharger le guide ReconWrap (Markdown)",
+          "url": "/content/reconwrap.md"
+        }
+      ],
+      "completion": [
+        "Package reconwrap/ avec contrat, registre, trois modules, CLI et rapports, versionné dans le dépôt de cours.",
+        "Trois MR successives (feat/architecture, feat/orchestration-rapport, feat/doc-qualite), chacune basée sur la principale à jour et relue.",
+        "Tests unittest locaux et CI, tag v0.1.0 et CHANGELOG. Les démonstrations D1 à D6 sont consignées à part, avec le labo démarré."
+      ],
+      "limits": [
+        "Périmètre loopback : 127.0.0.1 seulement. Pas de scan de plage, pas de cible distante, pas d’exploitation.",
+        "Les tests de CI s’appuient sur des fixtures : ils valident la logique, pas le comportement sur un vrai réseau. Les démonstrations exigent le labo démarré.",
+        "adsim est un simulateur fictif (domaine LAB.LOCAL) : le module AD n’est pas testé contre un annuaire réel dans ce parcours.",
+        "Un framework d’outils de sécurité ne vaut pas audit. Tout usage hors d’un cadre autorisé par écrit est interdit et engage ta responsabilité légale."
+      ]
     }
   ],
   "gitlabGuide": [
@@ -832,10 +2280,22 @@
       "body": "Utilise l’instance GitLab et les règles fournies par ton école. Vérifie les droits sur le projet, le runner, la branche principale et les réglages de fusion avant de commencer.",
       "items": [
         "Les dossiers de cours sont vides : clone le dépôt directement dans le dossier courant avec git clone <URL_DU_DEPOT> . avant de créer les fichiers. Remplace le placeholder par l’URL réelle ; le point signifie « ici ».",
+        "Configure une seule fois ton identité Git avec git config --global user.name et user.email, en reprenant les informations de ton compte scolaire.",
+        "Avec une URL SSH, la première connexion demande de confirmer l’empreinte du serveur, et HTTPS peut demander un jeton : fais le premier clone dans docker compose exec atelier bash, pas dans la console web.",
         "Initialise seulement le README et le .gitignore demandé par le parcours ; n’ajoute pas de corrigé préfabriqué.",
         "Protège la branche principale selon les règles de l’école : désactive le push direct et le force push si les droits le permettent.",
         "Exige un pipeline réussi pour fusionner. Laisse l’option pipeline ignoré considéré comme réussi désactivée quand elle existe.",
         "Vérifie le runner actif, son affectation au projet, les jobs sans tag ou les tags exacts, et son accès aux branches non protégées."
+      ]
+    },
+    {
+      "title": "Quatre résultats à ne pas confondre",
+      "body": "Chacun répond à une question différente ; aucun ne remplace les autres.",
+      "items": [
+        "Tests locaux : python verification.py réussit dans Cyber Atelier. Ton code passe tes tests sur cette machine ; GitLab ne les a pas encore exécutés.",
+        "Pipeline GitLab : un job exécuté par le runner de l’école sur le dernier commit de la MR. C’est ce résultat qui apparaît dans la MR.",
+        "Autorisation de fusion : GitLab la décide selon les règles du projet (pipeline réussi exigé, droits du compte, conflits, statut Draft). Un pipeline vert ne bloque rien si la règle n’est pas activée.",
+        "Case cochée dans Cyber Atelier : ta propre déclaration de progression. Elle ne vérifie rien et GitLab ne la lit pas."
       ]
     },
     {
@@ -866,6 +2326,7 @@
       "items": [
         "Choisis une image Python compatible avec le runner : un Docker executor peut télécharger/utiliser une image autorisée ; un Shell executor utilise Python déjà installé sur la machine du runner.",
         "Le job de test exécute python verification.py (ou python3 verification.py si nécessaire) et doit échouer si les tests échouent.",
+        "Sur le runner, 127.0.0.1 désigne le runner lui-même : le laboratoire de Cyber Atelier n’y existe pas. Les tests obligatoires ne doivent donc pas l’appeler.",
         "Configure des règles de pipeline limitées aux merge requests avec CI_PIPELINE_SOURCE égal à merge_request_event ; évite une règle finale qui accepte tous les push.",
         "Ne configure pas allow_failure et ne masque pas le code de sortie de la commande de test. Vérifie une vraie exécution de pipeline, pas seulement CI Lint.",
         "Documentation : https://docs.gitlab.com/ci/pipelines/merge_request_pipelines/ et https://docs.gitlab.com/ci/yaml/workflow/."
@@ -902,16 +2363,17 @@
         "Le code de tes exercices est enregistré dans le volume de travail ; arrêter puis relancer le conteneur conserve les fichiers et la progression.",
         "Les modifications de code sont des fichiers dans ton espace de travail local au conteneur, pas des changements publiés sur GitLab."
       ],
-      "command": "docker compose up --build"
+      "command": "docker compose up --build -d"
     },
     {
       "title": "Utiliser le terminal local",
       "body": "Les commandes de l’onglet terminal s’exécutent dans le projet de cours choisi. Utilise-le pour Python, les tests et les commandes simples disponibles.",
       "items": [
         "Le terminal de l’interface lance chaque commande avec un dossier courant explicite et une limite de temps.",
+        "Avant chaque commande, l’éditeur enregistre le fichier ouvert : la commande lit toujours la version affichée.",
         "Pour une session interactive Git, SSH ou une commande qui attend une saisie, ouvre un terminal de ta machine et utilise docker compose exec.",
         "Dans le conteneur, 127.0.0.1 désigne le conteneur lui-même. Le navigateur de l’hôte atteint l’application publiée via 127.0.0.1:8080.",
-        "Le laboratoire HeaderScope est un serveur local distinct. Démarre-le explicitement dans l’interface avant la démonstration et arrête-le ensuite."
+        "Le laboratoire (HeaderScope, démonstration PortPilot) démarre avec l’application sur 127.0.0.1:8000, dans le conteneur. Son état et son bouton d’arrêt ou de relance se trouvent sur la page du parcours."
       ],
       "command": "docker compose exec atelier bash"
     },
@@ -921,6 +2383,7 @@
       "items": [
         "Arrête les services avec docker compose down ; les volumes nommés sont conservés.",
         "Ne supprime les volumes que si tu veux aussi effacer code et progression.",
+        "Pour mettre à jour Cyber Atelier, remplace les fichiers de l’application puis relance docker compose up --build -d : les volumes sont réutilisés. N’utilise pas docker compose down -v, qui efface code, progression et configuration.",
         "La progression est déclarée par toi : réussite des tests locaux ne coche pas automatiquement une MR GitLab.",
         "Le contenu des journaux de commandes n’est pas conservé comme historique."
       ],

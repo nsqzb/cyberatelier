@@ -1,0 +1,8 @@
+{
+  "domain": "LAB.LOCAL",
+  "subject": "users",
+  "count": 2,
+  "items": [
+    {"name": "alice", "enabled": true, "groups": ["Domain Users", "IT Support"],},
+    {"name": "bob", "enabled": true, "groups": ["Domain Users", "Comptabilite"]
+}

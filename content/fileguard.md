@@ -37,7 +37,7 @@ Ajoute un test que deux fichiers identiques ont la même empreinte. Les tests do
 
 Après fusion de MR1, repars de la branche principale à jour. Construis l’inventaire des fichiers réguliers au premier niveau, trie les noms et écris manifest.json avec le format contractuel. Exclue le manifeste. Refuse les liens symboliques et n’entre pas dans les sous-dossiers.
 
-Écris des tests avec répertoires temporaires : manifeste vide pour un dossier vide, noms triés de manière déterministe, contenu attendu, manifeste lui-même exclu, lien symbolique refusé si le système sait en créer. Copie également les fixtures fournies dans le dépôt de l’exercice pour disposer d’un petit exemple relisible : README.txt, settings.ini et message.txt contiennent uniquement des données fictives, sans secrets.
+Écris des tests avec répertoires temporaires : manifeste vide pour un dossier vide, noms triés de manière déterministe, contenu attendu, manifeste lui-même exclu, lien symbolique refusé si le système sait en créer. Copie également les fixtures fournies dans le dépôt de l’exercice pour disposer d’un petit exemple relisible : README.txt, settings.ini et message.txt contiennent uniquement des données fictives, sans secrets. Dans Cyber Atelier, elles se trouvent en lecture seule dans /app/fixtures/integrity ; depuis la console du parcours, mkdir -p fixtures && cp /app/fixtures/integrity/* fixtures/ && chmod u+w fixtures/* les copie dans ton dépôt et rend les copies modifiables.
 
 Le manifeste peut être régénéré ; indique dans le programme et le README si la commande crée ou remplace le fichier. Ne promets pas de détecter un changement survenu puis restauré avant la vérification.
 

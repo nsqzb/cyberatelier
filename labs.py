@@ -100,3 +100,20 @@ class LabManager:
             if self.error:
                 result["error"] = self.error
             return result
+
+
+if __name__ == "__main__":
+    # Lancement direct sur ta machine : python3 labs.py (arrêt avec Ctrl+C).
+    # Utile quand tu codes dans VS Code : le labo répond alors sur 127.0.0.1:8000 de ton Mac.
+    import time
+
+    lab = LabManager()
+    etat = lab.start()
+    if not etat["running"]:
+        raise SystemExit(f"Impossible de démarrer le laboratoire : {etat.get('error')}")
+    print(f"Laboratoire actif sur http://{etat['host']}:{etat['port']}/ (Ctrl+C pour arrêter)")
+    try:
+        while True:
+            time.sleep(3600)
+    except KeyboardInterrupt:
+        lab.stop()

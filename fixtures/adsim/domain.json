@@ -1,0 +1,27 @@
+{
+  "domain": "LAB.LOCAL",
+  "description": "Domaine FICTIF pour Cyber Atelier. Aucune donnée réelle.",
+  "groups": [
+    {"name": "Domain Users", "description": "Tous les comptes du domaine"},
+    {"name": "Domain Admins", "description": "Administration du domaine"},
+    {"name": "IT Support", "description": "Support informatique"},
+    {"name": "Comptabilite", "description": "Service comptabilité"},
+    {"name": "Direction", "description": "Direction générale"}
+  ],
+  "users": [
+    {"name": "alice", "enabled": true, "groups": ["Domain Users", "IT Support"]},
+    {"name": "bob", "enabled": true, "groups": ["Domain Users", "Comptabilite"]},
+    {"name": "claire", "enabled": true, "groups": ["Domain Users", "Direction", "Domain Admins"]},
+    {"name": "david", "enabled": true, "groups": ["Domain Users", "IT Support"]},
+    {"name": "emma", "enabled": true, "groups": ["Domain Users", "Comptabilite"]},
+    {"name": "felix", "enabled": false, "groups": ["Domain Users", "Comptabilite"]},
+    {"name": "ancien.stagiaire", "enabled": false, "groups": ["Domain Users"]},
+    {"name": "svc-sauvegarde", "enabled": false, "groups": ["Domain Users"]}
+  ],
+  "computers": [
+    {"name": "WS-COMPTA-01", "os": "Windows 10 Pro", "enabled": true},
+    {"name": "WS-DIR-02", "os": "Windows 11 Pro", "enabled": true},
+    {"name": "SRV-FICHIERS-01", "os": "Windows Server 2019", "enabled": true},
+    {"name": "WS-ANCIEN-03", "os": "Windows 7 Professionnel", "enabled": false}
+  ]
+}

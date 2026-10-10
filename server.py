@@ -20,26 +20,29 @@ from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 
 BASE_DIR = Path(__file__).resolve().parent
-COURSES = {"portpilot", "headerscope", "fileguard"}
+COURSES = {"socle", "portpilot", "headerscope", "fileguard", "toolwrap", "reconwrap"}
 EXCLUDED = {".git", ".venv", "__pycache__"}
 MAX_FILE = 1_048_576
 MAX_STATE = 1_048_576
 MAX_RUN_OUTPUT = 65_536
 MAX_ZIP = 20 * 1024 * 1024
 MAX_FILES = 2000
-DEFAULT_STATE = {"version": 1, "selectedCourse": "portpilot", "completed": [],
-                 "notes": {c: "" for c in sorted(COURSES)}, "mrLinks": {}}
+DEFAULT_STATE = {"version": 1, "selectedCourse": "socle", "completed": [],
+                 "notes": {c: "" for c in sorted(COURSES)}, "mrLinks": {}, "paliers": []}
 
 
 def _state_normalize(value):
     if not isinstance(value, dict) or value.get("version") != 1:
         raise ValueError("Progression invalide : version 1 attendue.")
-    course = value.get("selectedCourse", "portpilot")
+    course = value.get("selectedCourse", "socle")
     if course not in COURSES:
         raise ValueError("Parcours sélectionné invalide.")
     completed = value.get("completed", [])
     if not isinstance(completed, list) or len(completed) > 100 or any(not isinstance(x, str) or len(x) > 100 for x in completed):
         raise ValueError("Liste des missions terminées invalide.")
+    paliers = value.get("paliers", [])
+    if not isinstance(paliers, list) or len(paliers) > 500 or any(not isinstance(x, str) or len(x) > 100 for x in paliers):
+        raise ValueError("Liste des paliers terminés invalide.")
     notes = value.get("notes", {})
     links = value.get("mrLinks", {})
     if not isinstance(notes, dict) or not isinstance(links, dict):
@@ -55,7 +58,7 @@ def _state_normalize(value):
             raise ValueError("Un lien de merge request est invalide ou trop long.")
         clean_links[key] = val
     return {"version": 1, "selectedCourse": course, "completed": list(dict.fromkeys(completed)),
-            "notes": {**{c: "" for c in sorted(COURSES)}, **clean_notes}, "mrLinks": clean_links}
+            "notes": {**{c: "" for c in sorted(COURSES)}, **clean_notes}, "mrLinks": clean_links, "paliers": list(dict.fromkeys(paliers))}
 
 
 class AtelierServer(ThreadingHTTPServer):

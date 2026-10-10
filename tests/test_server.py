@@ -75,10 +75,21 @@ class ServerApiTests(unittest.TestCase):
         self.assertEqual(self.json_request("GET", "/api/file?course=portpilot&path=src%2Fcheck.py")[1]["content"], "print('ok')\n")
         state = {"version": 1, "selectedCourse": "fileguard", "completed": ["fileguard-mr1"],
                  "notes": {"fileguard": "à reprendre"}, "mrLinks": {"fileguard-mr1": "https://gitlab.example/mr/1"}}
-        normalized = {**state, "notes": {"portpilot": "", "headerscope": "", "fileguard": "à reprendre"}}
+        normalized = {**state, "notes": {**{c: "" for c in server.COURSES}, "fileguard": "à reprendre"}, "paliers": []}
         self.assertEqual(self.json_request("POST", "/api/state", state), (200, normalized))
         self.assertEqual(self.json_request("GET", "/api/state"), (200, normalized))
         self.assertFalse(any(p.name.startswith(".atelier-") for p in self.data.iterdir()))
+
+    def test_paliers_are_saved_deduplicated_and_validated(self):
+        base = {"version": 1, "selectedCourse": "socle", "completed": [], "notes": {}, "mrLinks": {}}
+        status, saved = self.json_request("POST", "/api/state", {**base, "paliers": ["socle-mr1-p1", "socle-mr1-p1", "socle-mr1-p2"]})
+        self.assertEqual(status, 200)
+        self.assertEqual(saved["paliers"], ["socle-mr1-p1", "socle-mr1-p2"])
+        self.assertEqual(self.json_request("GET", "/api/state")[1]["paliers"], ["socle-mr1-p1", "socle-mr1-p2"])
+        status, _ = self.json_request("POST", "/api/state", {**base, "paliers": "pas-une-liste"})
+        self.assertEqual(status, 400)
+        status, old = self.json_request("POST", "/api/state", base)
+        self.assertEqual((status, old["paliers"]), (200, []), "une ancienne progression sans paliers reste valide")
 
     def test_path_and_symlink_traversal_are_rejected(self):
         for bad in ("../secret", "/etc/passwd", "a%2F..%2Fsecret", "a\\b"):

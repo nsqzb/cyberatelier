@@ -1,0 +1,7 @@
+# Mode « je code dans VS Code » : le dossier ./workspaces de ta machine remplace le volume
+# nommé « workspaces ». Compose charge ce fichier automatiquement avec compose.yaml.
+# L'ancien volume n'est pas supprimé : retire ce fichier pour le retrouver.
+services:
+  atelier:
+    volumes:
+      - ./workspaces:/workspaces

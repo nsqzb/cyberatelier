@@ -1,0 +1,8 @@
+# Tes projets d'exercice ont chacun leur propre dépôt Git dans workspaces/.
+workspaces/
+backups/
+.env
+__pycache__/
+*.py[cod]
+.venv/
+.DS_Store

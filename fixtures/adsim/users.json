@@ -1,0 +1,70 @@
+{
+  "domain": "LAB.LOCAL",
+  "subject": "users",
+  "count": 8,
+  "items": [
+    {
+      "name": "alice",
+      "enabled": true,
+      "groups": [
+        "Domain Users",
+        "IT Support"
+      ]
+    },
+    {
+      "name": "bob",
+      "enabled": true,
+      "groups": [
+        "Domain Users",
+        "Comptabilite"
+      ]
+    },
+    {
+      "name": "claire",
+      "enabled": true,
+      "groups": [
+        "Domain Users",
+        "Direction",
+        "Domain Admins"
+      ]
+    },
+    {
+      "name": "david",
+      "enabled": true,
+      "groups": [
+        "Domain Users",
+        "IT Support"
+      ]
+    },
+    {
+      "name": "emma",
+      "enabled": true,
+      "groups": [
+        "Domain Users",
+        "Comptabilite"
+      ]
+    },
+    {
+      "name": "felix",
+      "enabled": false,
+      "groups": [
+        "Domain Users",
+        "Comptabilite"
+      ]
+    },
+    {
+      "name": "ancien.stagiaire",
+      "enabled": false,
+      "groups": [
+        "Domain Users"
+      ]
+    },
+    {
+      "name": "svc-sauvegarde",
+      "enabled": false,
+      "groups": [
+        "Domain Users"
+      ]
+    }
+  ]
+}

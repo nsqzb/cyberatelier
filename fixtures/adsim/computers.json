@@ -1,0 +1,27 @@
+{
+  "domain": "LAB.LOCAL",
+  "subject": "computers",
+  "count": 4,
+  "items": [
+    {
+      "name": "WS-COMPTA-01",
+      "os": "Windows 10 Pro",
+      "enabled": true
+    },
+    {
+      "name": "WS-DIR-02",
+      "os": "Windows 11 Pro",
+      "enabled": true
+    },
+    {
+      "name": "SRV-FICHIERS-01",
+      "os": "Windows Server 2019",
+      "enabled": true
+    },
+    {
+      "name": "WS-ANCIEN-03",
+      "os": "Windows 7 Professionnel",
+      "enabled": false
+    }
+  ]
+}
