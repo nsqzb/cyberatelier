@@ -58,7 +58,8 @@ L'application fournit consignes, éditeur, console, laboratoire HTTP et outils f
 
 ### Contenu (`content/`)
 - `content/courses.json` (indent 2, `ensure_ascii=False`, saut de ligne final) : clés racine `version` (1), `title`, `totalMinutes` (1800), `description`, `courses` (6), `gitlabGuide` (liste de 7 sections), `environmentGuide` (liste de 4 sections). Chaque parcours contient `id`, `title`, `subtitle`, `description`, `level`, `color`, `durationMinutes` (300), `goals`, `prerequisites`, `scope`, `concepts`, `files`, `setup` (`label`, `command`, `note`, `interactive` optionnel), `steps` (3), `timeline` (somme 300), `references`, `resources`, `completion`, `limits`.
-  - Une mission (`steps`) a : `id`, `title`, `branch`, `minutes`, `mission`, `tasks`, `tests` (`id`, `title`, `input`, `expected`), `acceptance`, `hint`, et `demos` pour les parcours qui en ont (`socle` MR2 et MR3, `headerscope` MR3, `toolwrap` MR3, `reconwrap` MR2).
+  - **Format en paliers (les 18 missions)** : chaque mission a `paliers` (8 à 11 par mission, 153 au total) à la place de `tasks`/`hint`. Un palier : `id` (`<mission>-p<n>`), `title`, `minutes`, `goal`, `do` (liste), `commands` (liste, boutons Copier), `tests` (ids de tests de la mission demandés dans CE palier), `check`, `hint`. Règles vérifiées par `tests/test_content.py` : somme des minutes des paliers = `minutes` de la mission ; chaque test de la mission est demandé dans exactement un palier ; ids uniques. `web/app.js` : `renderPaliers`. Le modèle de référence est `socle-mr1`. **Règle produit : ne jamais raccourcir un exercice en le convertissant ; découper en paliers plus nombreux et plus guidés** (exemple travaillé sans rapport avec l'exercice pour toute notion nouvelle). `drafts/PALIERS.md` et `drafts/validate_paliers.py` servent à faire écrire de nouveaux paliers par un agent.
+  - Une mission (`steps`) a : `id`, `title`, `branch`, `minutes`, `mission`, `paliers`, `tests` (`id`, `title`, `input`, `expected`), `acceptance`, et `demos` pour les parcours qui en ont (`socle` MR2 et MR3, `headerscope` MR3, `toolwrap` MR3, `reconwrap` MR2).
   - **Ids de mission** : `<parcours>-mr1`, `-mr2`, `-mr3`, soit 18 ids stables. **Ne jamais les renommer** : ils sont stockés dans la progression de l'apprenant.
   - Ids de tests (automatisés, uniques par parcours) : socle S1–S24, PortPilot T1–T8, HeaderScope H1–H9, FileGuard F1–F14, ToolWrap W1–W16, ReconWrap R1–R17.
   - Ids de démonstrations (hors CI, ids réutilisés d'un parcours à l'autre) : socle D1–D2, HeaderScope D1–D3, ToolWrap D1–D3, ReconWrap D1–D6.
@@ -106,7 +107,7 @@ Routes (serveur sur `0.0.0.0:8080` dans le conteneur, publié sur `127.0.0.1` un
 
 Codes d'erreur : 400 (requête ou chemin invalide), 403 (Host ou Origin non local), 404, 409 (fichier existant avec `createOnly`, ou commande déjà en cours), 413 (trop volumineux), 500 (erreur interne).
 
-Progression (`/data/state.json`, version 1) : `{"version":1, "selectedCourse", "completed": [ids de missions], "notes": {parcours: texte}, "mrLinks": {id de mission: URL}}`.
+Progression (`/data/state.json`, version 1) : `{"version":1, "selectedCourse", "completed": [ids de missions], "notes": {parcours: texte}, "mrLinks": {id de mission: URL}, "paliers": [ids de paliers cochés]}`. La clé `paliers` est optionnelle (défaut `[]`, 500 entrées max) : les anciennes progressions restent valides sans migration.
 - `selectedCourse` par défaut : `socle` (`DEFAULT_STATE`). Une progression ancienne sans cette clé est lue avec `portpilot` (valeur de repli de `_state_normalize`) : **écart**, voir section 8.
 - Les anciennes progressions (portpilot, headerscope, fileguard) restent valides. Les clés de notes manquantes (`socle`, `toolwrap`, `reconwrap`) sont ajoutées vides.
 - Le serveur valide le format, la taille et la liste des parcours, mais pas l'appartenance des identifiants de mission. Le client (`normalizeProgression`) filtre ces identifiants.
@@ -186,7 +187,15 @@ Vérifications : 46 tests OK en local (macOS, hors Docker) le 2026-10-10 ; 46 OK
 - **Pas de solutions** : ni code Python d'exercice, ni `.gitlab-ci.yml` complet. Contrats, tests décrits en prose, pistes officielles et indices progressifs uniquement.
 - **Chaque MR = une branche `feat/...` + tests automatisés locaux + diff relu** avant fusion. Les tests sont en `unittest` dans `socle`, `toolwrap` et `reconwrap`, et dans `verification.py` dans `portpilot`, `headerscope` et `fileguard` (écart avec une règle uniforme).
 
-## 10. À faire (pistes non réalisées)
+## 10. Dépôts GitHub et mode de travail de l'apprenant
+- Dépôt de l'outil : https://github.com/nsqzb/cyberatelier (privé), branche de travail `amelioration/fiabilite-parcours`, PR n°1 ouverte vers `main`.
+- L'apprenant code dans VS Code sur son Mac, dans `workspaces/<parcours>` (ignoré par ce dépôt), avec un dépôt Git privé par parcours sur son GitHub (`nsqzb/<nom>`). Premier dépôt : `socle-python-git`. Les parcours GitLab de l'école gardent leurs exigences GitLab (CI, MR).
+- Le labo se lance sur le Mac avec `python3 labs.py` ; nmap et adsim se lancent via `docker compose exec atelier ...`.
+
+## 11. À faire (pistes non réalisées)
+- Alléger la page d'un parcours (objectifs, timeline, labo, prérequis, notes affichés autour des missions) : le format en paliers est fait, pas la page.
+- Rééquilibrer les durées : plusieurs paliers de 6 à 8 minutes (MR3 de socle, toolwrap, reconwrap) et des paliers de pipeline/fusion chargés pour 10 minutes.
+- Faire suivre chaque parcours de bout en bout par un apprenant (rien n'a été validé en conditions réelles).
 - Script de recette navigateur reproductible (aucun test navigateur automatisé dans le dépôt).
 - Corriger le repli `portpilot` de `_state_normalize` (écart signalé en section 8) et ajouter un test.
 - Déplacer les textes d'accueil en dur de `web/index.html` vers des valeurs calculées.
