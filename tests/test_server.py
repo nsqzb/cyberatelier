@@ -5,6 +5,7 @@ import threading
 import time
 import unittest
 from pathlib import Path
+from unittest import mock
 
 import server
 
@@ -63,7 +64,8 @@ class ServerApiTests(unittest.TestCase):
             stat = Path(f"/proc/{pid}/stat").read_text()
             state = stat[stat.rfind(")") + 2:].split()[0]
             return state != "Z"
-        except FileNotFoundError:
+        except (FileNotFoundError, ProcessLookupError):
+            # /proc can disappear after open(), while read() is still pending.
             return False
 
     def test_files_round_trip_and_state_persisted_atomically(self):
@@ -186,6 +188,21 @@ class ServerApiTests(unittest.TestCase):
         status, health = self.json_request("GET", "/api/health")
         self.assertEqual(status, 200)
         self.assertEqual(health["status"], "ok")
+
+
+class ProcessStateTests(unittest.TestCase):
+    def test_proc_probe_handles_disappearance_without_hiding_other_errors(self):
+        for error in (FileNotFoundError("already gone"), ProcessLookupError("gone during read")):
+            with self.subTest(error=type(error).__name__):
+                with mock.patch.object(Path, "read_text", side_effect=error):
+                    self.assertFalse(ServerApiTests.process_is_running(42))
+        for state, expected in (("S", True), ("Z", False)):
+            with self.subTest(state=state):
+                with mock.patch.object(Path, "read_text", return_value=f"42 (test process) {state} 1"):
+                    self.assertEqual(ServerApiTests.process_is_running(42), expected)
+        with mock.patch.object(Path, "read_text", side_effect=PermissionError("denied")):
+            with self.assertRaises(PermissionError):
+                ServerApiTests.process_is_running(42)
 
 
 if __name__ == "__main__":
