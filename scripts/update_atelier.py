@@ -8,6 +8,7 @@ from contextlib import contextmanager
 from datetime import datetime
 import fcntl
 import gzip
+import io
 import json
 import os
 from pathlib import Path
@@ -88,10 +89,13 @@ class Updater:
                 "main contient des commits locaux absents de GitHub, ou son historique a divergé. "
                 "Mise à jour refusée : aucun reset ni rebase automatique."
             )
-        incoming = set(self.git("ls-tree", "-r", "--name-only", "-z", "refs/remotes/origin/main").stdout.split("\0"))
-        protected = ("workspaces/", "data/", "userdata/", "backups/")
-        if any(path.startswith(protected) for path in incoming):
-            raise UpdateError("La version distante suit des dossiers de données personnels. Mise à jour refusée.")
+        # switch main passe d'abord par l'arbre local, avant la fusion du commit distant.
+        incoming = set()
+        for reference in ("refs/heads/main", "refs/remotes/origin/main"):
+            incoming.update(self.git("ls-tree", "-r", "--name-only", "-z", reference).stdout.split("\0"))
+        protected = ("workspaces", "data", "userdata", "backups")
+        if any(path == reserved or path.startswith(reserved + "/") for path in incoming for reserved in protected):
+            raise UpdateError("Une version de main suit des dossiers de données personnels, ou remplace leur racine. Mise à jour refusée.")
         ignored = self.git("ls-files", "--others", "--ignored", "--exclude-standard", "-z", "--", ".env", "compose.override.yaml", "drafts/").stdout.split("\0")
         if any(path and path in incoming for path in ignored):
             raise UpdateError("La version distante écraserait un fichier local ignoré (.env ou brouillon). Mise à jour refusée.")
@@ -150,6 +154,22 @@ class Updater:
             raise UpdateError("userdata/terminal.json doit être un fichier normal pour être sauvegardé.")
         return state if state.exists() else None
 
+    def add_terminal_snapshot(self, archive, state):
+        # Le CLI remplace atomiquement terminal.json : stat + open pourrait mélanger
+        # l'ancienne taille et le nouveau contenu. Lire un instantané sous son verrou.
+        lock_path = state.parent / f".{state.name}.lock"
+        descriptor = os.open(lock_path, os.O_CREAT | os.O_RDWR, 0o600)
+        with os.fdopen(descriptor, "a") as lock:
+            try:
+                fcntl.flock(lock, fcntl.LOCK_SH | fcntl.LOCK_NB)
+            except BlockingIOError as error:
+                raise UpdateError("Le compagnon enregistre ta progression. Relance la mise à jour dans un instant.") from error
+            data = state.read_bytes()
+        entry = tarfile.TarInfo("userdata/terminal.json")
+        entry.size = len(data)
+        entry.mode = 0o600
+        archive.addfile(entry, io.BytesIO(data))
+
     @contextmanager
     def lock(self):
         directory = self.root / "backups"
@@ -188,7 +208,7 @@ class Updater:
                     raise UpdateError("La sauvegarde Docker est incomplète : workspaces ou data manque. Mise à jour arrêtée.")
             with tarfile.open(tar_name, "a") as archive:
                 if state:
-                    archive.add(state, arcname="userdata/terminal.json", recursive=False)
+                    self.add_terminal_snapshot(archive, state)
             gzip_fd, gzip_name = tempfile.mkstemp(prefix=".backup-", suffix=".tar.gz", dir=directory)
             with os.fdopen(gzip_fd, "wb") as raw, gzip.GzipFile(fileobj=raw, mode="wb") as zipped, open(tar_name, "rb") as source:
                 shutil.copyfileobj(source, zipped)

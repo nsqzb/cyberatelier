@@ -1,5 +1,6 @@
 import copy
 from contextlib import contextmanager
+import fcntl
 import io
 import json
 import os
@@ -297,6 +298,137 @@ class UpdateTests(unittest.TestCase):
                 Updater(self.root, self.commands, self.messages.append).execute()
         self.assertFalse(self.calls(["git", "switch"]))
         self.assertFalse(self.calls(["docker", "compose", "build"]))
+
+    def test_terminal_backup_never_uses_stat_then_open_during_atomic_replace(self):
+        state = self.root / "userdata" / "terminal.json"
+        original = state.read_bytes()
+        larger = json.dumps({"version": 1, "notes": {"socle": "x" * 2048}}).encode()
+        gettarinfo = tarfile.TarFile.gettarinfo
+        def race(archive, name=None, arcname=None, fileobj=None):
+            entry = gettarinfo(archive, name, arcname, fileobj)
+            if name and Path(name).resolve() == state.resolve():
+                replacement = state.with_suffix(".new")
+                replacement.write_bytes(larger)
+                os.replace(replacement, state)
+            return entry
+        with patch.object(tarfile.TarFile, "gettarinfo", race):
+            self.updater.execute()
+        with tarfile.open(self.updater.backup_path, "r:gz") as archive:
+            data = archive.extractfile("userdata/terminal.json").read()
+            self.assertEqual(data, original)
+            self.assertEqual(json.loads(data), json.loads(original))
+            self.assertEqual(archive.getmember("userdata/terminal.json").mode, 0o600)
+
+    def test_terminal_backup_keeps_single_read_even_if_file_is_replaced_after_read(self):
+        state = self.root / "userdata" / "terminal.json"
+        original = state.read_bytes()
+        larger = json.dumps({"version": 1, "notes": {"socle": "x" * 2048}}).encode()
+        read_bytes = Path.read_bytes
+        replacements = []
+        def race(path):
+            data = read_bytes(path)
+            if path.resolve() == state.resolve():
+                replacement = state.with_suffix(".new")
+                replacement.write_bytes(larger)
+                os.replace(replacement, state)
+                replacements.append(True)
+            return data
+        with patch.object(Path, "read_bytes", race):
+            self.updater.execute()
+        self.assertEqual(replacements, [True])
+        with tarfile.open(self.updater.backup_path, "r:gz") as archive:
+            data = archive.extractfile("userdata/terminal.json").read()
+            self.assertEqual(data, original)
+            self.assertEqual(json.loads(data), json.loads(original))
+        self.assertEqual(state.read_bytes(), larger)
+
+    def test_terminal_writer_lock_refuses_backup_instead_of_reading_during_save(self):
+        lock_path = self.root / "userdata" / ".terminal.json.lock"
+        with lock_path.open("a") as lock:
+            fcntl.flock(lock, fcntl.LOCK_EX | fcntl.LOCK_NB)
+            with self.assertRaisesRegex(UpdateError, "compagnon enregistre"):
+                self.updater.execute()
+        self.assertFalse(self.calls(["git", "switch"]))
+        self.assertFalse(list((self.root / "backups").glob("*.tar.gz")))
+
+
+class RealGitProtectionTests(unittest.TestCase):
+    """Dépôts jetables uniquement ; Docker n'est jamais appelé."""
+
+    def git(self, root, *args):
+        return subprocess.run(["git", *args], cwd=root, check=True, capture_output=True, text=True).stdout.strip()
+
+    def prepare(self, directory):
+        root = Path(directory) / "app"
+        root.mkdir()
+        self.git(root, "init", "-b", "main")
+        self.git(root, "config", "user.name", "Test local")
+        self.git(root, "config", "user.email", "test@example.invalid")
+        (root / ".gitignore").write_text("workspaces/\ndata/\nuserdata/\nbackups/\n")
+        (root / "README.md").write_text("application\n")
+        self.git(root, "add", ".gitignore", "README.md")
+        self.git(root, "commit", "-m", "base")
+        original = self.git(root, "rev-parse", "HEAD")
+        bare = Path(directory) / "origin.git"
+        self.git(root, "clone", "--bare", str(root), str(bare))
+        self.git(root, "remote", "add", "origin", str(bare))
+        self.git(root, "fetch", "origin")
+        self.git(root, "branch", "--set-upstream-to=origin/main", "main")
+        incoming = Path(directory) / "incoming"
+        self.git(root, "clone", str(bare), str(incoming))
+        self.git(incoming, "config", "user.name", "Test local")
+        self.git(incoming, "config", "user.email", "test@example.invalid")
+        exercise = root / "workspaces" / "socle"
+        exercise.mkdir(parents=True)
+        self.git(exercise, "init", "-b", "feat/bases")
+        (exercise / "code.py").write_text("# travail personnel\n")
+        return root, incoming, original
+
+    def updater(self, root):
+        class GitOnlyRunner(CommandRunner):
+            def run(self, args, **kwargs):
+                if args[0] != "git":
+                    raise AssertionError(f"Docker ne doit jamais être lancé : {args}")
+                return super().run(args, **kwargs)
+        return Updater(root, GitOnlyRunner(root), lambda message: None)
+
+    def test_incoming_exact_personal_roots_are_refused_before_checkout(self):
+        for reserved in ("workspaces", "data", "userdata", "backups"):
+            for symlink in (False, True):
+                with self.subTest(reserved=reserved, symlink=symlink), tempfile.TemporaryDirectory() as directory:
+                    root, incoming, original = self.prepare(directory)
+                    path = incoming / reserved
+                    if symlink:
+                        path.symlink_to("ailleurs")
+                    else:
+                        path.write_text("fichier qui remplacerait un dossier")
+                    self.git(incoming, "add", "-f", reserved)
+                    self.git(incoming, "commit", "-m", "racine à protéger")
+                    self.git(incoming, "push", "origin", "main")
+                    with self.assertRaisesRegex(UpdateError, "remplace leur racine"):
+                        self.updater(root).execute()
+                    self.assertEqual(self.git(root, "rev-parse", "HEAD"), original)
+                    self.assertEqual((root / "workspaces" / "socle" / "code.py").read_text(), "# travail personnel\n")
+                    self.assertEqual(self.git(root / "workspaces" / "socle", "symbolic-ref", "--short", "HEAD"), "feat/bases")
+
+    def test_local_main_personal_root_is_refused_even_if_remote_has_removed_it(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root, incoming, original = self.prepare(directory)
+            self.git(root, "switch", "-c", "feat/application")
+            (incoming / "workspaces").symlink_to("ailleurs")
+            self.git(incoming, "add", "-f", "workspaces")
+            self.git(incoming, "commit", "-m", "ancienne main risquée")
+            self.git(incoming, "push", "origin", "main")
+            self.git(root, "fetch", "origin")
+            self.git(root, "branch", "-f", "main", "origin/main")
+            self.git(incoming, "rm", "workspaces")
+            self.git(incoming, "commit", "-m", "nouvelle main sans racine risquée")
+            self.git(incoming, "push", "origin", "main")
+            with self.assertRaisesRegex(UpdateError, "remplace leur racine"):
+                self.updater(root).execute()
+            self.assertEqual(self.git(root, "symbolic-ref", "--short", "HEAD"), "feat/application")
+            self.assertEqual(self.git(root, "rev-parse", "HEAD"), original)
+            self.assertEqual((root / "workspaces" / "socle" / "code.py").read_text(), "# travail personnel\n")
 
 
 class VersionTests(unittest.TestCase):
