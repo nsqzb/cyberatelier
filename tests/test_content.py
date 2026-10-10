@@ -51,6 +51,23 @@ class CourseContentTests(unittest.TestCase):
                     with self.subTest(case=case["id"]):
                         self.assertFalse(any(path in text for path in LAB_PATHS), text)
 
+    def test_paliers_are_well_formed(self):
+        for course in self.courses.values():
+            for step in course["steps"]:
+                paliers = step.get("paliers")
+                if not paliers:
+                    continue
+                with self.subTest(step=step["id"]):
+                    ids = [p["id"] for p in paliers]
+                    self.assertEqual(len(ids), len(set(ids)))
+                    self.assertTrue(all(i.startswith(step["id"] + "-p") for i in ids))
+                    self.assertEqual(sum(p["minutes"] for p in paliers), step["minutes"])
+                    known = {t["id"] for t in step.get("tests", [])}
+                    used = [t for p in paliers for t in p.get("tests", [])]
+                    self.assertEqual(set(used), known, "chaque test est demandé dans un palier")
+                    for p in paliers:
+                        self.assertTrue(all(p.get(k) for k in ("title", "goal", "do", "check", "hint")), p["id"])
+
     def test_local_links_and_documents_exist(self):
         for course in self.courses.values():
             self.assertTrue((BASE / "content" / f"{course['id']}.md").is_file())

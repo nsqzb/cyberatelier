@@ -28,7 +28,7 @@ MAX_RUN_OUTPUT = 65_536
 MAX_ZIP = 20 * 1024 * 1024
 MAX_FILES = 2000
 DEFAULT_STATE = {"version": 1, "selectedCourse": "socle", "completed": [],
-                 "notes": {c: "" for c in sorted(COURSES)}, "mrLinks": {}}
+                 "notes": {c: "" for c in sorted(COURSES)}, "mrLinks": {}, "paliers": []}
 
 
 def _state_normalize(value):
@@ -40,6 +40,9 @@ def _state_normalize(value):
     completed = value.get("completed", [])
     if not isinstance(completed, list) or len(completed) > 100 or any(not isinstance(x, str) or len(x) > 100 for x in completed):
         raise ValueError("Liste des missions terminées invalide.")
+    paliers = value.get("paliers", [])
+    if not isinstance(paliers, list) or len(paliers) > 500 or any(not isinstance(x, str) or len(x) > 100 for x in paliers):
+        raise ValueError("Liste des paliers terminés invalide.")
     notes = value.get("notes", {})
     links = value.get("mrLinks", {})
     if not isinstance(notes, dict) or not isinstance(links, dict):
@@ -55,7 +58,7 @@ def _state_normalize(value):
             raise ValueError("Un lien de merge request est invalide ou trop long.")
         clean_links[key] = val
     return {"version": 1, "selectedCourse": course, "completed": list(dict.fromkeys(completed)),
-            "notes": {**{c: "" for c in sorted(COURSES)}, **clean_notes}, "mrLinks": clean_links}
+            "notes": {**{c: "" for c in sorted(COURSES)}, **clean_notes}, "mrLinks": clean_links, "paliers": list(dict.fromkeys(paliers))}
 
 
 class AtelierServer(ThreadingHTTPServer):

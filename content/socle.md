@@ -30,39 +30,244 @@ Les minutes de chaque mission sont incluses dans les 300 minutes du parcours (vo
 
 ### MR1 — feat/bases (100 min)
 
-Crée le fichier `outils.py` et `test_outils.py`. Les fonctions de ce fichier ne lisent aucun fichier et n’affichent rien : elles reçoivent des valeurs et renvoient un résultat.
+Écris 4 petites fonctions, chacune avec ses tests : à chaque palier, tu écris un test, tu le vois échouer, tu écris le code qui le fait passer, puis tu fais un commit.
 
-Contrats à implémenter :
+Tu avances en 8 paliers. À chaque palier de code : un test, il échoue, tu écris le code qui le fait passer, tu fais un commit. Les fichiers sont `outils.py` et `test_outils.py`.
 
-1. `valider_nom_utilisateur(nom)` retourne `True` ou `False`. Si `nom` n’est pas une chaîne, elle lève `TypeError`. Les espaces de début et de fin sont retirés avant contrôle. Le nom doit faire entre 3 et 16 caractères, commencer par une lettre ASCII, et ne contenir ensuite que des lettres ASCII, des chiffres, `_` ou `-`. La casse est conservée et n’influence pas le résultat.
-2. `analyser_ligne(ligne)` retourne un dictionnaire aux clés `date`, `heure`, `evenement`, `utilisateur` et `ip`, ou `None`. Elle retourne `None` si la ligne est vide après retrait des espaces de bord, si elle n’a pas exactement cinq champs, si l’événement n’est ni `LOGIN_OK` ni `LOGIN_FAIL`, ou si l’adresse n’a pas exactement quatre nombres entiers de 0 à 255 séparés par des points.
-3. `compter_evenements(evenements)` prend une liste de dictionnaires renvoyés par `analyser_ligne`. Elle retourne toujours les clés `LOGIN_OK` et `LOGIN_FAIL`, même à zéro, et ne modifie pas la liste reçue.
-4. `echecs_par_utilisateur(evenements)` ne retient que les utilisateurs ayant au moins un `LOGIN_FAIL`, avec leur nombre d’échecs. Une liste vide donne un dictionnaire vide.
+#### Palier 1 — Prépare ton dépôt et ta branche (10 min)
 
-Le premier unittest utilise une classe qui hérite de `unittest.TestCase`, des méthodes nommées `test_...` et les assertions `assertEqual`, `assertIsNone`, `assertTrue`, `assertFalse` et `assertRaises`. Un test relancé à chaque modification prouve qu’une correction n’en casse pas une autre : c’est le réflexe que demandera le futur framework.
+Avoir un dossier propre, relié à GitHub, sur la branche de la mission.
 
-Tests à écrire (ids S1 à S10) :
+- Ouvre le dossier workspaces/socle de Cyber Atelier dans VS Code, puis un terminal (Terminal > New Terminal).
+- Une branche est une ligne de travail séparée de main : tu codes dessus sans risque, et main ne bouge pas tant que tu n’as pas fusionné.
+- Crée la branche de la mission et vérifie où tu es.
 
-- **S1** : noms valides simples (`alice`, `Alice_01`, `a-b-c`) donnent `True`.
-- **S2** : bornes de longueur : 3 et 16 caractères valides, 2 et 17 refusés.
-- **S3** : premier caractère et caractères interdits (`1alice`, `_alice`, `ali ce`, `ali.ce`, `alicé`, chaîne vide) donnent `False`.
-- **S4** : espaces de bord : un nom `bob` entouré d’espaces est valide ; `b` entouré d’espaces ne l’est pas, car il ne fait qu’un caractère.
-- **S5** : `None` et `42` lèvent `TypeError`.
-- **S6** : la ligne nominale `2026-01-05 08:12:44 LOGIN_OK alice 192.0.2.10` donne le dictionnaire exact attendu.
-- **S7** : chaîne vide, ligne à 4 champs, ligne à 6 champs, événement `LOGIN_BOOM` donnent `None`.
-- **S8** : adresses `192.0.2.300`, `192.0.2` et `abc.def.ghi.jkl` donnent `None`.
-- **S9** : comptage d’une liste vide (zéros pour les deux clés), puis de deux `LOGIN_OK` et un `LOGIN_FAIL` ; la liste d’entrée est identique avant et après l’appel.
-- **S10** : échecs par utilisateur : liste vide donne `{}` ; dans le cas mixte alice (deux échecs), bob (succès seul) et carol (un échec), le résultat est `{"alice": 2, "carol": 1}`.
+```bash
+git switch -c feat/bases
+```
 
-Pour la partie Git, tu livres cette MR de bout en bout :
+```bash
+git status
+```
 
-- crée un `.gitignore` avec au moins `__pycache__/` et `fixtures/` ;
-- vérifie avec `git status` et `git diff` ce qui sera commité ;
-- ajoute les fichiers voulus avec `git add`, fais un commit au message clair à l’impératif, relis avec `git log --oneline` ;
-- pousse la branche avec `git push -u origin feat/bases` et ouvre la merge request vers la branche principale ;
-- relis le diff de la MR avant de la déclarer prête.
+**Tu sais que c’est bon quand :** git status affiche « On branch feat/bases » et « nothing to commit, working tree clean ».
 
-Ce que tu dois observer : `python -m unittest -v` affiche OK pour S1 à S10, `git status` est propre après commit, le diff de la MR ne contient que `.gitignore`, `outils.py` et `test_outils.py`.
+*Indice :* Si Git répond « not a git repository », tu n’es pas dans le bon dossier. Si la branche existe déjà, utilise git switch feat/bases (sans -c).
+
+#### Palier 2 — Écris ton tout premier test (10 min)
+
+Comprendre à quoi sert un test avant d’en écrire pour de vrai.
+
+- Crée un fichier exemple.py (jetable, il ne sera pas livré) et recopie le code ci-dessous. Ici, doubler est un exemple sans rapport avec ton exercice.
+- Lance-le. Puis remplace 8 par 9, relance et lis le message : c’est ainsi que Python te dit qu’un test échoue. Remets 8.
+- Retiens la forme : une classe qui hérite de unittest.TestCase, des méthodes dont le nom commence par test_, et assertEqual(obtenu, attendu).
+- Quand c’est compris, supprime le fichier : rm exemple.py.
+
+```
+import unittest
+
+def doubler(n):
+    return n * 2
+
+class TestDoubler(unittest.TestCase):
+    def test_doubler_un_nombre(self):
+        self.assertEqual(doubler(4), 8)
+
+if __name__ == "__main__":
+    unittest.main()
+```
+
+```bash
+python3 exemple.py -v
+```
+
+**Tu sais que c’est bon quand :** Tu as vu « OK » avec 8, puis « FAIL » avec 9, et tu sais lire la ligne « AssertionError: 8 != 9 ».
+
+*Indice :* Si python3 n’est pas trouvé, tape python3 --version dans le terminal de VS Code. Les messages d’échec se lisent de bas en haut : la dernière ligne dit ce qui ne va pas.
+
+#### Palier 3 — Un test d’abord, puis la fonction : les noms valides (15 min)
+
+Écrire un test AVANT le code (il échoue), puis le minimum de code pour le faire passer.
+
+- Crée test_outils.py : importe unittest et from outils import valider_nom_utilisateur, puis une classe TestValiderNomUtilisateur avec un test pour S1.
+- Lance les tests : ils échouent parce que outils.py n’existe pas encore. C’est la phase « rouge », elle est normale.
+- Crée outils.py avec valider_nom_utilisateur(nom), qui retourne True ou False. Fais passer S1 : c’est la phase « verte ».
+- Contrat complet de la fonction, que tu vas compléter aux deux paliers suivants : le nom fait de 3 à 16 caractères, commence par une lettre ASCII, puis ne contient que des lettres ASCII, des chiffres, _ ou -. Les espaces de début et de fin sont retirés avant le contrôle. Un nom qui n’est pas une chaîne lève TypeError.
+
+```bash
+python3 -m unittest -v
+```
+
+```bash
+git add outils.py test_outils.py
+```
+
+```bash
+git commit -m "Ajoute valider_nom_utilisateur pour les noms valides"
+```
+
+- **S1** — Nom valide simple. Entrée : « alice », « Alice_01 », « a-b-c » Attendu : True pour les trois.
+
+**Tu sais que c’est bon quand :** python3 -m unittest -v affiche 1 test OK, et git log --oneline montre ton nouveau commit.
+
+*Indice :* La fonction n’a pas besoin d’être maligne maintenant : S1 ne vérifie que des noms valides. Écris le test suivant avant de compliquer la fonction.
+
+#### Palier 4 — Les limites : longueur et caractères (15 min)
+
+Faire échouer un test, puis compléter la fonction règle par règle.
+
+- Ajoute les tests S2 et S3, lance-les : certains échouent.
+- Complète valider_nom_utilisateur : longueur de 3 à 16, première lettre ASCII, caractères suivants autorisés.
+- Relance les tests après chaque règle ajoutée : tu avances par petits pas, jamais à l’aveugle.
+
+```bash
+python3 -m unittest -v
+```
+
+```bash
+git add outils.py test_outils.py
+```
+
+```bash
+git commit -m "Contrôle la longueur et les caractères des noms"
+```
+
+- **S2** — Bornes de longueur. Entrée : « abc » (3 caractères), une chaîne valide de 16 caractères, « ab » (2), une chaîne valide de 17 caractères Attendu : True pour 3 et 16 caractères, False pour 2 et 17.
+- **S3** — Premier caractère et caractères interdits. Entrée : « 1alice », « _alice », « ali ce », « ali.ce », « alicé », chaîne vide Attendu : False pour les six cas.
+
+**Tu sais que c’est bon quand :** S1, S2 et S3 passent.
+
+*Indice :* Piège : str.isalpha() et str.isalnum() acceptent aussi les lettres accentuées comme « é ». Pour rester en ASCII, compare chaque caractère à la chaîne string.ascii_letters (module string), ou teste avec str.isascii().
+
+#### Palier 5 — Espaces et mauvais types (12 min)
+
+Gérer deux cas limites, dont une erreur levée volontairement.
+
+- Ajoute les tests S4 et S5.
+- S4 : les espaces autour du nom sont retirés avant le contrôle.
+- S5 : un nom qui n’est pas une chaîne lève TypeError. Pour tester une exception avec unittest, la forme est celle de l’exemple ci-dessous (ici avec int, sans rapport avec ton exercice).
+- Écris le code pour que tout passe, puis fais un commit.
+
+```
+with self.assertRaises(ValueError):
+    int("abc")
+```
+
+```bash
+python3 -m unittest -v
+```
+
+```bash
+git add outils.py test_outils.py
+```
+
+```bash
+git commit -m "Gère les espaces et les types invalides"
+```
+
+- **S4** — Espaces de bord. Entrée : « bob » entouré d’espaces, puis « b » entouré d’espaces Attendu : True pour « bob » après retrait des espaces ; False pour « b », qui fait 1 caractère.
+- **S5** — Type non chaîne. Entrée : None, puis 42 Attendu : Les deux appels lèvent TypeError (assertRaises).
+
+**Tu sais que c’est bon quand :** S1 à S5 passent.
+
+*Indice :* isinstance(nom, str) vérifie le type. Fais ce contrôle en premier, avant d’appeler une méthode de chaîne comme strip().
+
+#### Palier 6 — Lire une ligne de journal (15 min)
+
+Transformer une ligne de texte en données avec split, un dictionnaire et None.
+
+- Le journal fictif contient des lignes comme « 2026-01-05 08:12:44 LOGIN_OK alice 192.0.2.10 » : date, heure, événement, utilisateur, adresse IP.
+- Contrat de analyser_ligne(ligne) : elle retourne un dictionnaire avec les clés date, heure, evenement, utilisateur et ip. Elle retourne None si la ligne est vide (après retrait des espaces de bord), si elle n’a pas exactement 5 champs, si l’événement n’est ni LOGIN_OK ni LOGIN_FAIL, ou si l’adresse n’a pas exactement 4 nombres entiers de 0 à 255 séparés par des points.
+- Procède test par test : S6 d’abord, puis S7, puis S8. Un test, un correctif.
+
+```bash
+python3 -m unittest -v
+```
+
+```bash
+git add outils.py test_outils.py
+```
+
+```bash
+git commit -m "Ajoute analyser_ligne"
+```
+
+- **S6** — Ligne de journal nominale. Entrée : « 2026-01-05 08:12:44 LOGIN_OK alice 192.0.2.10 » Attendu : Dictionnaire exact : date « 2026-01-05 », heure « 08:12:44 », evenement « LOGIN_OK », utilisateur « alice », ip « 192.0.2.10 ».
+- **S7** — Lignes refusées par la structure ou l’événement. Entrée : Chaîne vide ; ligne à 4 champs ; ligne à 6 champs ; événement « LOGIN_BOOM » Attendu : None pour les quatre cas.
+- **S8** — Adresse invalide. Entrée : ip « 192.0.2.300 », ip « 192.0.2 », ip « abc.def.ghi.jkl » Attendu : None pour les trois lignes.
+
+**Tu sais que c’est bon quand :** S1 à S8 passent.
+
+*Indice :* split() sans argument découpe sur les espaces et ignore ceux des bords. Pour l’adresse, découpe sur les points puis vérifie chaque morceau : est-ce des chiffres, puis est-ce entre 0 et 255 ?
+
+#### Palier 7 — Compter les événements (13 min)
+
+Parcourir une liste avec une boucle et construire des dictionnaires.
+
+- compter_evenements(evenements) reçoit une liste de dictionnaires renvoyés par analyser_ligne. Elle retourne toujours les deux clés LOGIN_OK et LOGIN_FAIL, même à zéro, et ne modifie pas la liste reçue.
+- echecs_par_utilisateur(evenements) ne garde que les utilisateurs ayant au moins un LOGIN_FAIL, avec leur nombre d’échecs. Une liste vide donne un dictionnaire vide.
+- Écris S9 puis la première fonction, puis S10 et la seconde.
+
+```bash
+python3 -m unittest -v
+```
+
+```bash
+git add outils.py test_outils.py
+```
+
+```bash
+git commit -m "Ajoute le comptage des événements et des échecs"
+```
+
+- **S9** — Comptage des événements. Entrée : Liste vide, puis deux LOGIN_OK et un LOGIN_FAIL. Vérifier aussi que la liste d’entrée est identique avant et après l’appel. Attendu : Liste vide : LOGIN_OK 0 et LOGIN_FAIL 0. Deuxième cas : LOGIN_OK 2 et LOGIN_FAIL 1. Liste inchangée.
+- **S10** — Échecs par utilisateur. Entrée : Liste vide ; alice avec deux LOGIN_FAIL ; bob avec un seul LOGIN_OK ; carol avec un LOGIN_FAIL Attendu : Liste vide : {}. Cas mixte : {"alice": 2, "carol": 1}, sans bob.
+
+**Tu sais que c’est bon quand :** Les 10 tests S1 à S10 passent.
+
+*Indice :* Pars d’un dictionnaire qui contient déjà les deux clés à 0, puis parcours la liste avec une boucle for. dict.get(clé, 0) renvoie 0 quand la clé n’existe pas encore.
+
+#### Palier 8 — Livre ta pull request (10 min)
+
+Relire ton travail, le pousser sur GitHub et le fusionner proprement.
+
+- Regarde ce que tu vas livrer : fichiers modifiés et historique.
+- Pousse la branche, puis ouvre la pull request (GitHub dit pull request ; GitLab dit merge request, c’est la même idée).
+- Relis le diff dans GitHub comme si c’était le code de quelqu’un d’autre. Ici aucun contrôle automatique ne tourne : c’est toi qui vérifies que les 10 tests passent en local avant de fusionner. Un pipeline viendra avec les parcours GitLab.
+- Clique sur « Merge pull request » dans GitHub, puis reviens sur main à jour pour préparer la mission suivante.
+
+```bash
+git status
+```
+
+```bash
+git diff main --stat
+```
+
+```bash
+git push -u origin feat/bases
+```
+
+```bash
+gh pr create --base main --title "Bases : validation et analyse de journal" --body "Ajoute outils.py et ses tests S1 à S10."
+```
+
+```bash
+git switch main
+```
+
+```bash
+git pull --ff-only
+```
+
+**Tu sais que c’est bon quand :** La pull request ne contient que outils.py et test_outils.py, et ton main local contient la fusion (git log --oneline).
+
+*Indice :* Si gh pr create se plaint d’une branche non poussée, lance d’abord git push -u origin feat/bases. Fusionne uniquement quand git status est propre et les 10 tests passent.
+
+**Avant de livrer :**
+- python3 -m unittest -v affiche OK pour S1 à S10.
+- git log --oneline montre un commit par palier de code (au moins cinq).
+- La pull request ne contient que outils.py et test_outils.py, sans __pycache__ ni fixtures.
 
 ### MR2 — feat/fichiers-erreurs (100 min)
 
