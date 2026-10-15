@@ -135,7 +135,7 @@
           "title": "MR1 — Fonctions pures, premier unittest et première merge request",
           "branch": "feat/bases",
           "minutes": 100,
-          "mission": "Tu vas écrire quatre fonctions pures de validation, d’analyse de ligne et de comptage. Tu construis leurs tests au fil des paliers, puis tu livres le tout dans ta première demande de fusion.",
+          "mission": "Tu vas écrire quatre fonctions pures de validation, d’analyse de ligne et de comptage. Tu construis leurs tests au fil des paliers, puis tu livres le tout dans ta première pull request GitHub.",
           "tests": [
             {
               "id": "S1",
@@ -217,8 +217,8 @@
                 "Crée .gitignore avec __pycache__/, .venv/ et fixtures/, un motif par ligne. Commite ce fichier ; git status doit ensuite être propre.",
                 "Vérifie le nom de ta branche avec git status. Si elle existe déjà, reprends-la avec git switch sans -c."
               ],
-              "check": "git status affiche « On branch feat/bases » et « nothing to commit, working tree clean ».",
-              "hint": "Si Git répond « not a git repository », tu n’es pas dans le bon dossier. Si la branche existe déjà, utilise git switch feat/bases (sans -c).",
+              "check": "git status confirme la branche feat/bases et un dépôt propre. Selon la langue de Git, tu peux voir « On branch feat/bases » ou « Sur la branche feat/bases », puis « nothing to commit, working tree clean » ou « rien à valider, la copie de travail est propre ».",
+              "hint": "Si Git indique que ce n’est pas un dépôt Git (« not a git repository » ou « n’est pas un dépôt git »), vérifie que tu es dans workspaces/socle. Si la branche existe déjà, utilise git switch feat/bases (sans -c).",
               "workspace": "Mac · workspaces/socle · Dépôt et .gitignore",
               "explanation": [
                 "La branche principale (main) contient le travail déjà fusionné. Ta branche feat/... reçoit les changements de cette mission.",
@@ -359,8 +359,8 @@
               },
               "hints": [
                 "La phase rouge prouve que le test observe une fonction absente ou incorrecte ; le vert vient après son écriture.",
-                "Commence seulement par les noms valides de S1, puis vérifie que les noms ressortent inchangés.",
-                "Pour un validateur de couleur, une entrée « bleu » acceptée ressort « bleu » ; ne la remplace pas par une valeur constante pour satisfaire un seul exemple."
+                "Commence seulement par les noms valides de S1, puis vérifie que la fonction renvoie True pour chacun.",
+                "Pour un validateur de couleur, « bleu » peut être admis et produire True ; ne remplace pas la décision par une valeur constante pour satisfaire un seul exemple."
               ]
             },
             {
@@ -437,7 +437,7 @@
                   "kind": "python",
                   "title": "Exemple Python à lire ou essayer",
                   "context": "VS Code sur le Mac : place ce code dans un fichier d’exemple jetable, puis lance ce fichier avec python3. Un extrait avec self se place dans une méthode de test.",
-                  "code": "with self.assertRaises(ValueError):\n    int(\"abc\")",
+                  "code": "with self.assertRaises(TypeError):\n    len(5)",
                   "placement": "before_actions"
                 },
                 {
@@ -459,8 +459,8 @@
               ],
               "hints": [
                 "Le type de l’entrée doit être vérifié avant une méthode de chaîne ; strip enlève seulement les espaces aux bords.",
-                "Compare un nom entouré d’espaces à un nom avec un espace au milieu, puis vérifie qu’un entier produit ValueError.",
-                "«  livre  ».strip() donne « livre », tandis que « li vre ».strip() garde l’espace intérieur ; 42 n’a pas de méthode strip()."
+                "Compare un nom entouré d’espaces à un nom avec un espace au milieu, puis vérifie que None et 42 provoquent TypeError.",
+                "«  livre  ».strip() donne « livre », tandis que « li vre ».strip() garde l’espace intérieur ; len(5) lève TypeError car 5 n’est pas une séquence."
               ]
             },
             {
@@ -594,27 +594,35 @@
             },
             {
               "id": "socle-mr1-p8",
-              "title": "Livre ta pull request",
+              "title": "Livre ta pull request GitHub",
               "minutes": 10,
               "goal": "Relire ton travail, le pousser sur GitHub et le fusionner proprement.",
               "do": [
                 "Lance la suite complète avec la commande indiquée au début de la mission.",
-                "Dans GitHub, vérifie que la PR n’inclut ni fixtures/ ni caches Python. Si gh n’est pas installé, ouvre la PR depuis le site : cet outil est facultatif.",
                 "Relis git status et git diff : la livraison doit contenir outils.py, test_outils.py et .gitignore, avec les modifications nécessaires de cette mission.",
                 "Ajoute les fichiers par leur nom, relis git diff --staged, puis commite ce qui ne l’est pas encore.",
-                "Pousse feat/bases et ouvre la demande de fusion vers main.",
-                "Relis le diff dans la demande de fusion. Cette mission n’a pas encore de pipeline : la relecture et les conditions de fusion restent nécessaires.",
-                "Fusionne après relecture et, pour GitLab de l’école, après son autorisation.",
+                "Pousse feat/bases sur GitHub, puis ouvre une pull request vers main.",
+                "Après la création de la pull request, vérifie dans GitHub qu’elle ne contient ni fixtures/ ni caches Python.",
+                "Relis le diff dans la pull request GitHub. Cette mission n’a pas encore de pipeline : la relecture et les conditions de fusion restent nécessaires.",
+                "Pour ce dépôt GitHub, fusionne la pull request après relecture. Pour un dépôt GitLab de l’école, ouvre une merge request et respecte les autorisations de fusion de ce dépôt.",
                 "Après la fusion, reviens sur main et lance git pull --ff-only avant la mission suivante."
               ],
-              "check": "La pull request contient outils.py, test_outils.py et le .gitignore de préparation, et ton main local contient la fusion (git log --oneline).",
-              "hint": "Si gh pr create se plaint d’une branche non poussée, lance d’abord git push -u origin feat/bases. Fusionne uniquement quand git status est propre et les 10 tests passent.",
+              "check": "La pull request GitHub contient outils.py, test_outils.py et le .gitignore de préparation, et ton main local contient la fusion (git log --oneline).",
+              "hint": "Si gh pr create indique que la branche n’est pas poussée, lance d’abord git push -u origin feat/bases. Si gh n’est pas installé, ouvre la pull request depuis le site GitHub. Fusionne uniquement quand git status est propre et les 10 tests passent.",
               "workspace": "Mac · workspaces/socle · Branche feat/bases et PR GitHub",
               "explanation": [
                 "git diff montre les lignes modifiées ; git diff --staged montre celles choisies pour le prochain commit. Le diff de la MR compare toute ta branche à main.",
-                "La demande de fusion (MR dans GitLab, PR dans GitHub) permet de relire le travail avant de l’intégrer à main."
+                "Pour ce dépôt, la pull request GitHub permet de relire le travail avant de l’intégrer à main. Le dépôt GitLab de l’école utilise une merge request."
               ],
               "blocks": [
+                {
+                  "kind": "shell",
+                  "title": "Lancer la suite complète",
+                  "context": "Terminal du Mac, dans cyberatelier/workspaces/socle, venv Mac activé. Exécute chaque ligne au moment indiqué, avec les modifications manuelles entre les blocs.",
+                  "code": "python3 -m unittest -v",
+                  "placement": "after_actions",
+                  "cwd": "exercise"
+                },
                 {
                   "kind": "shell",
                   "title": "Relire l’état du dépôt",
@@ -625,9 +633,17 @@
                 },
                 {
                   "kind": "shell",
-                  "title": "Publier la branche ou ouvrir la demande de fusion",
-                  "context": "Terminal du Mac, dans cyberatelier/workspaces/socle, venv Mac activé. Exécute chaque ligne au moment indiqué, avec les modifications manuelles entre les blocs.",
-                  "code": "git push -u origin feat/bases\ngh pr create --base main --title \"Bases : validation et analyse de journal\" --body \"Ajoute outils.py et ses tests S1 à S10.\"",
+                  "title": "Pousser la branche sur GitHub",
+                  "context": "Terminal du Mac, dans cyberatelier/workspaces/socle, venv Mac activé.",
+                  "code": "git push -u origin feat/bases",
+                  "placement": "after_actions",
+                  "cwd": "exercise"
+                },
+                {
+                  "kind": "shell",
+                  "title": "Ouvrir la pull request GitHub",
+                  "context": "Après avoir poussé feat/bases, dans le terminal du Mac ou sur le site GitHub.",
+                  "code": "gh pr create --base main --title \"Bases : validation et analyse de journal\" --body \"Ajoute outils.py et ses tests S1 à S10.\"",
                   "placement": "after_actions",
                   "cwd": "exercise"
                 },
