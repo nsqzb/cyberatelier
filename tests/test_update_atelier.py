@@ -275,6 +275,8 @@ class UpdateTests(unittest.TestCase):
             self.updater.execute()
         self.assertFalse(any("Cyber Atelier est à jour" in message for message in self.messages))
 
+    @unittest.skipUnless(os.access(ROOT / "mettre-a-jour", os.X_OK),
+                         "mettre-a-jour n'est exécutable que sur le Mac (fichiers en lecture seule dans l'image)")
     def test_wrapper_locates_script_when_called_from_exercise(self):
         fake_bin = self.root / "bin"
         fake_bin.mkdir()

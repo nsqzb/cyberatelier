@@ -5,16 +5,128 @@ on:
   pull_request:
   push:
     branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+# Un nouveau push sur la même PR annule le run précédent devenu inutile.
+concurrency:
+  group: tests-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+env:
+  PYTHONDONTWRITEBYTECODE: "1"
+  PYTHONUNBUFFERED: "1"
 
 jobs:
-  tests:
-    runs-on: ubuntu-latest
+  checks:
+    name: contrôles statiques
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
         with:
           python-version: "3.12"
       - name: Syntaxe JavaScript
         run: node --check web/app.js
-      - name: Tests unitaires
-        run: python -m unittest discover -s tests -p 'test_*.py' -v
+      - name: Compilation Python (avertissements traités comme erreurs)
+        run: python -W error -m compileall -q -x '/(drafts|workspaces|userdata)/' .
+      - name: JSON valides
+        run: |
+          find content fixtures -name '*.json' ! -name 'broken.json' -print0 \
+            | xargs -0 -n1 python -m json.tool --no-ensure-ascii > /dev/null
+      - name: Énoncés Markdown synchronisés avec courses.json
+        run: python scripts/generate_exercises.py --check
+
+  tests:
+    name: tests (${{ matrix.os }}, Python ${{ matrix.python-version }})
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 10
+    strategy:
+      fail-fast: false
+      matrix:
+        # 3.12 = image Docker ; 3.14 = Python du Mac de l'apprenant.
+        os: [ubuntu-24.04]
+        python-version: ["3.12", "3.13", "3.14"]
+        include:
+          - os: macos-15
+            python-version: "3.14"
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
+        with:
+          python-version: ${{ matrix.python-version }}
+      - name: Identité Git des tests
+        run: |
+          git config --global user.name "CI Cyber Atelier"
+          git config --global user.email "ci@example.invalid"
+          git config --global init.defaultBranch main
+      - name: Tests unitaires (mode développement, ressources non fermées interdites)
+        shell: bash
+        run: |
+          set -o pipefail
+          python -X dev -m unittest discover -s tests -p 'test_*.py' -v 2>&1 | tee "$RUNNER_TEMP/tests.log"
+          if grep -n "ResourceWarning" "$RUNNER_TEMP/tests.log"; then
+            echo "::error::Un test laisse un fichier ou un socket ouvert (ResourceWarning)."
+            exit 1
+          fi
+      - name: Aucun fichier suivi modifié par les tests
+        run: git diff --exit-code && test -z "$(git status --porcelain --untracked-files=all)"
+
+  docker:
+    name: image Docker
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - name: Construire l'image
+        run: docker build --pull -t cyberatelier:ci -t cyberatelier:local .
+      - name: Contenu de l'image (fixtures présentes, ébauches exclues)
+        run: |
+          docker run --rm cyberatelier:ci sh -c '
+            test -f /app/fixtures/socle/auth.log &&
+            test -f /app/tools/adsim.py &&
+            test ! -e /app/drafts &&
+            test ! -e /app/.git &&
+            command -v nmap git'
+      - name: Tests dans l'image (non root, lecture seule, sans capacités)
+        run: |
+          docker run --rm --read-only --cap-drop ALL \
+            --security-opt no-new-privileges:true \
+            --tmpfs /tmp:rw,nosuid,size=64m \
+            -e HOME=/tmp -e GIT_CONFIG_GLOBAL=/tmp/.gitconfig \
+            cyberatelier:ci sh -c '
+              git config --global user.name "CI" &&
+              git config --global user.email ci@example.invalid &&
+              python -m unittest discover -s tests -p "test_*.py"'
+      - name: Démarrage et santé du service (compose.yaml)
+        run: |
+          docker compose -p atelier-ci up -d --no-build
+          for i in $(seq 1 30); do
+            if curl -fsS http://127.0.0.1:8080/api/health; then echo; break; fi
+            sleep 1
+          done
+          curl -fsS http://127.0.0.1:8080/api/health > /dev/null
+          code=$(curl -s -o /dev/null -w '%{http_code}' -H 'Host: evil.example' http://127.0.0.1:8080/api/state)
+          test "$code" = 403
+          curl -fsS http://127.0.0.1:8080/ | grep -q '<html'
+        env:
+          COMPOSE_FILE: compose.yaml
+      - name: Journaux du service
+        if: always()
+        run: docker compose -p atelier-ci logs --no-color || true
+        env:
+          COMPOSE_FILE: compose.yaml
+      - name: Nettoyage du projet de CI
+        if: always()
+        run: docker compose -p atelier-ci down -v || true
+        env:
+          COMPOSE_FILE: compose.yaml

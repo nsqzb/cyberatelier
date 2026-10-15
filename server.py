@@ -3,6 +3,7 @@ from __future__ import annotations
 
 import io
 import json
+import math
 import os
 import re
 import selectors
@@ -29,15 +30,18 @@ MAX_STATE = 1_048_576
 MAX_RUN_OUTPUT = 65_536
 MAX_ZIP = 20 * 1024 * 1024
 MAX_FILES = 2000
+# Le JSON échappe certains caractères sur 6 octets : le corps d'un fichier de 1 Mio peut dépasser MAX_STATE.
+MAX_FILE_BODY = 6 * MAX_FILE + 4096
+PIPE_GRACE = 1.0
 DEFAULT_STATE = {"version": 1, "selectedCourse": "socle", "completed": [],
                  "notes": {c: "" for c in sorted(COURSES)}, "mrLinks": {}, "paliers": []}
 
 
 def _state_normalize(value):
-    if not isinstance(value, dict) or value.get("version") != 1:
+    if not isinstance(value, dict) or type(value.get("version")) is not int or value["version"] != 1:
         raise ValueError("Progression invalide : version 1 attendue.")
     course = value.get("selectedCourse", "socle")
-    if course not in COURSES:
+    if not isinstance(course, str) or course not in COURSES:
         raise ValueError("Parcours sélectionné invalide.")
     completed = value.get("completed", [])
     if not isinstance(completed, list) or len(completed) > 100 or any(not isinstance(x, str) or len(x) > 100 for x in completed):
@@ -58,6 +62,8 @@ def _state_normalize(value):
     for key, val in links.items():
         if not isinstance(key, str) or len(key) > 100 or not isinstance(val, str) or len(val) > 2048:
             raise ValueError("Un lien de merge request est invalide ou trop long.")
+        if val and urllib.parse.urlsplit(val).scheme.lower() not in {"http", "https"}:
+            raise ValueError("Un lien de merge request doit commencer par http:// ou https://.")
         clean_links[key] = val
     return {"version": 1, "selectedCourse": course, "completed": list(dict.fromkeys(completed)),
             "notes": {**{c: "" for c in sorted(COURSES)}, **clean_notes}, "mrLinks": clean_links, "paliers": list(dict.fromkeys(paliers))}
@@ -94,12 +100,30 @@ class AtelierServer(ThreadingHTTPServer):
 
 
 def _api_error(handler, status, message):
+    # Le corps de la requête n'a peut-être pas été lu : la connexion ne peut pas être réutilisée.
+    handler.close_connection = True
     handler._json(status, {"error": str(message)})
+
+
+def _reject_constant(name):
+    raise ValueError(f"Valeur JSON non standard refusée : {name}.")
 
 
 class RequestHandler(BaseHTTPRequestHandler):
     server: AtelierServer
     protocol_version = "HTTP/1.1"
+    server_version = "CyberAtelier"
+    sys_version = ""
+    # Un client qui annonce un corps sans l'envoyer ne bloque pas un thread indéfiniment.
+    timeout = 30
+
+    def end_headers(self):
+        # L'interface ne doit jamais être affichée dans le cadre d'un autre site (clickjacking).
+        self.send_header("X-Content-Type-Options", "nosniff")
+        self.send_header("X-Frame-Options", "DENY")
+        self.send_header("Content-Security-Policy", "frame-ancestors 'none'")
+        self.send_header("Referrer-Policy", "no-referrer")
+        super().end_headers()
 
     def log_message(self, fmt, *args):
         # Keep command output and potentially sensitive local paths out of logs.
@@ -111,6 +135,8 @@ class RequestHandler(BaseHTTPRequestHandler):
         self.send_header("Content-Type", "application/json; charset=utf-8")
         self.send_header("Content-Length", str(len(body)))
         self.send_header("Cache-Control", "no-store")
+        if self.close_connection:
+            self.send_header("Connection", "close")
         self.end_headers()
         self.wfile.write(body)
 
@@ -146,7 +172,7 @@ class RequestHandler(BaseHTTPRequestHandler):
         return values[key][0]
 
     def _course_root(self, course):
-        if course not in COURSES:
+        if not isinstance(course, str) or course not in COURSES:
             raise ValueError("Parcours inconnu.")
         root = self.server.workspaces_dir / course
         if root.is_symlink():
@@ -158,6 +184,8 @@ class RequestHandler(BaseHTTPRequestHandler):
         if not isinstance(raw, str) or not raw or "\x00" in raw or "\\" in raw:
             raise ValueError("Chemin de fichier invalide.")
         decoded = urllib.parse.unquote(raw, errors="strict")
+        if "\x00" in decoded or "\\" in decoded:
+            raise ValueError("Chemin de fichier invalide.")
         path = Path(decoded)
         if path.is_absolute() or decoded.startswith("/") or any(p in {"", ".", ".."} for p in decoded.split("/")):
             raise ValueError("Chemin absolu ou traversal refusé.")
@@ -182,19 +210,20 @@ class RequestHandler(BaseHTTPRequestHandler):
             raise ValueError("Chemin hors du workspace refusé.")
         return target
 
-    def _read_json(self):
+    def _read_json(self, limit=MAX_STATE):
         if self.headers.get_content_type() != "application/json":
             raise ValueError("Le corps doit être au format JSON.")
         try:
             length = int(self.headers.get("Content-Length", ""))
         except ValueError:
             raise ValueError("Taille du corps invalide.")
-        if length < 0 or length > MAX_STATE:
+        if length < 0 or length > limit:
             raise OverflowError("Corps JSON trop volumineux.")
         raw = self.rfile.read(length)
         try:
-            return json.loads(raw.decode("utf-8"))
-        except (UnicodeDecodeError, json.JSONDecodeError):
+            # NaN et Infinity ne sont pas du JSON standard : un délai NaN échapperait à la limite de 30 s.
+            return json.loads(raw.decode("utf-8"), parse_constant=_reject_constant)
+        except (UnicodeDecodeError, json.JSONDecodeError, RecursionError):
             raise ValueError("JSON invalide.")
 
     def _dispatch(self):
@@ -215,13 +244,28 @@ class RequestHandler(BaseHTTPRequestHandler):
             _api_error(self, 404, "Fichier introuvable.")
         except FileExistsError as e:
             _api_error(self, 409, str(e) or "Le fichier existe déjà.")
-        except (ValueError, OSError) as e:
+        except ValueError as e:
             _api_error(self, 400, str(e) or "Requête invalide.")
+        except OSError:
+            # Les messages système contiennent des chemins absolus de l'hôte.
+            _api_error(self, 400, "Opération impossible sur ce chemin.")
         except Exception:
             _api_error(self, 500, "Erreur interne du serveur.")
 
     do_GET = _dispatch
     do_POST = _dispatch
+
+    def _load_state(self):
+        path = self.server.state_path
+        if not path.exists():
+            return DEFAULT_STATE
+        try:
+            return _state_normalize(json.loads(path.read_text(encoding="utf-8")))
+        except (UnicodeDecodeError, json.JSONDecodeError, ValueError):
+            # Un fichier illisible bloquerait l'interface : il est conservé à côté, jamais écrasé.
+            backup = path.with_name(f"state.invalide-{time.strftime('%Y%m%d-%H%M%S')}.json")
+            os.replace(path, backup)
+            return DEFAULT_STATE
 
     def _api(self, parsed):
         p = parsed.path
@@ -235,10 +279,7 @@ class RequestHandler(BaseHTTPRequestHandler):
                              "version": version_info(BASE_DIR)})
         elif p == "/api/state":
             if self.command == "GET":
-                if self.server.state_path.exists():
-                    self._json(200, _state_normalize(json.loads(self.server.state_path.read_text(encoding="utf-8"))))
-                else:
-                    self._json(200, DEFAULT_STATE)
+                self._json(200, self._load_state())
             elif self.command == "POST":
                 state = _state_normalize(self._read_json())
                 self._atomic_write(self.server.state_path, json.dumps(state, ensure_ascii=False, indent=2).encode(), 0o600)
@@ -262,6 +303,8 @@ class RequestHandler(BaseHTTPRequestHandler):
                 q = urllib.parse.parse_qs(parsed.query, keep_blank_values=True, strict_parsing=True)
                 if set(q) != {"course", "path"} or any(len(v) != 1 for v in q.values()): raise ValueError("Paramètres invalides.")
                 root = self._course_root(q["course"][0]); rel = self._relative_path(q["path"][0]); target = self._safe_target(root, rel)
+                # Un FIFO ou un périphérique bloquerait open() : seuls les fichiers ordinaires sont lus.
+                if not target.is_file(): raise ValueError("Ce chemin n'est pas un fichier.")
                 if target.stat().st_size > MAX_FILE: raise OverflowError("Fichier trop volumineux.")
                 with target.open("rb") as stream:
                     data = stream.read(MAX_FILE + 1)
@@ -270,7 +313,7 @@ class RequestHandler(BaseHTTPRequestHandler):
                 except UnicodeDecodeError: raise ValueError("Le fichier n'est pas un texte UTF-8.")
                 self._json(200, {"path": rel.as_posix(), "content": content})
             elif self.command == "POST":
-                body = self._read_json()
+                body = self._read_json(MAX_FILE_BODY)
                 if not isinstance(body, dict) or set(body) - {"course", "path", "content", "createOnly"} or not all(k in body for k in ("course", "path", "content")):
                     raise ValueError("Champs attendus : course, path, content, createOnly optionnel.")
                 if not isinstance(body["content"], str): raise ValueError("Le contenu doit être du texte.")
@@ -326,7 +369,8 @@ class RequestHandler(BaseHTTPRequestHandler):
         if not isinstance(body["command"], str) or not body["command"].strip() or len(body["command"]) > 4096:
             raise ValueError("Commande invalide ou trop longue.")
         timeout = body.get("timeout", 30)
-        if not isinstance(timeout, (int, float)) or isinstance(timeout, bool) or timeout <= 0 or timeout > 30:
+        if (not isinstance(timeout, (int, float)) or isinstance(timeout, bool) or not math.isfinite(timeout)
+                or timeout <= 0 or timeout > 30):
             raise ValueError("Le délai doit être compris entre 0 et 30 secondes.")
         root = self._course_root(body["course"])
         cwd_value = body.get("cwd", ".")
@@ -346,7 +390,13 @@ class RequestHandler(BaseHTTPRequestHandler):
                 sel.register(fd, selectors.EVENT_READ)
                 deadline = started + float(timeout)
                 eof = False
+                exited_at = None
                 while not eof or proc.poll() is None:
+                    if proc.poll() is not None and not eof:
+                        # Un descendant sorti du groupe (setsid) peut garder stdout ouvert :
+                        # on n'attend sa fin que brièvement, jamais au-delà du délai.
+                        if exited_at is None: exited_at = time.monotonic()
+                        elif time.monotonic() >= min(deadline, exited_at + PIPE_GRACE): break
                     if proc.poll() is None and time.monotonic() >= deadline:
                         timed_out = True
                         try: os.killpg(proc.pid, signal.SIGKILL)
@@ -437,7 +487,7 @@ class RequestHandler(BaseHTTPRequestHandler):
                 ".css": "text/css; charset=utf-8", ".json": "application/json; charset=utf-8",
                 ".md": "text/markdown; charset=utf-8", ".pdf": "application/pdf"}.get(target.suffix, "application/octet-stream")
         self.send_response(200); self.send_header("Content-Type", mime); self.send_header("Content-Length", str(len(data)))
-        self.send_header("X-Content-Type-Options", "nosniff"); self.end_headers(); self.wfile.write(data)
+        self.end_headers(); self.wfile.write(data)
 
 
 def create_server(host=None, port=None, workspaces_dir=None, data_dir=None, lab_manager=None):

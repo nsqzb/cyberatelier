@@ -91,7 +91,7 @@ class CompanionTests(unittest.TestCase):
         self.state_file.parent.mkdir()
         samples = [b"not json", b'{"version": 99}',
                    b'{"version":1,"selectedCourse":[]}',
-                   b'{"version":1,"terminal":{"currentByCourse":{"socle":"unknown"}}}',
+                   b'{"version":1,"terminal":{"currentByCourse":{"socle":3}}}',
                    b'{"version":1,"terminal":{"hintLevels":{"socle-mr1-p1":true}}}']
         for original in samples:
             with self.subTest(original=original):
@@ -99,6 +99,33 @@ class CompanionTests(unittest.TestCase):
                 with self.assertRaises(cli.AtelierError):
                     self.state()
                 self.assertEqual(self.state_file.read_bytes(), original)
+
+    def test_unknown_position_after_content_update_does_not_block_the_reader(self):
+        self.state_file.parent.mkdir()
+        self.state_file.write_text(json.dumps({"version": 1, "terminal": {
+            "currentByCourse": {"socle": "socle-mr1-p99", "ancien": "x"},
+            "hintLevels": {"socle-mr1-p99": 2, "socle-mr1-p1": 1}}}), encoding="utf-8")
+        state = self.state()
+        self.assertIn("inconnus", state.notice)
+        self.assertEqual(state.data["terminal"]["currentByCourse"], {})
+        self.assertEqual(state.data["terminal"]["hintLevels"], {"socle-mr1-p1": 1})
+
+    def test_concurrent_writer_is_awaited_instead_of_failing(self):
+        import fcntl
+        import threading
+        state = self.state()
+        lock_path = self.state_file.parent / f".{self.state_file.name}.lock"
+        with lock_path.open("a") as lock:
+            fcntl.flock(lock.fileno(), fcntl.LOCK_EX)
+            timer = threading.Timer(0.3, fcntl.flock, (lock.fileno(), fcntl.LOCK_UN))
+            timer.start()
+            state.mark(True)
+            timer.join()
+        self.assertEqual(self.state().data["paliers"], [state.pid])
+        with lock_path.open("a") as lock, patch.object(cli, "LOCK_WAIT", 0.1):
+            fcntl.flock(lock.fileno(), fcntl.LOCK_EX)
+            with self.assertRaisesRegex(cli.AtelierError, "Une autre commande"):
+                state.mark(False)
 
     def test_atomic_write_failure_preserves_previous_file(self):
         state = self.state()
@@ -268,6 +295,15 @@ class LocalApiTests(unittest.TestCase):
             with self.assertRaisesRegex(cli.AtelierError, "Docker"):
                 cli.docker_lab(cli.ROOT, "demarrer")
             self.assertEqual(cli.fetch_local_progression(cli.ROOT), (None, "indisponible"))
+
+    def test_lab_http_refusal_is_not_reported_as_docker_down(self):
+        error = cli.urllib.error.HTTPError("http://127.0.0.1/api/lab", 409, "Conflict", {}, io.BytesIO(b"{}"))
+        self.addCleanup(error.close)
+        with patch.object(cli, "local_port", return_value=8081), \
+                patch.object(cli.urllib.request, "build_opener") as build:
+            build.return_value.open.side_effect = error
+            with self.assertRaisesRegex(cli.AtelierError, "HTTP 409"):
+                cli.docker_lab(cli.ROOT, "demarrer")
 
 
 if __name__ == "__main__":

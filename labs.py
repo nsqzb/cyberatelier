@@ -4,17 +4,33 @@ Ce module fournit uniquement des réponses de démonstration. Il n'exécute pas
 de code apprenant et ne contacte aucune autre machine.
 """
 
+import socket
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from threading import RLock, Thread
 
 
 class _LabHTTPServer(ThreadingHTTPServer):
     daemon_threads = True
+    # Permet de redémarrer malgré les connexions en TIME_WAIT. Sur macOS, cette
+    # option laisse aussi lier 127.0.0.1 quand 0.0.0.0 est déjà écouté :
+    # LabManager.start sonde donc le port avant de le prendre.
     allow_reuse_address = True
+
+
+def _port_in_use(host, port):
+    try:
+        with socket.create_connection((host, port), timeout=0.2):
+            return True
+    except OSError:
+        return False
 
 
 class _Handler(BaseHTTPRequestHandler):
     protocol_version = "HTTP/1.1"
+    server_version = "CyberAtelierLab/1"
+    sys_version = ""
+    # Un client muet ne bloque pas un thread du labo indéfiniment.
+    timeout = 5
 
     def log_message(self, _format, *_args):
         # Les accès du laboratoire ne polluent pas la sortie du serveur UI.
@@ -58,8 +74,11 @@ class LabManager:
     """Démarre et arrête le serveur local du laboratoire de façon sûre."""
 
     def __init__(self, host="127.0.0.1", port=8000):
-        if host not in ("127.0.0.1", "localhost", "::1"):
-            raise ValueError("Le laboratoire doit être lié à une adresse loopback.")
+        # Le serveur est IPv4 : ::1 ne pourrait pas être lié.
+        if host not in ("127.0.0.1", "localhost"):
+            raise ValueError("Le laboratoire doit être lié à 127.0.0.1.")
+        if isinstance(port, bool) or not isinstance(port, int) or not 0 <= port <= 65535:
+            raise ValueError("Port du laboratoire invalide (entier de 0 à 65535).")
         self.host = "127.0.0.1" if host == "localhost" else host
         self.port = port
         self.error = None
@@ -70,6 +89,9 @@ class LabManager:
     def start(self):
         with self._lock:
             if self._server is not None:
+                return self.status()
+            if self.port and _port_in_use(self.host, self.port):
+                self.error = f"Port {self.port} déjà utilisé par un autre programme."
                 return self.status()
             try:
                 server = _LabHTTPServer((self.host, self.port), _Handler)
