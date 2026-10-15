@@ -430,7 +430,8 @@
               "workspace": "Mac · workspaces/socle · outils.py ; test_outils.py",
               "explanation": [
                 "strip() enlève les espaces aux bords du texte ; les espaces au milieu restent présents.",
-                "TypeError signale que l’argument n’est pas du type demandé. assertRaises vérifie qu’une exception attendue est bien levée."
+                "TypeError signale que l’argument n’est pas du type demandé. assertRaises vérifie qu’une exception attendue est bien levée.",
+                "Si tu appelles strip() sur None ou 42 sans vérifier le type, Python lève AttributeError ; le contrat de S5 exige pourtant TypeError."
               ],
               "blocks": [
                 {
@@ -611,7 +612,7 @@
               "hint": "Si gh pr create indique que la branche n’est pas poussée, lance d’abord git push -u origin feat/bases. Si gh n’est pas installé, ouvre la pull request depuis le site GitHub. Fusionne uniquement quand git status est propre et les 10 tests passent.",
               "workspace": "Mac · workspaces/socle · Branche feat/bases et PR GitHub",
               "explanation": [
-                "git diff montre les lignes modifiées ; git diff --staged montre celles choisies pour le prochain commit. Le diff de la MR compare toute ta branche à main.",
+                "git diff montre les lignes modifiées ; git diff --staged montre celles choisies pour le prochain commit. Le diff de la pull request GitHub compare toute ta branche à main.",
                 "Pour ce dépôt, la pull request GitHub permet de relire le travail avant de l’intégrer à main. Le dépôt GitLab de l’école utilise une merge request."
               ],
               "blocks": [
@@ -620,7 +621,7 @@
                   "title": "Lancer la suite complète",
                   "context": "Terminal du Mac, dans cyberatelier/workspaces/socle, venv Mac activé. Exécute chaque ligne au moment indiqué, avec les modifications manuelles entre les blocs.",
                   "code": "python3 -m unittest -v",
-                  "placement": "after_actions",
+                  "placement": "before_actions",
                   "cwd": "exercise"
                 },
                 {
