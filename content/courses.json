@@ -1431,8 +1431,9 @@
           "acceptance": [
             "python3 -m unittest -v passe pour S1 à S24, et les tests créent leurs fichiers dans un dossier temporaire.",
             "Le conflit de fusion a été résolu à la main : aucun marqueur <<<<<<< , ======= ou >>>>>>> ne reste dans README.md.",
-            "Après confirmation de la fusion de la pull request (GitHub), main est à jour et le tag v0.1.0 désigne le commit livré.",
-            "Les branches exercice/ ont été supprimées localement ; la pull request (GitHub) a été relue.",
+            "git log --oneline --graph --all montre feat/analyseur rebasée sur main.",
+            "Après confirmation de la fusion GitHub avec « Create a merge commit », main local est à jour et le tag v0.1.0 désigne le commit de fusion.",
+            "La pull request GitHub a été relue ; les branches exercice/ ont été supprimées localement et n’apparaissent pas dans les branches distantes GitHub.",
             "Chaque palier de code a son commit, avec le message donné dans le palier."
           ],
           "paliers": [
@@ -1945,6 +1946,14 @@
                 },
                 {
                   "kind": "shell",
+                  "title": "Observer le graphe avant le nettoyage",
+                  "context": "Terminal du Mac, dans cyberatelier/workspaces/socle, venv Mac activé. Exécute chaque ligne au moment indiqué, avec les modifications manuelles entre les blocs.",
+                  "code": "git log --oneline --graph --all",
+                  "placement": "after_actions",
+                  "cwd": "exercise"
+                },
+                {
+                  "kind": "shell",
                   "title": "Commande à lancer au moment indiqué",
                   "context": "Terminal du Mac, dans cyberatelier/workspaces/socle, venv Mac activé. Exécute chaque ligne au moment indiqué, avec les modifications manuelles entre les blocs.",
                   "code": "git switch feat/analyseur",
@@ -1976,14 +1985,16 @@
                 "Reviens sur feat/analyseur et rebase sur main. En cas de conflit : corrige, git add, puis rebase --continue ; rebase --abort annule l’opération.",
                 "Relance tous les tests et observe le graphe des commits après le rebase. Relis aussi le diff contre origin/main.",
                 "Pousse feat/analyseur, puis crée une pull request (PR) sur GitHub et mentionne le rebase et le commentaire d’exercice.",
+                "Après relecture, choisis « Create a merge commit » dans GitHub pour fusionner la PR. Cette méthode conserve l’ascendance du commit local créé sur main et permet ensuite la mise à jour avec git pull --ff-only.",
                 "Attends que GitHub confirme la fusion de la PR. Après cette confirmation seulement, reviens sur main et mets-la à jour avec git pull --ff-only.",
                 "Sur main à jour après la fusion, crée le tag annoté v0.1.0, vérifie le commit qu’il désigne avec git show v0.1.0, puis pousse le tag."
               ],
-              "check": "Après confirmation de la fusion, main local est à jour et le tag annoté v0.1.0 pointe vers le commit fusionné ; git show v0.1.0 affiche son message et son commit. Le README ne contient aucun marqueur de conflit.",
-              "hint": "Si git rebase main s’arrête sur un conflit, lis git status et ne force rien ; git rebase --abort annule l’opération. Termine la relecture et ouvre la pull request, puis attends la confirmation de fusion avant de mettre main à jour et de poser le tag v0.1.0.",
+              "check": "Après confirmation d’une fusion GitHub par « Create a merge commit », git pull --ff-only avance main local jusqu’au commit de fusion. Le tag annoté v0.1.0 pointe vers ce commit ; git show v0.1.0 affiche son message et son commit. Le README ne contient aucun marqueur de conflit.",
+              "hint": "Si git rebase main s’arrête sur un conflit, lis git status et ne force rien ; git rebase --abort annule l’opération. Après la relecture, choisis « Create a merge commit » pour fusionner la pull request. Attends la confirmation GitHub avant de revenir sur main, de lancer git pull --ff-only et de poser le tag v0.1.0.",
               "workspace": "Mac · workspaces/socle · Historique Git ; PR GitHub",
               "explanation": [
                 "Un rebase rejoue les commits de ta branche sur une base qui a avancé. Il peut changer leurs identifiants : fais cet exercice avant le premier push.",
+                "Le commit ajouté sur main local se retrouve dans la branche après le rebase. « Create a merge commit » conserve ce commit dans l’historique distant ; une fusion squash ou rebase ne le ferait pas et empêcherait main local d’avancer avec git pull --ff-only.",
                 "Un tag annoté associe un nom de version, un message et un auteur à un commit précis."
               ],
               "blocks": [
@@ -2062,7 +2073,7 @@
                 {
                   "kind": "shell",
                   "title": "Après confirmation de la fusion : revenir sur main",
-                  "context": "Terminal du Mac, dans cyberatelier/workspaces/socle, venv Mac activé. Exécute chaque ligne au moment indiqué, avec les modifications manuelles entre les blocs. Exécute ce bloc seulement après que GitHub confirme la fusion de la pull request.",
+                  "context": "Terminal du Mac, dans cyberatelier/workspaces/socle, venv Mac activé. Exécute chaque ligne au moment indiqué, avec les modifications manuelles entre les blocs. Exécute ce bloc seulement après la confirmation GitHub que la pull request a été fusionnée avec « Create a merge commit ».",
                   "code": "git switch main",
                   "placement": "after_actions",
                   "cwd": "exercise"
@@ -2070,7 +2081,7 @@
                 {
                   "kind": "shell",
                   "title": "Après confirmation de la fusion : actualiser main",
-                  "context": "Terminal du Mac, dans cyberatelier/workspaces/socle, venv Mac activé. Exécute chaque ligne au moment indiqué, avec les modifications manuelles entre les blocs. Exécute ce bloc seulement après que GitHub confirme la fusion de la pull request.",
+                  "context": "Terminal du Mac, dans cyberatelier/workspaces/socle, venv Mac activé. Exécute chaque ligne au moment indiqué, avec les modifications manuelles entre les blocs. Exécute ce bloc seulement après la confirmation GitHub que la pull request a été fusionnée avec « Create a merge commit ».",
                   "code": "git pull --ff-only",
                   "placement": "after_actions",
                   "cwd": "exercise"
@@ -2078,7 +2089,7 @@
                 {
                   "kind": "shell",
                   "title": "Après confirmation de la fusion : créer le tag annoté",
-                  "context": "Terminal du Mac, dans cyberatelier/workspaces/socle, venv Mac activé. Exécute chaque ligne au moment indiqué, avec les modifications manuelles entre les blocs. Exécute ce bloc seulement après que GitHub confirme la fusion de la pull request.",
+                  "context": "Terminal du Mac, dans cyberatelier/workspaces/socle, venv Mac activé. Exécute chaque ligne au moment indiqué, avec les modifications manuelles entre les blocs. Exécute ce bloc seulement après la confirmation GitHub que la pull request a été fusionnée avec « Create a merge commit ».",
                   "code": "git tag -a v0.1.0 -m \"Analyseur de journal, version 0.1.0\"",
                   "placement": "after_actions",
                   "cwd": "exercise"
@@ -2086,7 +2097,7 @@
                 {
                   "kind": "shell",
                   "title": "Vérifier le commit désigné après la fusion",
-                  "context": "Terminal du Mac, dans cyberatelier/workspaces/socle, venv Mac activé. Exécute chaque ligne au moment indiqué, avec les modifications manuelles entre les blocs. Exécute ce bloc seulement après que GitHub confirme la fusion de la pull request.",
+                  "context": "Terminal du Mac, dans cyberatelier/workspaces/socle, venv Mac activé. Exécute chaque ligne au moment indiqué, avec les modifications manuelles entre les blocs. Exécute ce bloc seulement après la confirmation GitHub que la pull request a été fusionnée avec « Create a merge commit ».",
                   "code": "git show v0.1.0",
                   "placement": "after_actions",
                   "cwd": "exercise"
@@ -2094,7 +2105,7 @@
                 {
                   "kind": "shell",
                   "title": "Publier le tag après la fusion",
-                  "context": "Terminal du Mac, dans cyberatelier/workspaces/socle, venv Mac activé. Exécute chaque ligne au moment indiqué, avec les modifications manuelles entre les blocs. Exécute ce bloc seulement après que GitHub confirme la fusion de la pull request.",
+                  "context": "Terminal du Mac, dans cyberatelier/workspaces/socle, venv Mac activé. Exécute chaque ligne au moment indiqué, avec les modifications manuelles entre les blocs. Exécute ce bloc seulement après la confirmation GitHub que la pull request a été fusionnée avec « Create a merge commit ».",
                   "code": "git push origin v0.1.0",
                   "placement": "after_actions",
                   "cwd": "exercise"
@@ -2102,8 +2113,8 @@
               ],
               "hints": [
                 "Rappel : rebase rejoue les commits de ta branche sur une nouvelle base ; un tag annoté nomme un commit de livraison.",
-                "Piste : termine la relecture, pousse la branche et ouvre la PR. Attends sa confirmation de fusion avant de passer sur main pour actualiser et taguer.",
-                "Exemple : dans un dépôt d’essai, après la fusion confirmée, git switch main puis git pull --ff-only mettent main à jour ; git show v0.1.0 permet ensuite de contrôler le tag."
+                "Piste : après la relecture, choisis « Create a merge commit » dans GitHub. Attends la confirmation de fusion avant d’actualiser main et de poser le tag.",
+                "Exemple : après confirmation d’une fusion « Create a merge commit », git switch main puis git pull --ff-only mettent main à jour ; git show v0.1.0 permet ensuite de contrôler le tag."
               ]
             }
           ],
