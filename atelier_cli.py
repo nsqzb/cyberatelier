@@ -14,12 +14,14 @@ import subprocess
 import sys
 import tempfile
 import textwrap
+import time
 import urllib.error
 import urllib.request
 
 
 ROOT = Path(__file__).resolve().parent
 MAX_JSON = 1_048_576
+LOCK_WAIT = 3.0
 
 
 class AtelierError(Exception):
@@ -184,12 +186,17 @@ class StateStore:
             cursors = terminal.get("currentByCourse", {})
             levels = terminal.get("hintLevels", {})
             if (not isinstance(cursors, dict) or not isinstance(levels, dict) or
-                    any(cid not in curriculum.courses or pid not in curriculum.order[cid]
-                        for cid, pid in cursors.items()) or
-                    any(pid not in curriculum.paliers or type(level) is not int or not 0 <= level <= 3
-                        for pid, level in levels.items())):
+                    any(not isinstance(cid, str) or not isinstance(pid, str) for cid, pid in cursors.items()) or
+                    any(type(level) is not int or not 0 <= level <= 3 for level in levels.values())):
                 raise AtelierError("Position ou indices invalides dans la progression. Le fichier est conservé.")
-            self.data["terminal"] = {**terminal, "currentByCourse": cursors.copy(), "hintLevels": levels.copy()}
+            # Un palier retiré ou déplacé par une mise à jour du contenu ne doit pas bloquer le lecteur :
+            # la position revient au début du parcours et l'indice inconnu est oublié.
+            known_cursors = {cid: pid for cid, pid in cursors.items()
+                             if cid in curriculum.courses and pid in curriculum.order[cid]}
+            known_levels = {pid: level for pid, level in levels.items() if pid in curriculum.paliers}
+            if len(known_cursors) != len(cursors) or len(known_levels) != len(levels):
+                self.notice = "Positions ou indices de paliers inconnus ignorés (contenu mis à jour)."
+            self.data["terminal"] = {**terminal, "currentByCourse": known_cursors, "hintLevels": known_levels}
         else:
             self._revision = None
             raw, source = fetch_local_progression(root) if import_remote else (None, "désactivé")
@@ -210,10 +217,16 @@ class StateStore:
             self.path.parent.mkdir(parents=True, exist_ok=True)
             # Le verrou sérialise les écritures ; la révision refuse une ancienne copie en mémoire.
             with (self.path.parent / f".{self.path.name}.lock").open("a") as lock:
-                try:
-                    fcntl.flock(lock.fileno(), fcntl.LOCK_EX | fcntl.LOCK_NB)
-                except BlockingIOError as exc:
-                    raise AtelierError("Une autre commande enregistre la progression. Réessaie dans un instant.") from exc
+                # Une écriture concurrente dure quelques millisecondes : on l'attend brièvement.
+                deadline = time.monotonic() + LOCK_WAIT
+                while True:
+                    try:
+                        fcntl.flock(lock.fileno(), fcntl.LOCK_EX | fcntl.LOCK_NB)
+                        break
+                    except BlockingIOError as exc:
+                        if time.monotonic() >= deadline:
+                            raise AtelierError("Une autre commande enregistre la progression. Réessaie dans un instant.") from exc
+                        time.sleep(0.05)
                 current = hashlib.sha256(self.path.read_bytes()).hexdigest() if self.path.exists() else None
                 if current != self._revision:
                     raise AtelierError("La progression a changé dans un autre terminal. Relance la commande ; aucune donnée n'a été écrasée.")
@@ -331,8 +344,10 @@ def docker_lab(root: Path, action: str):
         if not isinstance(result, dict) or type(result.get("running")) is not bool:
             raise AtelierError("Réponse du laboratoire invalide.")
         if action == "demarrer" and not result["running"]:
-            raise AtelierError(f"Le laboratoire n'a pas démarré : {result.get('error') or 'vérifie le port du laboratoire' }.")
+            raise AtelierError(f"Le laboratoire n'a pas démarré : {result.get('error') or 'vérifie le port du laboratoire'}.")
         return result
+    except urllib.error.HTTPError as exc:
+        raise AtelierError(f"Cyber Atelier a refusé la demande au laboratoire (HTTP {exc.code}).") from exc
     except (urllib.error.URLError, TimeoutError, OSError) as exc:
         raise AtelierError("Laboratoire indisponible : vérifie que Docker et Cyber Atelier sont lancés.") from exc
     except (UnicodeError, json.JSONDecodeError) as exc:
