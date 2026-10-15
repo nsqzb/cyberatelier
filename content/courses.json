@@ -643,7 +643,7 @@
                 {
                   "kind": "shell",
                   "title": "Ouvrir la pull request GitHub",
-                  "context": "Après avoir poussé feat/bases, dans le terminal du Mac ou sur le site GitHub.",
+                  "context": "Terminal du Mac, dans cyberatelier/workspaces/socle, après avoir poussé feat/bases. Cette commande utilise GitHub CLI (gh) ; si gh est absent, ouvre la pull request depuis le site GitHub.",
                   "code": "gh pr create --base main --title \"Bases : validation et analyse de journal\" --body \"Ajoute outils.py et ses tests S1 à S10.\"",
                   "placement": "after_actions",
                   "cwd": "exercise"
@@ -651,7 +651,7 @@
                 {
                   "kind": "shell",
                   "title": "Après la fusion : actualiser la principale",
-                  "context": "Terminal du Mac, dans cyberatelier/workspaces/socle, venv Mac activé. Exécute chaque ligne au moment indiqué, avec les modifications manuelles entre les blocs.",
+                  "context": "Terminal du Mac, dans cyberatelier/workspaces/socle. Attends que GitHub confirme la fusion de la pull request avant d’exécuter ce bloc.",
                   "code": "git switch main",
                   "placement": "after_actions",
                   "cwd": "exercise"
@@ -659,7 +659,7 @@
                 {
                   "kind": "shell",
                   "title": "Commande à lancer au moment indiqué",
-                  "context": "Terminal du Mac, dans cyberatelier/workspaces/socle, venv Mac activé. Exécute chaque ligne au moment indiqué, avec les modifications manuelles entre les blocs.",
+                  "context": "Terminal du Mac, dans cyberatelier/workspaces/socle. Attends que GitHub confirme la fusion de la pull request avant d’exécuter ce bloc.",
                   "code": "git pull --ff-only",
                   "placement": "after_actions",
                   "cwd": "exercise"
@@ -883,7 +883,7 @@
               ],
               "hints": [
                 "S13 fixe le contrat du chemin : des espaces seuls ne constituent pas une entrée utilisable.",
-                "Compare les deux entrées refusées au cas admis ; elles doivent être évaluées sans chercher le fichier sur le disque.",
+                "Écris S13 avec les deux entrées refusées et le cas admis ; vérifie cette règle sans chercher le fichier sur le disque.",
                 "Dans un formulaire de réservation, un champ composé seulement d’espaces reste vide ; un texte comme « salle A » est accepté sans vérifier qu’un fichier existe."
               ]
             },
