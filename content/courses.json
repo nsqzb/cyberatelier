@@ -744,10 +744,10 @@
             }
           ],
           "acceptance": [
-            "python -m unittest passe pour S1 à S18 ; les tests de MR1 (S1 à S10) restent verts.",
+            "python3 -m unittest -v passe pour S1 à S18 ; les tests de MR1 (S1 à S10) restent verts.",
             "Les tests créent leurs fichiers dans un dossier temporaire et ne laissent rien dans le dépôt.",
             "git log --oneline montre le commit fautif et son revert ; git stash list est vide à la fin.",
-            "Le diff de la MR est relu et ne contient que journal.py, test_journal.py et les modifications éventuelles de outils.py justifiées.",
+            "Le diff de la pull request GitHub est relu et ne contient que journal.py, test_journal.py et les modifications éventuelles de outils.py justifiées.",
             "Chaque palier de code a son commit, avec le message donné dans le palier."
           ],
           "paliers": [
@@ -761,7 +761,7 @@
                 "Vérifie que MR1 est fusionnée et que outils.py est présent sur main.",
                 "Lis git status ; enregistre ton travail en cours avant de changer de branche.",
                 "Reviens sur main avec git switch main, mets-la à jour avec git pull --ff-only, puis crée feat/fichiers-erreurs. Remplace main par master si ton dépôt utilise ce nom.",
-                "Crée journal.py et test_journal.py, puis lance les tests déjà écrits : ils doivent tous passer.",
+                "Crée journal.py et test_journal.py, puis lance les tests de MR1 (S1 à S10) : ils doivent tous rester verts.",
                 "Vérifie le nom de ta branche avec git status. Si elle existe déjà, reprends-la avec git switch sans -c."
               ],
               "check": "git status affiche « On branch feat/fichiers-erreurs » et deux fichiers non suivis : journal.py et test_journal.py.",
@@ -809,6 +809,14 @@
                   "title": "Commande à lancer au moment indiqué",
                   "context": "Terminal du Mac, dans cyberatelier/workspaces/socle, venv Mac activé. Exécute chaque ligne au moment indiqué, avec les modifications manuelles entre les blocs.",
                   "code": "touch journal.py test_journal.py",
+                  "placement": "after_actions",
+                  "cwd": "exercise"
+                },
+                {
+                  "kind": "shell",
+                  "title": "Vérifier les tests de MR1",
+                  "context": "Terminal du Mac, dans cyberatelier/workspaces/socle, venv Mac activé. Exécute chaque ligne au moment indiqué, avec les modifications manuelles entre les blocs.",
+                  "code": "python3 -m unittest -v",
                   "placement": "after_actions",
                   "cwd": "exercise"
                 },
@@ -874,9 +882,9 @@
                 }
               ],
               "hints": [
-                "Valider un chemin vide est une règle pure : elle se teste sans créer de fichier.",
-                "Écris S11 avec une chaîne vide et une chaîne d’espaces ; demande ValueError avant toute ouverture de fichier.",
-                "Un champ de dossier «   » devient vide après strip() ; tester ce refus n’a pas besoin d’un disque ni d’un fichier fictif."
+                "S13 fixe le contrat du chemin : des espaces seuls ne constituent pas une entrée utilisable.",
+                "Compare les deux entrées refusées au cas admis ; elles doivent être évaluées sans chercher le fichier sur le disque.",
+                "Dans un formulaire de réservation, un champ composé seulement d’espaces reste vide ; un texte comme « salle A » est accepté sans vérifier qu’un fichier existe."
               ]
             },
             {
@@ -1029,7 +1037,7 @@
                   "kind": "shell",
                   "title": "Enregistrer le travail vérifié",
                   "context": "Terminal du Mac, dans cyberatelier/workspaces/socle, venv Mac activé. Exécute chaque ligne au moment indiqué, avec les modifications manuelles entre les blocs.",
-                  "code": "git add journal.py test_journal.py\ngit commit -m \"Ajoute charger_evenements et compte les lignes malformees\"",
+                  "code": "git add journal.py test_journal.py\ngit commit -m \"Ajoute charger_evenements et compte les lignes malformées\"",
                   "placement": "after_actions",
                   "cwd": "exercise"
                 }
@@ -1061,7 +1069,7 @@
                 "S18"
               ],
               "check": "S11 à S15 et S18 passent.",
-              "hint": "Calcule d’abord les compteurs, puis range-les dans le dictionnaire. Pour alice, echecs_par_utilisateur renvoie déjà un dictionnaire : reprends-le tel quel.",
+              "hint": "Cherche dans outils.py la fonction qui calcule déjà ce dictionnaire, puis réutilise-la.",
               "workspace": "Mac · workspaces/socle · journal.py ; test_journal.py",
               "explanation": [
                 "Le rapport rassemble les compteurs déjà calculés ; il ne relit pas les fichiers.",
@@ -1149,7 +1157,7 @@
                   "kind": "python",
                   "title": "Exemple Python à lire ou essayer",
                   "context": "VS Code sur le Mac : copie cet exemple dans exemple.py (jetable), enregistre-le, puis lance python3 exemple.py. Si plusieurs exemples sont proposés, essaie-les un par un en remplaçant le contenu du fichier. Retire ensuite les fichiers générés et le fichier d’exemple.",
-                  "code": "try:\n    json.loads(\"[1, 2\")\nexcept json.JSONDecodeError as exc:\n    print(\"erreur :\", exc)",
+                  "code": "import json\n\ntry:\n    json.loads(\"[1, 2\")\nexcept json.JSONDecodeError as exc:\n    print(\"erreur :\", exc)",
                   "placement": "before_actions"
                 },
                 {
@@ -1181,13 +1189,13 @@
               "minutes": 10,
               "goal": "Défaire un commit sans réécrire l’historique, mettre une modification de côté, et jeter un brouillon.",
               "do": [
-                "Commence avec un dépôt propre et tous les tests verts. Introduis une erreur dans verifier_chemin, sans changer les tests.",
-                "Lance les tests, observe l’échec et commite uniquement cette erreur volontaire.",
+                "Commence avec un dépôt propre et tous les tests verts. Dans verifier_chemin, retire temporairement l’instruction qui lève ValueError pour un chemin vide ou composé d’espaces ; ne change pas les tests.",
+                "Lance la suite : S13 doit échouer, tandis que S11, S12 et S14 à S18 restent verts. Vérifie ces résultats contre le contrat de S13, puis commite uniquement cette erreur volontaire.",
                 "Lance git revert HEAD --no-edit : les tests doivent redevenir verts. Relis les deux commits dans git log.",
                 "Ajoute seulement un commentaire # brouillon dans journal.py ; lance stash push, observe status propre et stash list, puis stash pop.",
                 "Vérifie que le commentaire est revenu. Utilise restore uniquement pour retirer ce brouillon, puis vérifie status propre et stash list vide."
               ],
-              "check": "git log --oneline montre « Casse verifier_chemin (exercice) » puis son revert ; git status est propre ; git stash list est vide.",
+              "check": "git log --oneline montre « Casse verifier_chemin (exercice) » puis son revert ; pendant l’essai, seul le test S13 échoue ; après revert, git status est propre et git stash list est vide.",
               "hint": "--no-edit évite l’ouverture d’un éditeur. Si git stash pop signale un conflit, ne force rien : lis git status et demande de l’aide. Le commit fautif reste dans l’historique : c’est voulu, le revert le défait.",
               "workspace": "Mac · workspaces/socle · journal.py ; test_journal.py",
               "explanation": [
@@ -1197,17 +1205,17 @@
               "blocks": [
                 {
                   "kind": "shell",
-                  "title": "Enregistrer le travail vérifié",
+                  "title": "Commande à lancer au moment indiqué",
                   "context": "Terminal du Mac, dans cyberatelier/workspaces/socle, venv Mac activé. Exécute chaque ligne au moment indiqué, avec les modifications manuelles entre les blocs.",
-                  "code": "git add journal.py\ngit commit -m \"Casse verifier_chemin (exercice)\"",
+                  "code": "python3 -m unittest -v",
                   "placement": "after_actions",
                   "cwd": "exercise"
                 },
                 {
                   "kind": "shell",
-                  "title": "Commande à lancer au moment indiqué",
+                  "title": "Commiter l’erreur volontaire",
                   "context": "Terminal du Mac, dans cyberatelier/workspaces/socle, venv Mac activé. Exécute chaque ligne au moment indiqué, avec les modifications manuelles entre les blocs.",
-                  "code": "python3 -m unittest -v",
+                  "code": "git add journal.py\ngit commit -m \"Casse verifier_chemin (exercice)\"",
                   "placement": "after_actions",
                   "cwd": "exercise"
                 },
@@ -1300,12 +1308,12 @@
                 "Avant la livraison, fais D1 avec une copie locale du journal fictif : lire → charger les événements → construire le rapport. Le nombre de lignes non vides doit égaler lignes_valides + lignes_malformees. Ne commite pas la fixture ni un rapport d’essai.",
                 "Relis git status et git diff : la livraison doit contenir journal.py et test_journal.py, avec les modifications nécessaires de cette mission.",
                 "Ajoute les fichiers par leur nom, relis git diff --staged, puis commite ce qui ne l’est pas encore.",
-                "Pousse feat/fichiers-erreurs et ouvre la demande de fusion vers main.",
-                "Relis le diff dans la demande de fusion. Cette mission n’a pas encore de pipeline : la relecture et les conditions de fusion restent nécessaires.",
-                "Fusionne après relecture et, pour GitLab de l’école, après son autorisation.",
+                "Pousse feat/fichiers-erreurs. Sur GitHub, ouvre une pull request (PR) vers main ; le bloc suivant montre gh pr create. Pour une mission GitLab de l’école, crée une merge request (MR) selon les règles de l’école.",
+                "Relis le diff de la PR GitHub ou de la MR GitLab de l’école, selon le dépôt utilisé. Cette mission n’a pas encore de pipeline : la relecture et les conditions de fusion restent nécessaires.",
+                "Sur GitHub, fusionne la PR après relecture. Sur GitLab de l’école, fusionne la MR après relecture et autorisation.",
                 "Après la fusion, reviens sur main et lance git pull --ff-only avant la mission suivante."
               ],
-              "check": "lignes_valides + lignes_malformees est égal au nombre affiché par grep. La pull request ne contient que journal.py et test_journal.py (et outils.py si tu l’as modifié, avec une raison).",
+              "check": "lignes_valides + lignes_malformees est égal au nombre affiché par grep. La pull request GitHub ne contient que journal.py et test_journal.py (et outils.py si tu l’as modifié, avec une raison).",
               "hint": "Si la démonstration affiche une erreur, lis la dernière ligne : elle dit quel fichier ou quelle fonction pose problème. Si fixtures/socle/auth.log manque, relance la commande de copie des fixtures de la préparation.",
               "workspace": "Mac · workspaces/socle · fixtures/socle/auth.log ; PR GitHub",
               "explanation": [
@@ -1339,9 +1347,17 @@
                 },
                 {
                   "kind": "shell",
-                  "title": "Publier la branche ou ouvrir la demande de fusion",
+                  "title": "Pousser la branche",
                   "context": "Terminal du Mac, dans cyberatelier/workspaces/socle, venv Mac activé. Exécute chaque ligne au moment indiqué, avec les modifications manuelles entre les blocs.",
-                  "code": "git push -u origin feat/fichiers-erreurs\ngh pr create --base main --title \"Fichiers, erreurs et JSON\" --body \"Ajoute journal.py et ses tests S11 à S18.\"",
+                  "code": "git push -u origin feat/fichiers-erreurs",
+                  "placement": "after_actions",
+                  "cwd": "exercise"
+                },
+                {
+                  "kind": "shell",
+                  "title": "Ouvrir la pull request GitHub",
+                  "context": "Terminal du Mac, dans cyberatelier/workspaces/socle, venv Mac activé. Ce bloc utilise GitHub CLI pour créer une pull request GitHub. Pour GitLab de l’école, crée une merge request sur le site de l’école.",
+                  "code": "gh pr create --base main --title \"Fichiers, erreurs et JSON\" --body \"Ajoute journal.py et ses tests S11 à S18.\"",
                   "placement": "after_actions",
                   "cwd": "exercise"
                 }
