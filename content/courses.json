@@ -1429,10 +1429,10 @@
             }
           ],
           "acceptance": [
-            "python -m unittest passe pour S1 à S24, et les tests créent leurs fichiers dans un dossier temporaire.",
+            "python3 -m unittest -v passe pour S1 à S24, et les tests créent leurs fichiers dans un dossier temporaire.",
             "Le conflit de fusion a été résolu à la main : aucun marqueur <<<<<<< , ======= ou >>>>>>> ne reste dans README.md.",
-            "git log --oneline --graph montre la branche rebasée sur main ; le tag v0.1.0 est présent dans git tag -l.",
-            "La merge request vers la branche principale a été relue ; les branches exercice/ ont été supprimées et ne figurent pas sur GitLab.",
+            "Après confirmation de la fusion de la pull request (GitHub), main est à jour et le tag v0.1.0 désigne le commit livré.",
+            "Les branches exercice/ ont été supprimées localement ; la pull request (GitHub) a été relue.",
             "Chaque palier de code a son commit, avec le message donné dans le palier."
           ],
           "paliers": [
@@ -1522,7 +1522,7 @@
                   "kind": "python",
                   "title": "Exemple Python à lire ou essayer",
                   "context": "VS Code sur le Mac : copie cet exemple dans exemple.py (jetable), enregistre-le, puis lance python3 exemple.py. Si plusieurs exemples sont proposés, essaie-les un par un en remplaçant le contenu du fichier. Retire ensuite les fichiers générés et le fichier d’exemple.",
-                  "code": "def afficher_panier(articles):\n    lignes = []\n    for nom in sorted(articles):\n        lignes.append(f\"{nom} : {articles[nom]}\")\n    return \"\\n\".join(lignes)\n\nprint(afficher_panier({\"pomme\": 3, \"banane\": 1}))",
+                  "code": "mots = [\"kiwi\", \"abricot\", \"figue\"]\nprint(\", \".join(sorted(mots)))",
                   "placement": "before_actions"
                 },
                 {
@@ -1548,7 +1548,7 @@
               ],
               "hints": [
                 "Le formatage transforme un dictionnaire en texte ; l’ordre et les retours à la ligne font partie du résultat.",
-                "Écris S18 en comparant la chaîne entière, puis construis l’affichage depuis les données sans relire le journal.",
+                "Écris S19 en comparant la chaîne entière, puis construis l’affichage depuis les données sans relire le journal.",
                 "Un bilan « Total : 2\\nPain : 1\\nRiz : 1 » diffère de « Total: 2 » ; compare des chaînes complètes pour repérer espaces et sauts de ligne."
               ]
             },
@@ -1593,7 +1593,7 @@
               ],
               "hints": [
                 "Le cas sans échec doit avoir un affichage prévu ; une collection vide n’est pas une erreur.",
-                "Écris S19 avec le rapport sans échec et compare sa chaîne entière au texte attendu, sans laisser une ligne de classement inventée.",
+                "Écris S20 avec le rapport sans échec et compare sa chaîne entière au texte attendu, sans laisser une ligne de classement inventée.",
                 "Pour une liste de retards vide, une phrase « Aucun retard » est plus claire qu’un titre suivi d’une zone vide ; le test doit exiger la forme choisie par le contrat."
               ]
             },
@@ -1617,21 +1617,21 @@
               "workspace": "Mac · workspaces/socle · analyseur.py ; test_analyseur.py",
               "explanation": [
                 "argv est ici une liste d’arguments, sans le nom du script. main(argv) la reçoit et rend un entier : les tests peuvent l’appeler comme une fonction.",
-                "stdout porte le résultat ; stderr porte les erreurs. redirect_stdout et redirect_stderr permettent au test de lire ces sorties dans StringIO."
+                "stdout est la sortie normale ; stderr reçoit les messages d’erreur. Dans les tests, redirect_stdout et redirect_stderr redirigent temporairement ces sorties vers io.StringIO, un flux de texte en mémoire que le test peut relire."
               ],
               "blocks": [
                 {
                   "kind": "python",
                   "title": "Exemple Python à lire ou essayer",
                   "context": "VS Code sur le Mac : copie cet exemple dans exemple.py (jetable), enregistre-le, puis lance python3 exemple.py. Si plusieurs exemples sont proposés, essaie-les un par un en remplaçant le contenu du fichier. Retire ensuite les fichiers générés et le fichier d’exemple.",
-                  "code": "import sys\n\ndef signaler(message):\n    print(message, file=sys.stderr)\n    return 2\n\nprint(signaler(\"usage : exemple FICHIER\"))",
+                  "code": "try:\n    nombre = int(\"douze\")\nexcept ValueError:\n    print(\"Cette valeur ne représente pas un entier.\")",
                   "placement": "before_actions"
                 },
                 {
                   "kind": "python",
                   "title": "Exemple Python à lire ou essayer",
                   "context": "VS Code sur le Mac : copie cet exemple dans exemple.py (jetable), enregistre-le, puis lance python3 exemple.py. Si plusieurs exemples sont proposés, essaie-les un par un en remplaçant le contenu du fichier. Retire ensuite les fichiers générés et le fichier d’exemple.",
-                  "code": "try:\n    with open(\"inexistant.txt\", encoding=\"utf-8\") as f:\n        print(f.read())\nexcept FileNotFoundError:\n    print(\"fichier introuvable\")",
+                  "code": "import sys\n\nprint(\"Message envoyé sur la sortie d’erreur.\", file=sys.stderr)",
                   "placement": "before_actions"
                 },
                 {
@@ -1696,7 +1696,7 @@
                   "kind": "shell",
                   "title": "Enregistrer le travail vérifié",
                   "context": "Terminal du Mac, dans cyberatelier/workspaces/socle, venv Mac activé. Exécute chaque ligne au moment indiqué, avec les modifications manuelles entre les blocs.",
-                  "code": "git add analyseur.py test_analyseur.py\ngit commit -m \"Affiche le rapport et renvoie 0 en cas de succes\"",
+                  "code": "git add analyseur.py test_analyseur.py\ngit commit -m \"Affiche le rapport et renvoie 0 en cas de succès\"",
                   "placement": "after_actions",
                   "cwd": "exercise"
                 }
@@ -1815,7 +1815,7 @@
                   "kind": "shell",
                   "title": "Enregistrer le travail vérifié",
                   "context": "Terminal du Mac, dans cyberatelier/workspaces/socle, venv Mac activé. Exécute chaque ligne au moment indiqué, avec les modifications manuelles entre les blocs.",
-                  "code": "git add README.md .gitignore\ngit commit -m \"Ajoute le README et complete le .gitignore\"",
+                  "code": "git add README.md\ngit commit -m \"Ajoute le README\"",
                   "placement": "after_actions",
                   "cwd": "exercise"
                 }
@@ -1931,7 +1931,7 @@
                   "kind": "shell",
                   "title": "Enregistrer le travail vérifié",
                   "context": "Terminal du Mac, dans cyberatelier/workspaces/socle, venv Mac activé. Exécute chaque ligne au moment indiqué, avec les modifications manuelles entre les blocs.",
-                  "code": "git add README.md\ngit commit -m \"Resout le conflit du titre (exercice)\"",
+                  "code": "git add README.md\ngit commit -m \"Résout le conflit du titre (exercice)\"",
                   "placement": "after_actions",
                   "cwd": "exercise"
                 },
@@ -1970,17 +1970,17 @@
               "id": "socle-mr3-p9",
               "title": "Rebase local, tag v0.1.0 et pull request",
               "minutes": 8,
-              "goal": "Replacer ta branche au-dessus d’un main qui a avancé, poser un tag annoté, puis ouvrir la MR.",
+              "goal": "Replacer ta branche au-dessus d’un main qui a avancé, ouvrir une pull request (GitHub), puis poser le tag v0.1.0 après sa fusion.",
               "do": [
-                "Commence avec un dépôt propre. Sur main local, ajoute le commentaire d’exercice à outils.py et commite-le ; ce commit sera inclus dans la PR, sans push direct de main.",
+                "Commence avec un dépôt propre. Sur main local, ajoute un commentaire d’exercice à outils.py et commite-le ; ce commit servira à pratiquer le rebase, sans push direct de main.",
                 "Reviens sur feat/analyseur et rebase sur main. En cas de conflit : corrige, git add, puis rebase --continue ; rebase --abort annule l’opération.",
-                "Relance tous les tests et observe le graphe des commits après le rebase.",
-                "Crée le tag annoté v0.1.0 avec un message, puis vérifie le commit désigné avec git show.",
-                "Relis le diff contre origin/main, pousse feat/analyseur et ouvre la PR. Mentionne le rebase et le commentaire d’exercice.",
-                "Pousse le tag séparément lorsqu’il est autorisé, puis fusionne après relecture et mets main à jour."
+                "Relance tous les tests et observe le graphe des commits après le rebase. Relis aussi le diff contre origin/main.",
+                "Pousse feat/analyseur, puis crée une pull request (PR) sur GitHub et mentionne le rebase et le commentaire d’exercice.",
+                "Attends que GitHub confirme la fusion de la PR. Après cette confirmation seulement, reviens sur main et mets-la à jour avec git pull --ff-only.",
+                "Sur main à jour après la fusion, crée le tag annoté v0.1.0, vérifie le commit qu’il désigne avec git show v0.1.0, puis pousse le tag."
               ],
-              "check": "git log --oneline --graph montre feat/analyseur posée au-dessus du commit de main ; git tag -l affiche v0.1.0 ; le README ne contient plus de marqueur de conflit.",
-              "hint": "Si git rebase main s’arrête sur un conflit, ce n’est pas le conflit voulu : lis git status, ne force rien. Tu peux revenir en arrière avec git rebase --abort. Un tag annoté (-a) contient un message et une date ; un tag léger ne contient rien de plus qu’un nom.",
+              "check": "Après confirmation de la fusion, main local est à jour et le tag annoté v0.1.0 pointe vers le commit fusionné ; git show v0.1.0 affiche son message et son commit. Le README ne contient aucun marqueur de conflit.",
+              "hint": "Si git rebase main s’arrête sur un conflit, lis git status et ne force rien ; git rebase --abort annule l’opération. Termine la relecture et ouvre la pull request, puis attends la confirmation de fusion avant de mettre main à jour et de poser le tag v0.1.0.",
               "workspace": "Mac · workspaces/socle · Historique Git ; PR GitHub",
               "explanation": [
                 "Un rebase rejoue les commits de ta branche sur une base qui a avancé. Il peut changer leurs identifiants : fais cet exercice avant le premier push.",
@@ -1989,7 +1989,7 @@
               "blocks": [
                 {
                   "kind": "shell",
-                  "title": "Après la fusion : actualiser la principale",
+                  "title": "Sur main local, avant le rebase",
                   "context": "Terminal du Mac, dans cyberatelier/workspaces/socle, venv Mac activé. Exécute chaque ligne au moment indiqué, avec les modifications manuelles entre les blocs.",
                   "code": "git switch main",
                   "placement": "after_actions",
@@ -1997,15 +1997,15 @@
                 },
                 {
                   "kind": "shell",
-                  "title": "Enregistrer le travail vérifié",
+                  "title": "Enregistrer le commit qui fait avancer main",
                   "context": "Terminal du Mac, dans cyberatelier/workspaces/socle, venv Mac activé. Exécute chaque ligne au moment indiqué, avec les modifications manuelles entre les blocs.",
-                  "code": "git add outils.py\ngit commit -m \"Ajoute un commentaire d’en-tete a outils.py\"",
+                  "code": "git add outils.py\ngit commit -m \"Ajoute un commentaire d’en-tête à outils.py\"",
                   "placement": "after_actions",
                   "cwd": "exercise"
                 },
                 {
                   "kind": "shell",
-                  "title": "Commande à lancer au moment indiqué",
+                  "title": "Revenir sur la branche de la mission",
                   "context": "Terminal du Mac, dans cyberatelier/workspaces/socle, venv Mac activé. Exécute chaque ligne au moment indiqué, avec les modifications manuelles entre les blocs.",
                   "code": "git switch feat/analyseur",
                   "placement": "after_actions",
@@ -2013,7 +2013,7 @@
                 },
                 {
                   "kind": "shell",
-                  "title": "Commande à lancer au moment indiqué",
+                  "title": "Rejouer les commits sur main",
                   "context": "Terminal du Mac, dans cyberatelier/workspaces/socle, venv Mac activé. Exécute chaque ligne au moment indiqué, avec les modifications manuelles entre les blocs.",
                   "code": "git rebase main",
                   "placement": "after_actions",
@@ -2021,31 +2021,23 @@
                 },
                 {
                   "kind": "shell",
-                  "title": "Relire l’état du dépôt",
+                  "title": "Relancer les tests",
                   "context": "Terminal du Mac, dans cyberatelier/workspaces/socle, venv Mac activé. Exécute chaque ligne au moment indiqué, avec les modifications manuelles entre les blocs.",
-                  "code": "git log --oneline --graph",
+                  "code": "python3 -m unittest -v",
                   "placement": "after_actions",
                   "cwd": "exercise"
                 },
                 {
                   "kind": "shell",
-                  "title": "Commande à lancer au moment indiqué",
+                  "title": "Observer le graphe des branches",
                   "context": "Terminal du Mac, dans cyberatelier/workspaces/socle, venv Mac activé. Exécute chaque ligne au moment indiqué, avec les modifications manuelles entre les blocs.",
-                  "code": "git tag -a v0.1.0 -m \"Analyseur de journal, version 0.1.0\"",
+                  "code": "git log --oneline --graph --all",
                   "placement": "after_actions",
                   "cwd": "exercise"
                 },
                 {
                   "kind": "shell",
-                  "title": "Commande à lancer au moment indiqué",
-                  "context": "Terminal du Mac, dans cyberatelier/workspaces/socle, venv Mac activé. Exécute chaque ligne au moment indiqué, avec les modifications manuelles entre les blocs.",
-                  "code": "git tag -l",
-                  "placement": "after_actions",
-                  "cwd": "exercise"
-                },
-                {
-                  "kind": "shell",
-                  "title": "Relire l’état du dépôt",
+                  "title": "Relire le diff avant publication",
                   "context": "Terminal du Mac, dans cyberatelier/workspaces/socle, venv Mac activé. Exécute chaque ligne au moment indiqué, avec les modifications manuelles entre les blocs.",
                   "code": "git diff origin/main --stat",
                   "placement": "after_actions",
@@ -2053,17 +2045,65 @@
                 },
                 {
                   "kind": "shell",
-                  "title": "Publier la branche ou ouvrir la demande de fusion",
+                  "title": "Pousser la branche de la mission",
                   "context": "Terminal du Mac, dans cyberatelier/workspaces/socle, venv Mac activé. Exécute chaque ligne au moment indiqué, avec les modifications manuelles entre les blocs.",
-                  "code": "git push -u origin feat/analyseur\ngh pr create --base main --title \"Analyseur de journal\" --body \"Ajoute analyseur.py, test_analyseur.py et le README (S19 à S24).\"",
+                  "code": "git push -u origin feat/analyseur",
+                  "placement": "after_actions",
+                  "cwd": "exercise"
+                },
+                {
+                  "kind": "shell",
+                  "title": "Ouvrir la pull request sur GitHub",
+                  "context": "Terminal du Mac, dans cyberatelier/workspaces/socle, venv Mac activé. Exécute chaque ligne au moment indiqué, avec les modifications manuelles entre les blocs.",
+                  "code": "gh pr create --base main --title \"Analyseur de journal\" --body \"Ajoute analyseur.py, test_analyseur.py et le README (S19 à S24).\"",
+                  "placement": "after_actions",
+                  "cwd": "exercise"
+                },
+                {
+                  "kind": "shell",
+                  "title": "Après confirmation de la fusion : revenir sur main",
+                  "context": "Terminal du Mac, dans cyberatelier/workspaces/socle, venv Mac activé. Exécute chaque ligne au moment indiqué, avec les modifications manuelles entre les blocs. Exécute ce bloc seulement après que GitHub confirme la fusion de la pull request.",
+                  "code": "git switch main",
+                  "placement": "after_actions",
+                  "cwd": "exercise"
+                },
+                {
+                  "kind": "shell",
+                  "title": "Après confirmation de la fusion : actualiser main",
+                  "context": "Terminal du Mac, dans cyberatelier/workspaces/socle, venv Mac activé. Exécute chaque ligne au moment indiqué, avec les modifications manuelles entre les blocs. Exécute ce bloc seulement après que GitHub confirme la fusion de la pull request.",
+                  "code": "git pull --ff-only",
+                  "placement": "after_actions",
+                  "cwd": "exercise"
+                },
+                {
+                  "kind": "shell",
+                  "title": "Après confirmation de la fusion : créer le tag annoté",
+                  "context": "Terminal du Mac, dans cyberatelier/workspaces/socle, venv Mac activé. Exécute chaque ligne au moment indiqué, avec les modifications manuelles entre les blocs. Exécute ce bloc seulement après que GitHub confirme la fusion de la pull request.",
+                  "code": "git tag -a v0.1.0 -m \"Analyseur de journal, version 0.1.0\"",
+                  "placement": "after_actions",
+                  "cwd": "exercise"
+                },
+                {
+                  "kind": "shell",
+                  "title": "Vérifier le commit désigné après la fusion",
+                  "context": "Terminal du Mac, dans cyberatelier/workspaces/socle, venv Mac activé. Exécute chaque ligne au moment indiqué, avec les modifications manuelles entre les blocs. Exécute ce bloc seulement après que GitHub confirme la fusion de la pull request.",
+                  "code": "git show v0.1.0",
+                  "placement": "after_actions",
+                  "cwd": "exercise"
+                },
+                {
+                  "kind": "shell",
+                  "title": "Publier le tag après la fusion",
+                  "context": "Terminal du Mac, dans cyberatelier/workspaces/socle, venv Mac activé. Exécute chaque ligne au moment indiqué, avec les modifications manuelles entre les blocs. Exécute ce bloc seulement après que GitHub confirme la fusion de la pull request.",
+                  "code": "git push origin v0.1.0",
                   "placement": "after_actions",
                   "cwd": "exercise"
                 }
               ],
               "hints": [
-                "rebase rejoue des commits sur une nouvelle base ; un tag annoté nomme un commit de livraison.",
-                "Termine la relecture et les essais Git, reviens sur la branche utile, puis vérifie le commit visé par le tag après la fusion.",
-                "git show v0.2.0 dans un dépôt d’essai permet de voir le message du tag et le commit nommé ; le nom de tag seul ne garantit pas le bon contenu."
+                "Rappel : rebase rejoue les commits de ta branche sur une nouvelle base ; un tag annoté nomme un commit de livraison.",
+                "Piste : termine la relecture, pousse la branche et ouvre la PR. Attends sa confirmation de fusion avant de passer sur main pour actualiser et taguer.",
+                "Exemple : dans un dépôt d’essai, après la fusion confirmée, git switch main puis git pull --ff-only mettent main à jour ; git show v0.1.0 permet ensuite de contrôler le tag."
               ]
             }
           ],
