@@ -217,13 +217,20 @@ class ServerApiTests(unittest.TestCase):
     def test_detached_descendant_holding_stdout_does_not_block_or_keep_the_lock(self):
         # Un petit-fils qui quitte le groupe (setsid) en gardant stdout ne doit ni bloquer la requête
         # jusqu'à sa fin, ni laisser le verrou pris pour les commandes suivantes.
-        detach = "python3 -c 'import os, time; os.setsid(); print(os.getpid(), flush=True); time.sleep(20)' &"
-        started = time.monotonic()
-        status, result = self.json_request("POST", "/api/run", {"course": "portpilot", "command": detach, "timeout": 10})
+        # Le shell attend que le descendant ait quitté le groupe (PID écrit après setsid) avant de se terminer :
+        # sinon le serveur le tuerait encore légitimement avec le groupe, et le cas testé n'existerait pas.
+        detach = ("python3 -c 'import os, time; os.setsid(); open(\"escaped.tmp\", \"w\").write(str(os.getpid())); "
+                  "os.replace(\"escaped.tmp\", \"escaped.pid\"); time.sleep(20)' & "
+                  "while [ ! -s escaped.pid ]; do sleep 0.05; done; echo detache")
+        status, result = self.json_request("POST", "/api/run", {"course": "portpilot", "command": detach, "timeout": 20})
         self.assertEqual(status, 200)
-        self.assertLess(time.monotonic() - started, 5)
-        escaped = int(result["stdout"].split()[0])
+        escaped = int((self.workspaces / "portpilot" / "escaped.pid").read_text())
         self.addCleanup(lambda: os.kill(escaped, 9) if self.process_is_running(escaped) else None)
+        self.assertIn("detache", result["stdout"])
+        self.assertFalse(result["timedOut"])
+        self.assertTrue(self.process_is_running(escaped), "le descendant a bien échappé au groupe")
+        # La réponse arrive environ PIPE_GRACE après la fin du shell, pas à la fin du descendant (20 s).
+        self.assertLess(result["duration"], 15)
         status, result = self.json_request("POST", "/api/run", {"course": "portpilot", "command": "echo suivant"})
         self.assertEqual((status, result["stdout"]), (200, "suivant\n"))
 
