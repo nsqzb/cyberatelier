@@ -1,0 +1,10 @@
+# Les actions de la CI sont épinglées par SHA : Dependabot propose les mises à jour.
+# Le projet n'a aucune dépendance pip (bibliothèque standard uniquement).
+version: 2
+updates:
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+    commit-message:
+      prefix: "CI"
