@@ -12,3 +12,4 @@
 @media print{.palier-body{display:block}.palier-box{break-inside:auto}.copy-button,.palier-tick{display:none}.mission-card{break-inside:auto}.palier-title{break-after:avoid}.command-row pre{white-space:pre-wrap}.learning-guide{break-inside:auto}}
 
 .palier-example{border:1px solid var(--line);border-radius:12px;padding:16px;margin:16px 0;background:#f5faf9}.palier-example dl{margin:0}.palier-example dt{font-size:13px;font-weight:700;color:var(--muted);margin-top:12px}.palier-example dd{margin:6px 0 0}.palier-example pre{font-size:14px;line-height:1.6;white-space:pre-wrap;overflow-wrap:anywhere;margin:0}.palier-rules li{margin-bottom:8px}
+.file-button:focus-within{outline:2px solid #438f8a;outline-offset:2px}
