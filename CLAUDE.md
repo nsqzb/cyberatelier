@@ -87,8 +87,8 @@ L'application fournit consignes, éditeur, console, laboratoire HTTP et outils f
 
 - **Lancer ou mettre à jour** : `docker compose up --build -d`, puis ouvrir http://127.0.0.1:8080. Les volumes sont conservés. Si `compose.override.yaml` est présent (mode VS Code), `workspaces` est le dossier `./workspaces` de l'hôte, et non le volume nommé : `docker compose down -v` ne supprime pas ce dossier de l'hôte. La sauvegarde ci-dessous (`tar -C / workspaces data` dans le conteneur) lit `/workspaces`, donc inclut aussi ce dossier monté.
 - **Statut** : `docker compose ps`.
-- **Tests de Cyber Atelier** (pas ceux de l'apprenant) : `docker compose exec -T atelier python -m unittest discover -s tests -p 'test_*.py' -v`. Il y a **46 méthodes de test** : 13 d'origine (`test_server` 8 + `test_labs` 5), 7 de `test_content.py`, 26 de `test_tools.py`. Dernier passage dans Docker selon la passation : 46/46 OK (non revérifié ici, pas de Docker dans ce travail). Passage local hors Docker (macOS, Python 3.14, `PYTHONDONTWRITEBYTECODE=1`) le 2026-10-10 : 46 OK.
-- **Limite des tests** : dans `test_server.py`, `process_is_running` lit `/proc`. Sans `/proc` (macOS natif), elle renvoie `False` et les tests de mort de processus passent sans rien prouver. Ils ne sont probants que dans Linux/Docker.
+- **Tests de Cyber Atelier** (pas ceux de l'apprenant) : `docker compose exec -T atelier python -m unittest discover -s tests -p 'test_*.py' -v`. **126 tests** au 2026-10-15 (test_server 23, test_labs 10, test_tools 26, test_content 12, test_atelier_cli 24, test_update_atelier 31). Passages du 2026-10-15 : 126 OK sur macOS (Python 3.14), 126 OK dans l'image Docker (lecture seule, `--cap-drop ALL`, 1 test sauté : `mettre-a-jour` n'est pas exécutable dans l'image).
+- **Tests de processus** : `process_is_running` lit `/proc` sous Linux (distingue les zombies) et utilise `os.kill(pid, 0)` ailleurs : les tests de mort de processus sont donc probants aussi sur macOS.
 - **Shell interactif** (Git, SSH, `git clone`) : `docker compose exec atelier bash`.
 - **Arrêter sans perdre les données** : `docker compose stop`, puis `docker compose start`. `docker compose down` supprime les conteneurs mais garde les volumes.
 - **Sauvegarder** : `docker compose exec -T atelier tar -czf - -C / workspaces data > backups/...tar.gz`. Le volume `home` est volontairement exclu (clé SSH privée possible).
@@ -108,7 +108,7 @@ Routes (serveur sur `0.0.0.0:8080` dans le conteneur, publié sur `127.0.0.1` un
 Codes d'erreur : 400 (requête ou chemin invalide), 403 (Host ou Origin non local), 404, 409 (fichier existant avec `createOnly`, ou commande déjà en cours), 413 (trop volumineux), 500 (erreur interne).
 
 Progression (`/data/state.json`, version 1) : `{"version":1, "selectedCourse", "completed": [ids de missions], "notes": {parcours: texte}, "mrLinks": {id de mission: URL}, "paliers": [ids de paliers cochés]}`. La clé `paliers` est optionnelle (défaut `[]`, 500 entrées max) : les anciennes progressions restent valides sans migration.
-- `selectedCourse` par défaut : `socle` (`DEFAULT_STATE`). Une progression ancienne sans cette clé est lue avec `portpilot` (valeur de repli de `_state_normalize`) : **écart**, voir section 8.
+- `selectedCourse` par défaut : `socle` (`DEFAULT_STATE` et repli de `_state_normalize`). Une progression illisible (`state.json` corrompu) est renommée `state.invalide-<date>.json` et le serveur repart des valeurs par défaut.
 - Les anciennes progressions (portpilot, headerscope, fileguard) restent valides. Les clés de notes manquantes (`socle`, `toolwrap`, `reconwrap`) sont ajoutées vides.
 - Le serveur valide le format, la taille et la liste des parcours, mais pas l'appartenance des identifiants de mission. Le client (`normalizeProgression`) filtre ces identifiants.
 
@@ -165,7 +165,7 @@ Contenu des changements (détail dans `docs/JOURNAL.md`) :
 Vérifications : 46 tests OK en local (macOS, hors Docker) le 2026-10-10 ; 46 OK dans Docker selon la passation. Parcours navigateur (passation) : sauvegarde avant exécution, console conservée, fixtures copiées et modifiables, démos HeaderScope D1 à D3, bouton mobile, pas de défilement horizontal à 375 px.
 
 ### Limites connues
-- **Progression sans `selectedCourse`** : `_state_normalize` relit `portpilot` (`value.get("selectedCourse", "portpilot")`) alors que `DEFAULT_STATE` vaut `socle`. Non corrigé.
+- **Authentification** : l'API ne repose que sur Host/Origin. Un client non navigateur sur le Mac peut forger Host et lancer `/api/run`. Piste : jeton aléatoire injecté dans la page. Les commandes héritent aussi de l'environnement du serveur.
 - **Textes d'accueil en dur** dans `web/index.html` (`#side-info`, paragraphe d'accueil). Les compteurs de `renderProgress` (heures, MR) sont, eux, calculés.
 - **Gabarit `hint`** : les parcours `portpilot`, `headerscope` et `fileguard` ont un indice unique ; `socle`, `toolwrap` et `reconwrap` ont trois niveaux (`Niveau 2 :`, `Niveau 3 :`), comme le demande `drafts/BRIEF.md`.
 - **Tests dépendant de `/proc`** : voir section 3.
@@ -197,9 +197,9 @@ Vérifications : 46 tests OK en local (macOS, hors Docker) le 2026-10-10 ; 46 OK
 - Rééquilibrer les durées : plusieurs paliers de 6 à 8 minutes (MR3 de socle, toolwrap, reconwrap) et des paliers de pipeline/fusion chargés pour 10 minutes.
 - Faire suivre chaque parcours de bout en bout par un apprenant (rien n'a été validé en conditions réelles).
 - Script de recette navigateur reproductible (aucun test navigateur automatisé dans le dépôt).
-- Corriger le repli `portpilot` de `_state_normalize` (écart signalé en section 8) et ajouter un test.
+- Ajouter un jeton d'API (voir limites connues) et un environnement minimal pour `/api/run`.
 - Déplacer les textes d'accueil en dur de `web/index.html` vers des valeurs calculées.
-- Empêcher deux exécutions simultanées côté interface : désactiver les boutons pendant `/api/run`.
+- Désactiver visuellement les boutons pendant `/api/run` (un second clic est déjà refusé avec un message).
 - Renommer ou supprimer un fichier depuis l'interface.
 - Mémoriser le dossier de travail (cwd) par parcours : `state.cwdByCourse` existe en mémoire seulement, il est perdu au rechargement.
 - Afficher une aide claire dans la console en cas d'échec d'une commande interactive (clone SSH).
@@ -239,3 +239,13 @@ Vérifications : 46 tests OK en local (macOS, hors Docker) le 2026-10-10 ; 46 OK
 - `./mettre-a-jour` appelle `scripts/update_atelier.py`, qui retrouve la racine de l’application même depuis un dossier d’exercice. Il vérifie Git et les montages, sauvegarde les dépôts d’exercice, la progression Docker et le JSON terminal, actualise main uniquement par avance rapide, construit avant de redémarrer et attend la santé Docker. `--check` consulte GitHub et Docker sans checkout ni redémarrage.
 - `atelier_version.py` lit Git sur le Mac ou `.atelier-build.json` dans l’image. L’updater génère ce dernier (ignoré par Git, inclus dans le build). La version est affichée par la CLI, la santé API et le site facultatif.
 - Le générateur PDF rend les indices repliables des Markdown sous forme de libellés lisibles. Le guide `docs/TERMINAL_MAC.md` explique commandes, stockage et séparation des dépôts.
+
+
+## CI GitHub et fiabilisation (2026-10-15, branche feat/ci-qualite)
+
+- `.github/workflows/tests.yml` : `permissions: contents: read`, `concurrency`, `timeout-minutes`, actions épinglées par SHA (Dependabot `github-actions` dans `.github/dependabot.yml`). Jobs : `contrôles statiques` (node --check, compileall `-W error`, JSON valides, `generate_exercises.py --check`), `tests` (Ubuntu 3.12/3.13/3.14 + macOS 3.14, `-X dev`, échec sur `ResourceWarning`, aucun fichier suivi modifié), `image Docker` (build, contenu de l'image, tests en lecture seule sans capacités, `docker compose up` sous le projet `atelier-ci` puis santé et refus d'un Host étranger).
+- Serveur : délai NaN/Infinity refusé (JSON non standard), descendant `setsid` qui garde stdout ne bloque plus la requête ni le verrou (`PIPE_GRACE`), `course`/`selectedCourse` non textuels en 400, antislash contrôlé après décodage, messages `OSError` sans chemin de l'hôte, `Connection: close` sur les erreurs, corps de `/api/file` borné par `MAX_FILE_BODY`, FIFO refusé, `timeout` des sockets, liens MR http/https uniquement, en-têtes `X-Frame-Options`, `frame-ancestors`, `nosniff`, `Referrer-Policy`.
+- Labo : port occupé détecté même sur macOS (sonde avant liaison), port validé, `::1` retiré (serveur IPv4), délai par client, en-tête `Server` sans version Python.
+- Interface : le bouton Enregistrer confirme l'enregistrement, une seconde commande pendant `/api/run` est refusée sans écraser la sortie, l'import est refusé si le programme n'est pas chargé, compteur de MR filtré sur les ids connus, contour de focus du bouton d'import.
+- Terminal Mac : une position ou un indice de palier inconnu est ignoré avec une notice (au lieu de bloquer le lecteur), le verrou attend jusqu'à 3 s, un refus HTTP du labo n'est plus annoncé comme « Docker arrêté ».
+- Constat GitHub (non modifié) : le dépôt `nsqzb/cyberatelier` est **public** (la section 10 le disait privé), sans protection de `main` ni secret scanning. Décision à prendre par l'utilisateur.
