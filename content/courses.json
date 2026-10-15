@@ -1189,7 +1189,7 @@
               "minutes": 10,
               "goal": "Défaire un commit sans réécrire l’historique, mettre une modification de côté, et jeter un brouillon.",
               "do": [
-                "Commence avec un dépôt propre et tous les tests verts. Dans verifier_chemin, retire temporairement l’instruction qui lève ValueError pour un chemin vide ou composé d’espaces ; ne change pas les tests.",
+                "Commence avec un dépôt propre et tous les tests verts. Dans verifier_chemin, remplace temporairement par pass l’instruction qui lève ValueError pour un chemin vide ou composé d’espaces ; conserve la condition et le reste de la fonction, sans changer les tests.",
                 "Lance la suite : S13 doit échouer, tandis que S11, S12 et S14 à S18 restent verts. Vérifie ces résultats contre le contrat de S13, puis commite uniquement cette erreur volontaire.",
                 "Lance git revert HEAD --no-edit : les tests doivent redevenir verts. Relis les deux commits dans git log.",
                 "Ajoute seulement un commentaire # brouillon dans journal.py ; lance stash push, observe status propre et stash list, puis stash pop.",
