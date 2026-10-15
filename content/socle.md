@@ -178,7 +178,7 @@ Les durées sont des repères compris dans les 300 minutes du parcours.
 
 ### MR1 — feat/bases (100 min)
 
-Tu vas écrire quatre fonctions pures de validation, d’analyse de ligne et de comptage. Tu construis leurs tests au fil des paliers, puis tu livres le tout dans ta première demande de fusion.
+Tu vas écrire quatre fonctions pures de validation, d’analyse de ligne et de comptage. Tu construis leurs tests au fil des paliers, puis tu livres le tout dans ta première pull request GitHub.
 
 **Avant de commencer**
 
@@ -234,7 +234,7 @@ git commit -m "Prépare les exclusions du parcours"
 git status
 ```
 
-**Tu sais que c’est bon quand :** git status affiche « On branch feat/bases » et « nothing to commit, working tree clean ».
+**Tu sais que c’est bon quand :** git status confirme la branche feat/bases et un dépôt propre. Selon la langue de Git, tu peux voir « On branch feat/bases » ou « Sur la branche feat/bases », puis « nothing to commit, working tree clean » ou « rien à valider, la copie de travail est propre ».
 
 **Indices progressifs**
 
@@ -414,14 +414,14 @@ La phase rouge prouve que le test observe une fonction absente ou incorrecte ; l
 <details>
 <summary>Indice 2</summary>
 
-Commence seulement par les noms valides de S1, puis vérifie que les noms ressortent inchangés.
+Commence seulement par les noms valides de S1, puis vérifie que la fonction renvoie True pour chacun.
 
 </details>
 
 <details>
 <summary>Indice 3</summary>
 
-Pour un validateur de couleur, une entrée « bleu » acceptée ressort « bleu » ; ne la remplace pas par une valeur constante pour satisfaire un seul exemple.
+Pour un validateur de couleur, « bleu » peut être admis et produire True ; ne remplace pas la décision par une valeur constante pour satisfaire un seul exemple.
 
 </details>
 
@@ -507,14 +507,15 @@ Gérer deux cas limites, dont une erreur levée volontairement.
 
 - strip() enlève les espaces aux bords du texte ; les espaces au milieu restent présents.
 - TypeError signale que l’argument n’est pas du type demandé. assertRaises vérifie qu’une exception attendue est bien levée.
+- Si tu appelles strip() sur None ou 42 sans vérifier le type, Python lève AttributeError ; le contrat de S5 exige pourtant TypeError.
 
 **Éditeur · Exemple Python à lire ou essayer**
 
 VS Code sur le Mac : place ce code dans un fichier d’exemple jetable, puis lance ce fichier avec python3. Un extrait avec self se place dans une méthode de test.
 
 ```python
-with self.assertRaises(ValueError):
-    int("abc")
+with self.assertRaises(TypeError):
+    len(5)
 ```
 
 **Cas de test à écrire**
@@ -568,14 +569,14 @@ Le type de l’entrée doit être vérifié avant une méthode de chaîne ; stri
 <details>
 <summary>Indice 2</summary>
 
-Compare un nom entouré d’espaces à un nom avec un espace au milieu, puis vérifie qu’un entier produit ValueError.
+Compare un nom entouré d’espaces à un nom avec un espace au milieu, puis vérifie que None et 42 provoquent TypeError.
 
 </details>
 
 <details>
 <summary>Indice 3</summary>
 
-«  livre  ».strip() donne « livre », tandis que « li vre ».strip() garde l’espace intérieur ; 42 n’a pas de méthode strip().
+«  livre  ».strip() donne « livre », tandis que « li vre ».strip() garde l’espace intérieur ; len(5) lève TypeError car 5 n’est pas une séquence.
 
 </details>
 
@@ -799,7 +800,7 @@ Pour les fruits ['pomme', 'poire', 'pomme'], un comptage par nom donne {'pomme':
 
 </details>
 
-#### Palier 8 — Livre ta pull request (10 min)
+#### Palier 8 — Livre ta pull request GitHub (10 min)
 
 Relire ton travail, le pousser sur GitHub et le fusionner proprement.
 
@@ -807,18 +808,26 @@ Relire ton travail, le pousser sur GitHub et le fusionner proprement.
 
 **Pour comprendre**
 
-- git diff montre les lignes modifiées ; git diff --staged montre celles choisies pour le prochain commit. Le diff de la MR compare toute ta branche à main.
-- La demande de fusion (MR dans GitLab, PR dans GitHub) permet de relire le travail avant de l’intégrer à main.
+- git diff montre les lignes modifiées ; git diff --staged montre celles choisies pour le prochain commit. Le diff de la pull request GitHub compare toute ta branche à main.
+- Pour ce dépôt, la pull request GitHub permet de relire le travail avant de l’intégrer à main. Le dépôt GitLab de l’école utilise une merge request.
+
+**Terminal · Lancer la suite complète**
+
+Terminal du Mac, dans cyberatelier/workspaces/socle, venv Mac activé. Exécute chaque ligne au moment indiqué, avec les modifications manuelles entre les blocs.
+
+```bash
+python3 -m unittest -v
+```
 
 **Actions dans l’ordre**
 
 1. Lance la suite complète avec la commande indiquée au début de la mission.
-2. Dans GitHub, vérifie que la PR n’inclut ni fixtures/ ni caches Python. Si gh n’est pas installé, ouvre la PR depuis le site : cet outil est facultatif.
-3. Relis git status et git diff : la livraison doit contenir outils.py, test_outils.py et .gitignore, avec les modifications nécessaires de cette mission.
-4. Ajoute les fichiers par leur nom, relis git diff --staged, puis commite ce qui ne l’est pas encore.
-5. Pousse feat/bases et ouvre la demande de fusion vers main.
-6. Relis le diff dans la demande de fusion. Cette mission n’a pas encore de pipeline : la relecture et les conditions de fusion restent nécessaires.
-7. Fusionne après relecture et, pour GitLab de l’école, après son autorisation.
+2. Relis git status et git diff : la livraison doit contenir outils.py, test_outils.py et .gitignore, avec les modifications nécessaires de cette mission.
+3. Ajoute les fichiers par leur nom, relis git diff --staged, puis commite ce qui ne l’est pas encore.
+4. Pousse feat/bases sur GitHub, puis ouvre une pull request vers main.
+5. Après la création de la pull request, vérifie dans GitHub qu’elle ne contient ni fixtures/ ni caches Python.
+6. Relis le diff dans la pull request GitHub. Cette mission n’a pas encore de pipeline : la relecture et les conditions de fusion restent nécessaires.
+7. Pour ce dépôt GitHub, fusionne la pull request après relecture. Pour un dépôt GitLab de l’école, ouvre une merge request et respecte les autorisations de fusion de ce dépôt.
 8. Après la fusion, reviens sur main et lance git pull --ff-only avant la mission suivante.
 
 **Terminal · Relire l’état du dépôt**
@@ -830,14 +839,25 @@ git status
 git diff main --stat
 ```
 
-**Terminal · Publier la branche ou ouvrir la demande de fusion**
+**Terminal · Pousser la branche sur GitHub**
+
+Terminal du Mac, dans cyberatelier/workspaces/socle, venv Mac activé.
 
 ```bash
 git push -u origin feat/bases
+```
+
+**Terminal · Ouvrir la pull request GitHub**
+
+Terminal du Mac, dans cyberatelier/workspaces/socle, après avoir poussé feat/bases. Cette commande utilise GitHub CLI (gh) ; si gh est absent, ouvre la pull request depuis le site GitHub.
+
+```bash
 gh pr create --base main --title "Bases : validation et analyse de journal" --body "Ajoute outils.py et ses tests S1 à S10."
 ```
 
 **Terminal · Après la fusion : actualiser la principale**
+
+Terminal du Mac, dans cyberatelier/workspaces/socle. Attends que GitHub confirme la fusion de la pull request avant d’exécuter ce bloc.
 
 ```bash
 git switch main
@@ -849,7 +869,7 @@ git switch main
 git pull --ff-only
 ```
 
-**Tu sais que c’est bon quand :** La pull request contient outils.py, test_outils.py et le .gitignore de préparation, et ton main local contient la fusion (git log --oneline).
+**Tu sais que c’est bon quand :** La pull request GitHub contient outils.py, test_outils.py et le .gitignore de préparation, et ton main local contient la fusion (git log --oneline).
 
 **Indices progressifs**
 
@@ -910,7 +930,7 @@ Partir de main à jour, sur une branche neuve, avant d’écrire la moindre lign
 2. Vérifie que MR1 est fusionnée et que outils.py est présent sur main.
 3. Lis git status ; enregistre ton travail en cours avant de changer de branche.
 4. Reviens sur main avec git switch main, mets-la à jour avec git pull --ff-only, puis crée feat/fichiers-erreurs. Remplace main par master si ton dépôt utilise ce nom.
-5. Crée journal.py et test_journal.py, puis lance les tests déjà écrits : ils doivent tous passer.
+5. Crée journal.py et test_journal.py, puis lance les tests de MR1 (S1 à S10) : ils doivent tous rester verts.
 6. Vérifie le nom de ta branche avec git status. Si elle existe déjà, reprends-la avec git switch sans -c.
 
 **Terminal · Après la fusion : actualiser la principale**
@@ -943,6 +963,12 @@ git log --oneline
 
 ```bash
 touch journal.py test_journal.py
+```
+
+**Terminal · Vérifier les tests de MR1**
+
+```bash
+python3 -m unittest -v
 ```
 
 **Terminal · Relire l’état du dépôt**
@@ -1039,21 +1065,21 @@ Depuis le terminal dans `cyberatelier`, `python3 atelier.py indice` révèle un 
 <details>
 <summary>Indice 1</summary>
 
-Valider un chemin vide est une règle pure : elle se teste sans créer de fichier.
+S13 fixe le contrat du chemin : des espaces seuls ne constituent pas une entrée utilisable.
 
 </details>
 
 <details>
 <summary>Indice 2</summary>
 
-Écris S11 avec une chaîne vide et une chaîne d’espaces ; demande ValueError avant toute ouverture de fichier.
+Écris S13 avec les deux entrées refusées et le cas admis ; vérifie cette règle sans chercher le fichier sur le disque.
 
 </details>
 
 <details>
 <summary>Indice 3</summary>
 
-Un champ de dossier «   » devient vide après strip() ; tester ce refus n’a pas besoin d’un disque ni d’un fichier fictif.
+Dans un formulaire de réservation, un champ composé seulement d’espaces reste vide ; un texte comme « salle A » est accepté sans vérifier qu’un fichier existe.
 
 </details>
 
@@ -1306,7 +1332,7 @@ python3 -m unittest -v
 
 ```bash
 git add journal.py test_journal.py
-git commit -m "Ajoute charger_evenements et compte les lignes malformees"
+git commit -m "Ajoute charger_evenements et compte les lignes malformées"
 ```
 
 **Tu sais que c’est bon quand :** S11 à S14 passent. Une liste vide donne ([], 0).
@@ -1474,6 +1500,8 @@ with open("panier.json", encoding="utf-8") as f:
 **Éditeur · Exemple Python à lire ou essayer**
 
 ```python
+import json
+
 try:
     json.loads("[1, 2")
 except json.JSONDecodeError as exc:
@@ -1555,25 +1583,25 @@ Défaire un commit sans réécrire l’historique, mettre une modification de c�
 
 **Actions dans l’ordre**
 
-1. Commence avec un dépôt propre et tous les tests verts. Introduis une erreur dans verifier_chemin, sans changer les tests.
-2. Lance les tests, observe l’échec et commite uniquement cette erreur volontaire.
+1. Commence avec un dépôt propre et tous les tests verts. Dans verifier_chemin, remplace temporairement par pass l’instruction qui lève ValueError pour un chemin vide ou composé d’espaces ; conserve la condition et le reste de la fonction, sans changer les tests.
+2. Lance la suite : S13 doit échouer, tandis que S11, S12 et S14 à S18 restent verts. Vérifie ces résultats contre le contrat de S13, puis commite uniquement cette erreur volontaire.
 3. Lance git revert HEAD --no-edit : les tests doivent redevenir verts. Relis les deux commits dans git log.
 4. Ajoute seulement un commentaire # brouillon dans journal.py ; lance stash push, observe status propre et stash list, puis stash pop.
 5. Vérifie que le commentaire est revenu. Utilise restore uniquement pour retirer ce brouillon, puis vérifie status propre et stash list vide.
 
-**Terminal · Enregistrer le travail vérifié**
+**Terminal · Commande à lancer au moment indiqué**
 
 Terminal du Mac, dans cyberatelier/workspaces/socle, venv Mac activé. Exécute chaque ligne au moment indiqué, avec les modifications manuelles entre les blocs.
 
 ```bash
-git add journal.py
-git commit -m "Casse verifier_chemin (exercice)"
+python3 -m unittest -v
 ```
 
-**Terminal · Commande à lancer au moment indiqué**
+**Terminal · Commiter l’erreur volontaire**
 
 ```bash
-python3 -m unittest -v
+git add journal.py
+git commit -m "Casse verifier_chemin (exercice)"
 ```
 
 **Terminal · Commande à lancer au moment indiqué**
@@ -1631,7 +1659,7 @@ git log --oneline
 git stash list
 ```
 
-**Tu sais que c’est bon quand :** git log --oneline montre « Casse verifier_chemin (exercice) » puis son revert ; git status est propre ; git stash list est vide.
+**Tu sais que c’est bon quand :** git log --oneline montre « Casse verifier_chemin (exercice) » puis son revert ; pendant l’essai, seul le test S13 échoue ; après revert, git status est propre et git stash list est vide.
 
 **Indices progressifs**
 
@@ -1675,9 +1703,9 @@ Vérifier le rapport sur le journal fictif, puis livrer la MR.
 2. Avant la livraison, fais D1 avec une copie locale du journal fictif : lire → charger les événements → construire le rapport. Le nombre de lignes non vides doit égaler lignes_valides + lignes_malformees. Ne commite pas la fixture ni un rapport d’essai.
 3. Relis git status et git diff : la livraison doit contenir journal.py et test_journal.py, avec les modifications nécessaires de cette mission.
 4. Ajoute les fichiers par leur nom, relis git diff --staged, puis commite ce qui ne l’est pas encore.
-5. Pousse feat/fichiers-erreurs et ouvre la demande de fusion vers main.
-6. Relis le diff dans la demande de fusion. Cette mission n’a pas encore de pipeline : la relecture et les conditions de fusion restent nécessaires.
-7. Fusionne après relecture et, pour GitLab de l’école, après son autorisation.
+5. Pousse feat/fichiers-erreurs. Sur GitHub, ouvre une pull request (PR) vers main ; le bloc suivant montre gh pr create. Pour une mission GitLab de l’école, crée une merge request (MR) selon les règles de l’école.
+6. Relis le diff de la PR GitHub ou de la MR GitLab de l’école, selon le dépôt utilisé. Cette mission n’a pas encore de pipeline : la relecture et les conditions de fusion restent nécessaires.
+7. Sur GitHub, fusionne la PR après relecture. Sur GitLab de l’école, fusionne la MR après relecture et autorisation.
 8. Après la fusion, reviens sur main et lance git pull --ff-only avant la mission suivante.
 
 **Terminal · Commande à lancer au moment indiqué**
@@ -1701,14 +1729,21 @@ git status
 git diff main --stat
 ```
 
-**Terminal · Publier la branche ou ouvrir la demande de fusion**
+**Terminal · Pousser la branche**
 
 ```bash
 git push -u origin feat/fichiers-erreurs
+```
+
+**Terminal · Ouvrir la pull request GitHub**
+
+Terminal du Mac, dans cyberatelier/workspaces/socle, venv Mac activé. Ce bloc utilise GitHub CLI pour créer une pull request GitHub. Pour GitLab de l’école, crée une merge request sur le site de l’école.
+
+```bash
 gh pr create --base main --title "Fichiers, erreurs et JSON" --body "Ajoute journal.py et ses tests S11 à S18."
 ```
 
-**Tu sais que c’est bon quand :** lignes_valides + lignes_malformees est égal au nombre affiché par grep. La pull request ne contient que journal.py et test_journal.py (et outils.py si tu l’as modifié, avec une raison).
+**Tu sais que c’est bon quand :** lignes_valides + lignes_malformees est égal au nombre affiché par grep. La pull request GitHub ne contient que journal.py et test_journal.py (et outils.py si tu l’as modifié, avec une raison).
 
 **Indices progressifs**
 
@@ -1745,10 +1780,10 @@ Ces essais lisent des fichiers locaux ou utilisent le labo et les outils réels,
 
 **Avant de livrer**
 
-- python -m unittest passe pour S1 à S18 ; les tests de MR1 (S1 à S10) restent verts.
+- python3 -m unittest -v passe pour S1 à S18 ; les tests de MR1 (S1 à S10) restent verts.
 - Les tests créent leurs fichiers dans un dossier temporaire et ne laissent rien dans le dépôt.
 - git log --oneline montre le commit fautif et son revert ; git stash list est vide à la fin.
-- Le diff de la MR est relu et ne contient que journal.py, test_journal.py et les modifications éventuelles de outils.py justifiées.
+- Le diff de la pull request GitHub est relu et ne contient que journal.py, test_journal.py et les modifications éventuelles de outils.py justifiées.
 - Chaque palier de code a son commit, avec le message donné dans le palier.
 
 ### MR3 — feat/analyseur (70 min)
@@ -1852,13 +1887,8 @@ Séparer le calcul du texte et son affichage : une fonction qui renvoie une cha�
 VS Code sur le Mac : copie cet exemple dans exemple.py (jetable), enregistre-le, puis lance python3 exemple.py. Si plusieurs exemples sont proposés, essaie-les un par un en remplaçant le contenu du fichier. Retire ensuite les fichiers générés et le fichier d’exemple.
 
 ```python
-def afficher_panier(articles):
-    lignes = []
-    for nom in sorted(articles):
-        lignes.append(f"{nom} : {articles[nom]}")
-    return "\n".join(lignes)
-
-print(afficher_panier({"pomme": 3, "banane": 1}))
+mots = ["kiwi", "abricot", "figue"]
+print(", ".join(sorted(mots)))
 ```
 
 **Règles à respecter**
@@ -1912,7 +1942,7 @@ Le formatage transforme un dictionnaire en texte ; l’ordre et les retours à l
 <details>
 <summary>Indice 2</summary>
 
-Écris S18 en comparant la chaîne entière, puis construis l’affichage depuis les données sans relire le journal.
+Écris S19 en comparant la chaîne entière, puis construis l’affichage depuis les données sans relire le journal.
 
 </details>
 
@@ -1980,7 +2010,7 @@ Le cas sans échec doit avoir un affichage prévu ; une collection vide n’est 
 <details>
 <summary>Indice 2</summary>
 
-Écris S19 avec le rapport sans échec et compare sa chaîne entière au texte attendu, sans laisser une ligne de classement inventée.
+Écris S20 avec le rapport sans échec et compare sa chaîne entière au texte attendu, sans laisser une ligne de classement inventée.
 
 </details>
 
@@ -2000,30 +2030,25 @@ Faire renvoyer un code de retour à main, sans jamais quitter le programme soi-m
 **Pour comprendre**
 
 - argv est ici une liste d’arguments, sans le nom du script. main(argv) la reçoit et rend un entier : les tests peuvent l’appeler comme une fonction.
-- stdout porte le résultat ; stderr porte les erreurs. redirect_stdout et redirect_stderr permettent au test de lire ces sorties dans StringIO.
+- stdout est la sortie normale ; stderr reçoit les messages d’erreur. Dans les tests, redirect_stdout et redirect_stderr redirigent temporairement ces sorties vers io.StringIO, un flux de texte en mémoire que le test peut relire.
 
 **Éditeur · Exemple Python à lire ou essayer**
 
 VS Code sur le Mac : copie cet exemple dans exemple.py (jetable), enregistre-le, puis lance python3 exemple.py. Si plusieurs exemples sont proposés, essaie-les un par un en remplaçant le contenu du fichier. Retire ensuite les fichiers générés et le fichier d’exemple.
 
 ```python
-import sys
-
-def signaler(message):
-    print(message, file=sys.stderr)
-    return 2
-
-print(signaler("usage : exemple FICHIER"))
+try:
+    nombre = int("douze")
+except ValueError:
+    print("Cette valeur ne représente pas un entier.")
 ```
 
 **Éditeur · Exemple Python à lire ou essayer**
 
 ```python
-try:
-    with open("inexistant.txt", encoding="utf-8") as f:
-        print(f.read())
-except FileNotFoundError:
-    print("fichier introuvable")
+import sys
+
+print("Message envoyé sur la sortie d’erreur.", file=sys.stderr)
 ```
 
 **Exemple de résultat attendu**
@@ -2141,7 +2166,7 @@ python3 -m unittest -v
 
 ```bash
 git add analyseur.py test_analyseur.py
-git commit -m "Affiche le rapport et renvoie 0 en cas de succes"
+git commit -m "Affiche le rapport et renvoie 0 en cas de succès"
 ```
 
 **Tu sais que c’est bon quand :** S19 à S23 passent.
@@ -2304,8 +2329,8 @@ python3 -m unittest -v
 **Terminal · Enregistrer le travail vérifié**
 
 ```bash
-git add README.md .gitignore
-git commit -m "Ajoute le README et complete le .gitignore"
+git add README.md
+git commit -m "Ajoute le README"
 ```
 
 **Tu sais que c’est bon quand :** git status est propre, et le README contient les trois codes de retour et la mention des données fictives.
@@ -2423,13 +2448,19 @@ grep -n "<<<<<<<\|=======\|>>>>>>>" README.md
 
 ```bash
 git add README.md
-git commit -m "Resout le conflit du titre (exercice)"
+git commit -m "Résout le conflit du titre (exercice)"
 ```
 
 **Terminal · Commande à lancer au moment indiqué**
 
 ```bash
 grep -c "<<<<<<<\|=======\|>>>>>>>" README.md
+```
+
+**Terminal · Observer le graphe avant le nettoyage**
+
+```bash
+git log --oneline --graph --all
 ```
 
 **Terminal · Commande à lancer au moment indiqué**
@@ -2475,25 +2506,27 @@ Deux branches qui remplacent « Titre A » par « Titre B » et « Titre C » ex
 
 #### Palier 9 — Rebase local, tag v0.1.0 et pull request (8 min)
 
-Replacer ta branche au-dessus d’un main qui a avancé, poser un tag annoté, puis ouvrir la MR.
+Replacer ta branche au-dessus d’un main qui a avancé, ouvrir une pull request (GitHub), puis poser le tag v0.1.0 après sa fusion.
 
 **Où tu travailles :** Mac · workspaces/socle · Historique Git ; PR GitHub
 
 **Pour comprendre**
 
 - Un rebase rejoue les commits de ta branche sur une base qui a avancé. Il peut changer leurs identifiants : fais cet exercice avant le premier push.
+- Le commit ajouté sur main local se retrouve dans la branche après le rebase. « Create a merge commit » conserve ce commit dans l’historique distant ; une fusion squash ou rebase ne le ferait pas et empêcherait main local d’avancer avec git pull --ff-only.
 - Un tag annoté associe un nom de version, un message et un auteur à un commit précis.
 
 **Actions dans l’ordre**
 
-1. Commence avec un dépôt propre. Sur main local, ajoute le commentaire d’exercice à outils.py et commite-le ; ce commit sera inclus dans la PR, sans push direct de main.
+1. Commence avec un dépôt propre. Sur main local, ajoute un commentaire d’exercice à outils.py et commite-le ; ce commit servira à pratiquer le rebase, sans push direct de main.
 2. Reviens sur feat/analyseur et rebase sur main. En cas de conflit : corrige, git add, puis rebase --continue ; rebase --abort annule l’opération.
-3. Relance tous les tests et observe le graphe des commits après le rebase.
-4. Crée le tag annoté v0.1.0 avec un message, puis vérifie le commit désigné avec git show.
-5. Relis le diff contre origin/main, pousse feat/analyseur et ouvre la PR. Mentionne le rebase et le commentaire d’exercice.
-6. Pousse le tag séparément lorsqu’il est autorisé, puis fusionne après relecture et mets main à jour.
+3. Relance tous les tests et observe le graphe des commits après le rebase. Relis aussi le diff contre origin/main.
+4. Pousse feat/analyseur, puis crée une pull request (PR) sur GitHub et mentionne le rebase et le commentaire d’exercice.
+5. Après relecture, choisis « Create a merge commit » dans GitHub pour fusionner la PR. Cette méthode conserve l’ascendance du commit local créé sur main et permet ensuite la mise à jour avec git pull --ff-only.
+6. Attends que GitHub confirme la fusion de la PR. Après cette confirmation seulement, reviens sur main et mets-la à jour avec git pull --ff-only.
+7. Sur main à jour après la fusion, crée le tag annoté v0.1.0, vérifie le commit qu’il désigne avec git show v0.1.0, puis pousse le tag.
 
-**Terminal · Après la fusion : actualiser la principale**
+**Terminal · Sur main local, avant le rebase**
 
 Terminal du Mac, dans cyberatelier/workspaces/socle, venv Mac activé. Exécute chaque ligne au moment indiqué, avec les modifications manuelles entre les blocs.
 
@@ -2501,57 +2534,88 @@ Terminal du Mac, dans cyberatelier/workspaces/socle, venv Mac activé. Exécute 
 git switch main
 ```
 
-**Terminal · Enregistrer le travail vérifié**
+**Terminal · Enregistrer le commit qui fait avancer main**
 
 ```bash
 git add outils.py
-git commit -m "Ajoute un commentaire d’en-tete a outils.py"
+git commit -m "Ajoute un commentaire d’en-tête à outils.py"
 ```
 
-**Terminal · Commande à lancer au moment indiqué**
+**Terminal · Revenir sur la branche de la mission**
 
 ```bash
 git switch feat/analyseur
 ```
 
-**Terminal · Commande à lancer au moment indiqué**
+**Terminal · Rejouer les commits sur main**
 
 ```bash
 git rebase main
 ```
 
-**Terminal · Relire l’état du dépôt**
+**Terminal · Relancer les tests**
 
 ```bash
-git log --oneline --graph
+python3 -m unittest -v
 ```
 
-**Terminal · Commande à lancer au moment indiqué**
+**Terminal · Observer le graphe des branches**
 
 ```bash
-git tag -a v0.1.0 -m "Analyseur de journal, version 0.1.0"
+git log --oneline --graph --all
 ```
 
-**Terminal · Commande à lancer au moment indiqué**
-
-```bash
-git tag -l
-```
-
-**Terminal · Relire l’état du dépôt**
+**Terminal · Relire le diff avant publication**
 
 ```bash
 git diff origin/main --stat
 ```
 
-**Terminal · Publier la branche ou ouvrir la demande de fusion**
+**Terminal · Pousser la branche de la mission**
 
 ```bash
 git push -u origin feat/analyseur
+```
+
+**Terminal · Ouvrir la pull request sur GitHub**
+
+```bash
 gh pr create --base main --title "Analyseur de journal" --body "Ajoute analyseur.py, test_analyseur.py et le README (S19 à S24)."
 ```
 
-**Tu sais que c’est bon quand :** git log --oneline --graph montre feat/analyseur posée au-dessus du commit de main ; git tag -l affiche v0.1.0 ; le README ne contient plus de marqueur de conflit.
+**Terminal · Après confirmation de la fusion : revenir sur main**
+
+Terminal du Mac, dans cyberatelier/workspaces/socle, venv Mac activé. Exécute chaque ligne au moment indiqué, avec les modifications manuelles entre les blocs. Exécute ce bloc seulement après la confirmation GitHub que la pull request a été fusionnée avec « Create a merge commit ».
+
+```bash
+git switch main
+```
+
+**Terminal · Après confirmation de la fusion : actualiser main**
+
+```bash
+git pull --ff-only
+```
+
+**Terminal · Après confirmation de la fusion : créer le tag annoté**
+
+```bash
+git tag -a v0.1.0 -m "Analyseur de journal, version 0.1.0"
+```
+
+**Terminal · Vérifier le commit désigné après la fusion**
+
+```bash
+git show v0.1.0
+```
+
+**Terminal · Publier le tag après la fusion**
+
+```bash
+git push origin v0.1.0
+```
+
+**Tu sais que c’est bon quand :** Après confirmation d’une fusion GitHub par « Create a merge commit », git pull --ff-only avance main local jusqu’au commit de fusion. Le tag annoté v0.1.0 pointe vers ce commit ; git show v0.1.0 affiche son message et son commit. Le README ne contient aucun marqueur de conflit.
 
 **Indices progressifs**
 
@@ -2560,21 +2624,21 @@ Depuis le terminal dans `cyberatelier`, `python3 atelier.py indice` révèle un 
 <details>
 <summary>Indice 1</summary>
 
-rebase rejoue des commits sur une nouvelle base ; un tag annoté nomme un commit de livraison.
+Rappel : rebase rejoue les commits de ta branche sur une nouvelle base ; un tag annoté nomme un commit de livraison.
 
 </details>
 
 <details>
 <summary>Indice 2</summary>
 
-Termine la relecture et les essais Git, reviens sur la branche utile, puis vérifie le commit visé par le tag après la fusion.
+Piste : après la relecture, choisis « Create a merge commit » dans GitHub. Attends la confirmation de fusion avant d’actualiser main et de poser le tag.
 
 </details>
 
 <details>
 <summary>Indice 3</summary>
 
-git show v0.2.0 dans un dépôt d’essai permet de voir le message du tag et le commit nommé ; le nom de tag seul ne garantit pas le bon contenu.
+Exemple : après confirmation d’une fusion « Create a merge commit », git switch main puis git pull --ff-only mettent main à jour ; git show v0.1.0 permet ensuite de contrôler le tag.
 
 </details>
 
@@ -2588,10 +2652,11 @@ Ces essais lisent des fichiers locaux ou utilisent le labo et les outils réels,
 
 **Avant de livrer**
 
-- python -m unittest passe pour S1 à S24, et les tests créent leurs fichiers dans un dossier temporaire.
+- python3 -m unittest -v passe pour S1 à S24, et les tests créent leurs fichiers dans un dossier temporaire.
 - Le conflit de fusion a été résolu à la main : aucun marqueur <<<<<<< , ======= ou >>>>>>> ne reste dans README.md.
-- git log --oneline --graph montre la branche rebasée sur main ; le tag v0.1.0 est présent dans git tag -l.
-- La merge request vers la branche principale a été relue ; les branches exercice/ ont été supprimées et ne figurent pas sur GitLab.
+- git log --oneline --graph --all montre feat/analyseur rebasée sur main.
+- Après confirmation de la fusion GitHub avec « Create a merge commit », main local est à jour et le tag v0.1.0 désigne le commit de fusion.
+- La pull request GitHub a été relue ; les branches exercice/ ont été supprimées localement et n’apparaissent pas dans les branches distantes GitHub.
 - Chaque palier de code a son commit, avec le message donné dans le palier.
 
 <!-- END GENERATED EXERCISES -->
